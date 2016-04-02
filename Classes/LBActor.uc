@@ -26,7 +26,8 @@ function InitMechanisms()
     //init mechanisms
     for(i=0;i<AllMechanisms.length;i++)
     {
-        AllMechanisms[i].parent=self;
+        if(AllMechanisms[i].parent==none)
+            AllMechanisms[i].parent=self;
     }
 }
 
@@ -84,6 +85,21 @@ function SetParamFloat(name mechanism, name param, float value)
         
     m.SetParamFloat(param, value);    
 }
+
+
+function float GetParamFloat(name mechanism, name param)
+{
+    local LBMechanism m;
+    local float res;
+    
+    m=GetMechanismByName(mechanism);
+    if(m==none)
+        return 0;
+        
+    res=m.GetParamFloat(param);    
+    return res;
+}
+
 
 function SetParamVector(name mechanism, name param, vector value)
 {

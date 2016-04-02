@@ -7,7 +7,9 @@
 class LBMechanism extends Object 
 editinlinenew;
 
- var actor parent; //parent actor
+ var(MechanismBase) actor parent; //parent actor
+ var(MechanismBase) class<Actor> parentclass;
+ 
  var(MechanismBase) bool benabled; //whether this mechanism is currently enabled
  
  var bool bfirsttick; //whether this is the first tick and we should do some inits
@@ -37,6 +39,21 @@ function SetParamVector(name param, vector value)
  
 function SetParamRotator(name param, rotator value)
 {}    
+    
+function object GetParam(name param)
+{}
+    
+function int GetParamInt(name param)
+{}    
+
+function float GetParamFloat(name param)
+{}      
+
+function vector GetParamVector(name param)
+{} 
+ 
+function rotator GetParamRotator(name param)
+{}        
     
 event OwnerTick(float deltatime)
 {

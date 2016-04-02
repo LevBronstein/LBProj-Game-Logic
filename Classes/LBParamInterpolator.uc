@@ -15,7 +15,7 @@ struct PhaseParameter
 struct ParameterFrame
 {
         //CONSTANT!!!
-    var() string ParameterName; //the name of the parameter
+    var() name ParameterName; //the name of the parameter
     var() array<PhaseParameter> KeyFrames; //array of phase parameters to be used as keyframes
     var() bool bDiscrete;
 };
@@ -48,6 +48,7 @@ var(Playback) Playback_Status Playback; //current playback status
 var(Playback) Time_Loop TimeFlow; // do we need to limit time between t0 and t1
 var(Playback) Time_Control TimeManager; // what to do after timer reaches t1
 var(ParamFrames) array<ParameterFrame> Params;
+var array<float> CurParamValues;
 
 function float CalcParamInTime(int param, float t)
 {
@@ -76,14 +77,6 @@ function float CalcParamInTime(int param, float t)
         }     
     }
     
-    //`log(t@"lastkey"@lastkey);
-    
-    //if (lastkey==0)
-    //{
-    //    //`log(t@"param"@Params[param].ParameterName@"value"@res);
-    //    return Params[param].KeyFrames[0].PhaseValue;
-    //}
-        
     //иначе переходит из состояния lastkey-1 в состояние lastkey
     //расстояние между lastkey-1 и lastkey равняется KeyFrames[lastkey-1].PhaseLength 
     //итого получаем процент отдаления от lastkey-1 к lastkey   
@@ -93,14 +86,30 @@ function float CalcParamInTime(int param, float t)
     //если фазовый параметр в lastkey не является дискретным, то применяется интерполяция
     if(!Params[param].bDiscrete)
     {
-        res=lerp(Params[param].KeyFrames[lastkey-1].PhaseValue, Params[param].KeyFrames[lastkey].PhaseValue, t0);
+        if (lastkey>=Params[param].KeyFrames.Length)
+            res=Params[param].KeyFrames[Params[param].KeyFrames.Length-1].PhaseValue;
+        else
+            res=lerp(Params[param].KeyFrames[lastkey-1].PhaseValue, Params[param].KeyFrames[lastkey].PhaseValue, t0);
     }
     else
     {
         res=Params[param].KeyFrames[lastkey-1].PhaseValue;
     }
-    //`log(t@"param"@Params[param].ParameterName@"value"@res);
+
+    CurParamValues[param]=res;
     return res;
+}
+
+function Initialize()
+{
+    CurParamValues.Length=Params.Length;
+}
+
+function FirstTickInit()
+{
+    super.FirstTickInit();
+    
+    Initialize();
 }
 
 event OwnerTick(float deltatime)
@@ -112,7 +121,9 @@ event OwnerTick(float deltatime)
     if (Playback==PLAYBACK_ONTICK)
     { 
         Play(); 
-    }    
+    }  
+  
+    //`log("TestParam"@GetParamFloat('TestParam'));
 }
 
 function Play()
@@ -182,8 +193,21 @@ function PlayCurFrame()
 }
 
 function SetParamFloat(name param, float value)
-{}    
+{
+    
+}    
 
+function float GetParamFloat(name param)
+{
+    local int i;
+    
+    for (i=0; i<Params.Length; i++)
+    {
+        if (Params[i].ParameterName==param)
+            return CurParamValues[i]; 
+    }
+}     
+    
 defaultproperties
 {
 }
