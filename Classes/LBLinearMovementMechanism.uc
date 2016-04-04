@@ -6,12 +6,23 @@
  */
 class LBLinearMovementMechanism extends LBMechanism;
 
-var(ParamSource) name ParameterSource;
-var(ParamSource) name ForwardSpeedParam;
-var(ParamSource) name AngularSpeedParam;
-var(ParamSource) bool bUseParamSource;
-var(LinearMovement) float FwdSpeed;
-var(LinearMovement) float AngSpeed;
+var(ParamSource) name ParameterSource; //A mechanism, from which we get all params via GetParamFloat
+var(ParamSource) name ForwardSpeedParam; //A name for a float param, that sets the FwdSpeed
+var(ParamSource) name AngularSpeedParam; //A name for a float param, that sets the AngSpeed
+var(ParamSource) bool bUseParamSource; //Defines whether we should get params (from ParameterSource)
+var(LinearMovement) float FwdSpeed; //Forward speed if < 0 then moves backwards
+var(LinearMovement) float kFwdSpeed; //Coefficient that modifies the FwdSpeed: k*FwdSpeed
+var(LinearMovement) float AngSpeed; //Angular speed turns right or left if <0
+var(LinearMovement) float kAngSpeed; //Coefficient that modifies the AngSpeed: k*AngSpeed
+var(Debug) bool bShowDebugLines; //Display debug in game
+var(Debug) bool bLogDebugInfo; //Display debug in game
+
+var float currot;
+
+function FirstTickInit()
+{
+    super.FirstTickInit();
+}
 
 event OwnerTick(float deltatime)
 {
@@ -20,35 +31,62 @@ event OwnerTick(float deltatime)
     if(benabled==false)
         return;
     
-    PerformMovement();
     if (bUseParamSource)
-    GetParameters();
+        GetParameters();
+        
+    PerformMovement();  
 }
 
 function PerformMovement()
 {
     local vector v;
     local rotator r;
+  
+    r=rot(0,0,0);
+    currot=currot+AngSpeed;
     
-    v.x=FwdSpeed;
-    v=v<<parent.rotation;
-    r=parent.rotation;
-    r.yaw+=AngSpeed*DegToUnrRot;
-    parent.Move(v);
+    r.yaw=currot*DegToUnrRot;
     parent.SetRotation(r);
+    
+    v=vect(0,0,0);
+    v.x=FwdSpeed;
+    v=v>>parent.rotation;
+    
+    parent.Velocity=v*kFwdSpeed;
+    
+    if (bShowDebugLines)
+        parent.DrawDebugLine(parent.location+vect(0,0,25), parent.location+parent.Velocity+vect(0,0,25), 0, 255, 0);
+    
+    if (bLogDebugInfo)
+        `log(mechname@":"@v@r*unrrottodeg@"|"@FwdSpeed@AngSpeed);
+    
 }
 
 function GetParameters()
 {
     //всё же как преобразовать в parentclass?
-    FwdSpeed=LBActor(parent).GetParamFloat(ParameterSource,ForwardSpeedParam);
-    AngSpeed=LBActor(parent).GetParamFloat(ParameterSource,AngularSpeedParam);
+    if (LBActor(parent)!=none)
+    {
+        FwdSpeed=LBActor(parent).GetParamFloat(ParameterSource,ForwardSpeedParam);
+        AngSpeed=LBActor(parent).GetParamFloat(ParameterSource,AngularSpeedParam);
+        return;
+    }
+    if (LBPawn(parent)!=none)
+    {
+        FwdSpeed=LBPawn(parent).GetParamFloat(ParameterSource,ForwardSpeedParam);
+        AngSpeed=LBPawn(parent).GetParamFloat(ParameterSource,AngularSpeedParam);
+        return;
+    }
 }
 
 defaultproperties
 {
-    ParameterSource=''
+    ParameterSource=""
     bUseParamSource=false
     FwdSpeed=0
+    kFwdSpeed=100
     AngSpeed=0
+    kAngSpeed=1
+    
+    currot=0
 }

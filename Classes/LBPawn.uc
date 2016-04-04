@@ -1,16 +1,14 @@
 /**
- *  MyProjMechanismDrivenActor
+ *  LBPawn
  *
- *  Creation date: 21.02.2016 22:46
+ *  Creation date: 04.04.2016 21:34
  *  Copyright 2016, Windows7
  */
-class LBActor extends Actor
+class LBPawn extends Pawn
 placeable
 ClassGroup(LevBronstein);
 
-var(Mechanisms) instanced array<LBMechanism> AllMechanisms; //mechanisms used for this actor
-var(Mechanisms) const StaticMeshComponent Mesh; //Mesh for this actor
-var(Mechanisms) const editconst DynamicLightEnvironmentComponent LightEnvironment;
+var (Mechanisms) instanced array<LBMechanism> AllMechanisms; //mechanisms used for this pawn
 
 event PostBeginPlay()
 {
@@ -26,8 +24,7 @@ function InitMechanisms()
     //init mechanisms
     for(i=0;i<AllMechanisms.length;i++)
     {
-        if(AllMechanisms[i].parent==none)
-            AllMechanisms[i].parent=self;
+        AllMechanisms[i].parent=self;
     }
 }
 
@@ -52,6 +49,12 @@ function LBMechanism GetMechanismByName(name mechname)
     }
     return none;
 }
+
+event Tick(float deltatime)
+{
+    TickAllMechanisms(deltatime);
+}
+
 
 /********************** SET PARAM OVERLOADS **********************/
 
@@ -126,34 +129,27 @@ function SetParamRotator(name mechanism, name param, rotator value)
     m.SetParamRotator(param, value);    
 }
 
-event Tick(float deltatime)
-{
-    TickAllMechanisms(deltatime);
-}
-
-
-
 defaultproperties
 {
-    //bShouldShadowParentAllAttachedActors=TRUE
+    bRunPhysicsWithNoController=true
+
+    bStatic = False
     
-    bStatic=false
-    bWorldGeometry=false
-    //bPawnCanBaseOn=true
-    bShadowParented=true
-    
+    Components.Remove(Sprite)
+   
     Begin Object Class=DynamicLightEnvironmentComponent Name=MyLightEnvironment
-        bEnabled=TRUE
-    End Object
- 
-    LightEnvironment=MyLightEnvironment
-    Components.Add(MyLightEnvironment)
+      bSynthesizeSHLight=TRUE
+      bIsCharacterLightEnvironment=TRUE
+      bUseBooleanEnvironmentShadowing=FALSE
+   End Object
+   Components.Add(MyLightEnvironment)
+   LightEnvironment=MyLightEnvironment
     
-    Begin Object Class=StaticMeshComponent Name=BaseMesh
-        StaticMesh=StaticMesh'EngineMeshes.Sphere'
-        LightEnvironment=MyLightEnvironment
-    End Object
-    Components.Add(BaseMesh)
-    Mesh=BaseMesh
-    CollisionComponent=Mesh
+    Begin Object Class=SkeletalMeshComponent Name=WPawnSkeletalMeshComponent
+       //Your Mesh Properties
+       LightEnvironment=MyLightEnvironment
+   End Object
+   Mesh=WPawnSkeletalMeshComponent
+   Components.Add(WPawnSkeletalMeshComponent)
+
 }

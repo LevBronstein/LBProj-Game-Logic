@@ -55,7 +55,7 @@ function float CalcParamInTime(int param, float t)
     local int i;
     local int lastkey;
     local float ct;
-    local float t0;
+    local float tt;
     local float res;
     
     if (Params.Length==0 ||Params[param].KeyFrames.Length==0)
@@ -80,8 +80,8 @@ function float CalcParamInTime(int param, float t)
     //иначе переходит из состояния lastkey-1 в состояние lastkey
     //расстояние между lastkey-1 и lastkey равняется KeyFrames[lastkey-1].PhaseLength 
     //итого получаем процент отдаления от lastkey-1 к lastkey   
-    t0=min(abs(t-ct), Params[param].KeyFrames[lastkey-1].PhaseLength);
-    t0=1-(t0/Params[param].KeyFrames[lastkey-1].PhaseLength); //что, если PhaseLength=0?
+    tt=min(abs(t-ct), Params[param].KeyFrames[lastkey-1].PhaseLength);
+    tt=1-(tt/Params[param].KeyFrames[lastkey-1].PhaseLength); //что, если PhaseLength=0?
     
     //если фазовый параметр в lastkey не является дискретным, то применяется интерполяция
     if(!Params[param].bDiscrete)
@@ -89,7 +89,7 @@ function float CalcParamInTime(int param, float t)
         if (lastkey>=Params[param].KeyFrames.Length)
             res=Params[param].KeyFrames[Params[param].KeyFrames.Length-1].PhaseValue;
         else
-            res=lerp(Params[param].KeyFrames[lastkey-1].PhaseValue, Params[param].KeyFrames[lastkey].PhaseValue, t0);
+            res=lerp(Params[param].KeyFrames[lastkey-1].PhaseValue, Params[param].KeyFrames[lastkey].PhaseValue, tt);
     }
     else
     {
