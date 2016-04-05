@@ -91,22 +91,6 @@ function SetParamFloat(name mechanism, name param, float value)
     m.SetParamFloat(param, value);    
 }
 
-/********************** GET PARAM OVERLOADS **********************/
-
-function float GetParamFloat(name mechanism, name param)
-{
-    local LBMechanism m;
-    local float res;
-    
-    m=GetMechanismByName(mechanism);
-    if(m==none)
-        return 0;
-        
-    res=m.GetParamFloat(param);    
-    return res;
-}
-
-
 function SetParamVector(name mechanism, name param, vector value)
 {
     local LBMechanism m;
@@ -127,6 +111,22 @@ function SetParamRotator(name mechanism, name param, rotator value)
         return;
         
     m.SetParamRotator(param, value);    
+}
+
+
+/********************** GET PARAM OVERLOADS **********************/
+
+function float GetParamFloat(name mechanism, name param)
+{
+    local LBMechanism m;
+    local float res;
+    
+    m=GetMechanismByName(mechanism);
+    if(m==none)
+        return 0;
+        
+    res=m.GetParamFloat(param);    
+    return res;
 }
 
 defaultproperties
