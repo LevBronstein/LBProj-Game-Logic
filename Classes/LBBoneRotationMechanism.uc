@@ -31,7 +31,10 @@ function FirstTickInit()
         bfirsttick=false;
         
     bonecontroller=SkelControlSingleBone(LBPawn(parent).Mesh.FindSkelControl(BoneRotationController));
-    `log(">>>>>>>>>>"@mechname@": bonecontroller="@bonecontroller);
+    if (bonecontroller==none)
+    {
+        `log(">>>"@mechname@": bonecontroller <"@BoneRotationController@"> not found!");
+    }
 }
 
 event OwnerTick(float deltatime)
