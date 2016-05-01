@@ -15,6 +15,7 @@ editinlinenew;
  var bool bfirsttick; //whether this is the first tick and we should do some inits
  
  var(MechanismBase) name mechname; //id of the current mech to find it out
+ var(MechanismDebug) bool bLogDebug;
  
  
 function FirstTickInit()
@@ -62,8 +63,16 @@ event OwnerTick(float deltatime)
         return;
 }
 
+function LogError(string message)
+{
+    if (bLogDebug)
+    `log(">>"@mechname@message@"<<");
+}
+    
 defaultproperties
 {
     bfirsttick=true
     benabled=true
+    
+    bLogDebug=false
 }

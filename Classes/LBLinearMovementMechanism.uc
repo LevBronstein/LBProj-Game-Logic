@@ -14,8 +14,7 @@ var(LinearMovement) float FwdSpeed; //Forward speed if < 0 then moves backwards
 var(LinearMovement) float kFwdSpeed; //Coefficient that modifies the FwdSpeed: k*FwdSpeed
 var(LinearMovement) float AngSpeed; //Angular speed turns right or left if <0
 var(LinearMovement) float kAngSpeed; //Coefficient that modifies the AngSpeed: k*AngSpeed
-var(Debug) bool bShowDebugLines; //Display debug in game
-var(Debug) bool bLogDebugInfo; //Display debug in game
+var(MechanismDebug) bool bShowDebugLines; //Display debug in game
 
 var float currot;
 
@@ -57,7 +56,7 @@ function PerformMovement()
     if (bShowDebugLines)
         parent.DrawDebugLine(parent.location+vect(0,0,25), parent.location+parent.Velocity+vect(0,0,25), 0, 255, 0);
     
-    if (bLogDebugInfo)
+    if (bLogDebug)
         `log(mechname@":"@v@r*unrrottodeg@"|"@FwdSpeed@AngSpeed);
     
 }
