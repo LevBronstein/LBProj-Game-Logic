@@ -33,7 +33,7 @@ function FirstTickInit()
     bonecontroller=SkelControlSingleBone(LBPawn(parent).Mesh.FindSkelControl(BoneRotationController));
     if (bonecontroller==none)
     {
-        `log(">>>"@mechname@": bonecontroller <"@BoneRotationController@"> not found!");
+        LogError("bonecontroller <"@BoneRotationController@"> not found!");
     }
 }
 
@@ -60,7 +60,7 @@ function PerformRotation()
         bonecontroller.BoneRotation.Pitch=pitchrot*DegToUnrRot;
         if (bApplyRoll)
         bonecontroller.BoneRotation.Roll=rollrot*DegToUnrRot;
-        `log(">>>>>>>>>>"@mechname@": yawrot="@yawrot@"real rot:"@bonecontroller.BoneRotation); 
+        //`log(">>>>>>>>>>"@mechname@": yawrot="@yawrot@"real rot:"@bonecontroller.BoneRotation); 
     }
 }
 

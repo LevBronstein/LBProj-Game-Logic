@@ -13,7 +13,8 @@ var(XenoCrystMaster) name LEyeSocket;
 var(XenoCrystMaster) name REyeSocket;
 var(XenoCrystMaster) name TrueRayOriginSocket;
 var(XenoCrystMaster) float MaxRayLength; //The length of the ray. Warning! Can slow down the game!
- 
+var(XenoCrystMaster) name ReflectiveMaterial; //The material which allows our rays to bounce
+
 function FirstTickInit()
 {
     if (bfirsttick==false)
@@ -48,9 +49,36 @@ function GetParameters()
     }
 }
  
+function actor DrawBeam(vector origin, vector target, out vector hitloc, out vector hitnormal, optional bool bDrawTrace=false)
+{
+    local LBPawn p;
+    local Actor hit;
+    
+    p=LBPawn(parent);
+    if (parent==none)
+    {
+        LogError("proc: DrawBeam(), parent is not an LBPawn or none:" @parent);   
+        return none;    
+    }
+    
+    hit=p.Trace(hitloc, hitnormal, target, origin);
+    
+    if (bDrawTrace==false)
+        return hit;
+    
+    if (hit!=none)
+        p.DrawDebugLine(origin, hitloc, 0, 255, 128);
+    else
+        p.DrawDebugLine(origin, target, 0, 255, 128);
+        
+    return hit;
+}
+
 function DrawBeams()
 {
     local LBPawn p;
+    local TraceHitInfo tinf;
+    local Actor hit;
     local vector l, d; 
     local rotator r;
     local vector h, n;
@@ -70,36 +98,23 @@ function DrawBeams()
     d=vect(0,0,1)>>r;
     d=Normal(d);
     
-    if (p.Trace(oh, on, l+d*(MaxRayLength+MaxRayLength*0.134), l)==none)
-    {
-        //if hits nothing - return right here
-        p.Mesh.GetSocketWorldLocationAndRotation(LEyeSocket, l, r, 0);
-        d=vect(0,0,1)>>r;
-        p.DrawDebugLine(l, l+d*MaxRayLength, 0, 255, 128);
-        p.Mesh.GetSocketWorldLocationAndRotation(REyeSocket, l, r, 0);
-        d=vect(0,0,1)>>r;
-        p.DrawDebugLine(l, l+d*MaxRayLength, 0, 255, 128);
-        return;
-    }
+    hit=DrawBeam(l, l+d*(MaxRayLength+MaxRayLength*0.134), oh, on, false);
     
     p.Mesh.GetSocketWorldLocationAndRotation(LEyeSocket, l, r, 0);
-    p.DrawDebugLine(l, oh, 0, 255, 128);
+    DrawBeam(l, oh, h, n, true);
     p.Mesh.GetSocketWorldLocationAndRotation(REyeSocket, l, r, 0);
-    p.DrawDebugLine(l, oh, 0, 255, 128);
+    DrawBeam(l, oh, h, n, true);
     
-    for (i=0;i<4; i++)
+    for (i=0;i<4;i++)
     {
-        if (p.Trace(h, n, oh+on*MaxRayLength, oh)!=none)
+        if (LBActor(hit)!=none)
         {
-            p.DrawDebugLine(oh, h, 0, 255, 128);  
+            hit=DrawBeam(oh, oh+on*MaxRayLength, h, n, true);
             oh=h;
             on=n;
         }
         else
-        {
-            p.DrawDebugLine(oh, oh+on*MaxRayLength, 0, 255, 128); 
-            break;
-        }
+            return;
     }
 }
    
@@ -109,6 +124,7 @@ defaultproperties
     LEyeSocket="LeftEye"
     REyeSocket="RightEye"
     TrueRayOriginSocket="RayOrigin"
+    ReflectiveMaterial="Mirror"
     
     MaxRayLength=10240
 }

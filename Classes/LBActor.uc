@@ -9,8 +9,8 @@ placeable
 ClassGroup(LevBronstein);
 
 var(Mechanisms) instanced array<LBMechanism> AllMechanisms; //mechanisms used for this actor
-var(Mechanisms) const StaticMeshComponent Mesh; //Mesh for this actor
-var(Mechanisms) const editconst DynamicLightEnvironmentComponent LightEnvironment;
+var(LBActor) const StaticMeshComponent Mesh; //Mesh for this actor
+var(LBActor) const editconst DynamicLightEnvironmentComponent LightEnvironment;
 
 event PostBeginPlay()
 {
