@@ -91,6 +91,17 @@ function SetParamFloat(name mechanism, name param, float value)
     m.SetParamFloat(param, value);    
 }
 
+function SetParamBool(name mechanism, name param, bool value)
+{
+    local LBMechanism m;
+    
+    m=GetMechanismByName(mechanism);
+    if(m==none)
+        return;
+        
+        m.SetParamBool(param, value);    
+}
+
 function SetParamVector(name mechanism, name param, vector value)
 {
     local LBMechanism m;
@@ -126,6 +137,19 @@ function float GetParamFloat(name mechanism, name param)
         return 0;
         
     res=m.GetParamFloat(param);    
+    return res;
+}
+
+function bool GetParamBool(name mechanism, name param)
+{
+    local LBMechanism m;
+    local bool res;
+    
+    m=GetMechanismByName(mechanism);
+    if(m==none)
+    return false;
+        
+        res=m.GetParamBool(param);    
     return res;
 }
 

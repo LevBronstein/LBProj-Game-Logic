@@ -33,7 +33,10 @@ function SetParamInt(name param, int value)
 {}    
 
 function SetParamFloat(name param, float value)
-{}      
+{} 
+
+function SetParamBool(name param, bool value)
+{}        
 
 function SetParamVector(name param, vector value)
 {} 
@@ -50,6 +53,9 @@ function int GetParamInt(name param)
 function float GetParamFloat(name param)
 {}      
 
+function bool GetParamBool(name param)
+{}
+    
 function vector GetParamVector(name param)
 {} 
  

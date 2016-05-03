@@ -51,7 +51,8 @@ function PerformMovement()
     v.x=FwdSpeed;
     v=v>>parent.rotation;
     
-    parent.Velocity=v*kFwdSpeed;
+    v=v*kFwdSpeed;
+    parent.MoveSmooth(v);
     
     if (bShowDebugLines)
         parent.DrawDebugLine(parent.location+vect(0,0,25), parent.location+parent.Velocity+vect(0,0,25), 0, 255, 0);

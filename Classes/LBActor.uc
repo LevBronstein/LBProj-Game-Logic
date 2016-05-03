@@ -88,21 +88,16 @@ function SetParamFloat(name mechanism, name param, float value)
     m.SetParamFloat(param, value);    
 }
 
-/********************** GET PARAM OVERLOADS **********************/
-
-function float GetParamFloat(name mechanism, name param)
+function SetParamBool(name mechanism, name param, bool value)
 {
     local LBMechanism m;
-    local float res;
     
     m=GetMechanismByName(mechanism);
     if(m==none)
-        return 0;
+        return;
         
-    res=m.GetParamFloat(param);    
-    return res;
+    m.SetParamBool(param, value);    
 }
-
 
 function SetParamVector(name mechanism, name param, vector value)
 {
@@ -126,6 +121,35 @@ function SetParamRotator(name mechanism, name param, rotator value)
     m.SetParamRotator(param, value);    
 }
 
+/********************** GET PARAM OVERLOADS **********************/
+
+function float GetParamFloat(name mechanism, name param)
+{
+    local LBMechanism m;
+    local float res;
+    
+    m=GetMechanismByName(mechanism);
+    if(m==none)
+        return 0;
+        
+    res=m.GetParamFloat(param);    
+    return res;
+}
+
+
+function bool GetParamBool(name mechanism, name param)
+{
+    local LBMechanism m;
+    local bool res;
+    
+    m=GetMechanismByName(mechanism);
+    if(m==none)
+        return false;
+        
+    res=m.GetParamBool(param);    
+    return res;
+}
+
 event Tick(float deltatime)
 {
     TickAllMechanisms(deltatime);
@@ -142,6 +166,10 @@ defaultproperties
     //bPawnCanBaseOn=true
     bShadowParented=true
     
+    bCollideActors=true
+    bCollideWorld=true
+    bBlockActors=true
+    
     Begin Object Class=DynamicLightEnvironmentComponent Name=MyLightEnvironment
         bEnabled=TRUE
     End Object
@@ -155,5 +183,5 @@ defaultproperties
     End Object
     Components.Add(BaseMesh)
     Mesh=BaseMesh
-    CollisionComponent=Mesh
+    CollisionComponent=BaseMesh
 }

@@ -13,7 +13,7 @@ var(XenoCrystMaster) name LEyeSocket;
 var(XenoCrystMaster) name REyeSocket;
 var(XenoCrystMaster) name TrueRayOriginSocket;
 var(XenoCrystMaster) float MaxRayLength; //The length of the ray. Warning! Can slow down the game!
-var(XenoCrystMaster) name ReflectiveMaterial; //The material which allows our rays to bounce
+var(XenoCrystMaster) name CrystControllerMechName; //The name of the LBCrystController mechanism, which is attached to LBActors, which are used to reflect our beams
 
 function FirstTickInit()
 {
@@ -77,7 +77,6 @@ function actor DrawBeam(vector origin, vector target, out vector hitloc, out vec
 function DrawBeams()
 {
     local LBPawn p;
-    local TraceHitInfo tinf;
     local Actor hit;
     local vector l, d; 
     local rotator r;
@@ -100,18 +99,26 @@ function DrawBeams()
     
     hit=DrawBeam(l, l+d*(MaxRayLength+MaxRayLength*0.134), oh, on, false);
     
-    p.Mesh.GetSocketWorldLocationAndRotation(LEyeSocket, l, r, 0);
+    if (p.Mesh.GetSocketWorldLocationAndRotation(LEyeSocket, l, r, 0)==false)
+        LogError("proc: DrawBeams(), the mesh doesn't have a left eye socket!");  
     DrawBeam(l, oh, h, n, true);
-    p.Mesh.GetSocketWorldLocationAndRotation(REyeSocket, l, r, 0);
+    if (p.Mesh.GetSocketWorldLocationAndRotation(REyeSocket, l, r, 0)==false)
+        LogError("proc: DrawBeams(), the mesh doesn't have a right eye socket!");
     DrawBeam(l, oh, h, n, true);
     
     for (i=0;i<4;i++)
     {
+        //proceed only if we hit an LBActor with bReflectsBeams property set to ture (has a LBCrystController mechanism)
         if (LBActor(hit)!=none)
         {
-            hit=DrawBeam(oh, oh+on*MaxRayLength, h, n, true);
-            oh=h;
-            on=n;
+            if (LBActor(hit).GetParamBool(CrystControllerMechName, 'bReflectsBeams')==true)
+            {
+                hit=DrawBeam(oh, oh+on*MaxRayLength, h, n, true);
+                oh=h;
+                on=n;
+            }
+            else
+                return;
         }
         else
             return;
@@ -124,7 +131,7 @@ defaultproperties
     LEyeSocket="LeftEye"
     REyeSocket="RightEye"
     TrueRayOriginSocket="RayOrigin"
-    ReflectiveMaterial="Mirror"
+    CrystControllerMechName="CRYST_CONTROL"
     
     MaxRayLength=10240
 }

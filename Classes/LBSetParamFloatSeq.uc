@@ -15,10 +15,12 @@ var() name paramname;
 
 event Activated()
 {
+    //`log(">>> ("@targetactor@"|"@targetpawn@")"@mechname@"."@paramname@"->"@value);
     if(targetactor!=none)
         targetactor.SetParamFloat(mechname,paramname,value); 
     if(targetpawn!=none)
         targetpawn.SetParamFloat(mechname,paramname,value);
+    //`log(">>> ("@targetactor@"|"@targetpawn@")"@mechname@"."@paramname@"="@targetactor.GetParamFloat(mechname, paramname)); 
 }
 
 
