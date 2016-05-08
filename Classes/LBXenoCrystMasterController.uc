@@ -9,11 +9,14 @@ class LBXenoCrystMasterController extends LBMechanism;
 var(ParamSource) name ParameterSource; //A mechanism, from which we'll get all params via GetParamFloat
 var(ParamSource) bool bUseParamSource; //Defines whether we should get params (from ParameterSource)
 
-var(XenoCrystMaster) name LEyeSocket;
-var(XenoCrystMaster) name REyeSocket;
-var(XenoCrystMaster) name TrueRayOriginSocket;
-var(XenoCrystMaster) float MaxRayLength; //The length of the ray. Warning! Can slow down the game!
-var(XenoCrystMaster) name CrystControllerMechName; //The name of the LBCrystController mechanism, which is attached to LBActors, which are used to reflect our beams
+var(XenoCrystMasterSystem) name LEyeSocket;
+var(XenoCrystMasterSystem) name REyeSocket;
+var(XenoCrystMasterSystem) name TrueRayOriginSocket;
+var(XenoCrystMasterSystem) float MaxRayLength; //The length of the ray. Warning! Can slow down the game!
+var(XenoCrystMasterSystem) float MaxRayCount; //Max recursive depth. Warning! Can slow down the game!
+var(XenoCrystMasterSystem) name CrystControllerMechName; //The name of the LBCrystController mechanism, which is attached to LBActors, which are used to reflect our beams
+var(XenoCrystMasterSystem) bool bDisplayTraces; //When true - the debug lines are drawn
+var(XenoCrystMasterGameplay) bool bActiveBeams; //When true - shooting the beams
 
 function FirstTickInit()
 {
@@ -101,19 +104,22 @@ function DrawBeams()
     
     if (p.Mesh.GetSocketWorldLocationAndRotation(LEyeSocket, l, r, 0)==false)
         LogError("proc: DrawBeams(), the mesh doesn't have a left eye socket!");  
-    DrawBeam(l, oh, h, n, true);
+    DrawBeam(l, oh, h, n, bDisplayTraces);
     if (p.Mesh.GetSocketWorldLocationAndRotation(REyeSocket, l, r, 0)==false)
         LogError("proc: DrawBeams(), the mesh doesn't have a right eye socket!");
-    DrawBeam(l, oh, h, n, true);
+    DrawBeam(l, oh, h, n, bDisplayTraces);
     
-    for (i=0;i<4;i++)
+    for (i=0;i<MaxRayCount;i++)
     {
         //proceed only if we hit an LBActor with bReflectsBeams property set to ture (has a LBCrystController mechanism)
         if (LBActor(hit)!=none)
         {
             if (LBActor(hit).GetParamBool(CrystControllerMechName, 'bReflectsBeams')==true)
             {
-                hit=DrawBeam(oh, oh+on*MaxRayLength, h, n, true);
+                //if beams are active - fill the charge of the cryst
+                if (bActiveBeams)
+                    LBActor(hit).SetParamFloat(CrystControllerMechName, 'CrystCharge', 1);
+                hit=DrawBeam(oh, oh+on*MaxRayLength, h, n, bDisplayTraces);
                 oh=h;
                 on=n;
             }
@@ -134,4 +140,8 @@ defaultproperties
     CrystControllerMechName="CRYST_CONTROL"
     
     MaxRayLength=10240
+    MaxRayCount=32
+    
+    bActiveBeams=false
+    bDisplayTraces=false
 }

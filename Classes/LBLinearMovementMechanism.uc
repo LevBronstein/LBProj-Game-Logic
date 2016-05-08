@@ -57,8 +57,7 @@ function PerformMovement()
     if (bShowDebugLines)
         parent.DrawDebugLine(parent.location+vect(0,0,25), parent.location+parent.Velocity+vect(0,0,25), 0, 255, 0);
     
-    if (bLogDebug)
-        `log(mechname@":"@v@r*unrrottodeg@"|"@FwdSpeed@AngSpeed);
+    LogError(v@r*unrrottodeg@"|"@FwdSpeed@AngSpeed);
     
 }
 

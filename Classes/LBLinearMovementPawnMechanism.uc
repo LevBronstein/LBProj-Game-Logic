@@ -37,6 +37,31 @@ function FirstTickInit()
     `log(mechname@": BlendByMoveSpdNode= <not used>"@"BlendByAngSpdNode="@blendbyangspd);
 }
 
+function PerformMovement()
+{
+    local vector v;
+    local rotator r;
+  
+    r=rot(0,0,0);
+    currot=currot+AngSpeed;
+    
+    r.yaw=currot*DegToUnrRot;
+    parent.SetRotation(r);
+    
+    v=vect(0,0,0);
+    v.x=FwdSpeed;
+    v=v>>parent.rotation;
+    
+    v=v*kFwdSpeed;
+    parent.Velocity=v;
+    
+    if (bShowDebugLines)
+        parent.DrawDebugLine(parent.location+vect(0,0,25), parent.location+parent.Velocity+vect(0,0,25), 0, 255, 0);
+    
+    LogError(v@r*unrrottodeg@"|"@FwdSpeed@AngSpeed);
+    
+}
+
 function UpdateAnimNodes()
 {
     //if (blendbymovespd != none)

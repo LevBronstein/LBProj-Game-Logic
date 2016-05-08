@@ -72,8 +72,9 @@ event OwnerTick(float deltatime)
 function LogError(string message)
 {
     if (bLogDebug)
-    `log(">>"@mechname@message@"<<");
+    `log(">>"@mechname@" :: "@message@"<<");
 }
+
     
 defaultproperties
 {
