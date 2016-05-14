@@ -109,7 +109,8 @@ function PerformRotation()
             }
         }
     }
-   
+    
+    r=parent.rotation;
     r.Yaw=currot*DegToUnrRot;
     parent.SetRotation(r);
     
@@ -137,7 +138,7 @@ function SetParamFloat(name param, float value)
     else if (param=='kFwdSpeed')
         kFwdSpeed=value;
     else if (param=='AngSpeed')
-        kFwdSpeed=value;   
+        AngSpeed=value;   
     else if (param=='kAngSpeed')
         kAngSpeed=value;  
 } 

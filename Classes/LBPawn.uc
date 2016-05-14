@@ -9,6 +9,8 @@ placeable
 ClassGroup(LevBronstein);
 
 var (Mechanisms) instanced array<LBMechanism> AllMechanisms; //mechanisms used for this pawn
+var (Lighting) DynamicLightEnvironmentComponent LightEnvironment;
+
 
 event PostBeginPlay()
 {
@@ -170,7 +172,6 @@ defaultproperties
    LightEnvironment=MyLightEnvironment
     
     Begin Object Class=SkeletalMeshComponent Name=WPawnSkeletalMeshComponent
-       //Your Mesh Properties
        LightEnvironment=MyLightEnvironment
    End Object
    Mesh=WPawnSkeletalMeshComponent
