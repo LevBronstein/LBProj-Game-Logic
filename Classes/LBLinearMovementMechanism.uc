@@ -42,6 +42,8 @@ function PerformMovement()
     local rotator r;
   
     r=rot(0,0,0);
+    r.pitch=LBActor(parent).Rotation.pitch;
+    r.roll=LBActor(parent).Rotation.roll;
     currot=currot+AngSpeed;
     
     r.yaw=currot*DegToUnrRot;

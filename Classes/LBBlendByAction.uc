@@ -31,6 +31,9 @@ defaultproperties
     
     Children(0)=(Name="NoAction")
     Children(1)=(Name="Action1")
+    Children(2)=(Name="Action2")
+    Children(3)=(Name="Action3")
+    Children(4)=(Name="Action4")
     
     BlendTime=0.5
     
