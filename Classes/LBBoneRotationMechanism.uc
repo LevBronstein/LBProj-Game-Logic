@@ -59,8 +59,7 @@ function PerformRotation()
         if (bApplyPitch)
         bonecontroller.BoneRotation.Pitch=pitchrot*DegToUnrRot;
         if (bApplyRoll)
-        bonecontroller.BoneRotation.Roll=rollrot*DegToUnrRot;
-        //`log(">>>>>>>>>>"@mechname@": yawrot="@yawrot@"real rot:"@bonecontroller.BoneRotation); 
+        bonecontroller.BoneRotation.Roll=rollrot*DegToUnrRot; 
     }
 }
 
