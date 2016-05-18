@@ -16,6 +16,7 @@ editinlinenew;
  
  var(MechanismBase) name mechname; //id of the current mech to find it out
  var(MechanismDebug) bool bLogDebug;
+ var(MechanismDebug) bool bLogFullInfo;
  
  
 function FirstTickInit()
@@ -72,7 +73,13 @@ event OwnerTick(float deltatime)
 function LogError(string message)
 {
     if (bLogDebug)
-    `log(">>"@mechname@" :: "@message@"<<");
+    `log(">>"$mechname$"::"$message$"<<");
+}
+
+function LogInfo(string message)
+{
+    if (bLogFullInfo)
+    `log(">"$mechname$"::"$message$"<");
 }
 
     

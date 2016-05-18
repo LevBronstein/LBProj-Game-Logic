@@ -4,12 +4,21 @@
  *  Creation date: 15.05.2016 00:47
  *  Copyright 2016, Windows7
  */
-class LBXenoSolverController extends LBMechanism;
+class LBXenoSolverController extends LBInteractableMechanism;
 
 struct LBAction
 {
     var() string ActionName;
     //var name() AnimSecName; //in future
+};
+
+struct LBInteraction
+{
+    var() string InteractionName;
+    var() name TargetMechanism;
+    var() name TargetParam;
+    var() float Value; //A value to set
+    var float DefaultValue; //A value to reset
 };
 
 var(ParamSource) name ParameterSource; //A mechanism, from which we'll get all params via GetParamFloat
@@ -24,10 +33,13 @@ var(XenoSolverAnimationSystem) name BlendByActionNode; //def: blendbyaction
 var(XenoSolverGameplay) array<LBAction> ActionList;
 var(XenoSolverGameplay) int SolverCurrentAction; //0- no action
 var(XenoSolverGameplay) bool bInteracting; //Set true if at this moment the solver is interacting with the target (targetactor)
+var(XenoSolverGameplay) array<LBInteraction> InteractionList;
+var(XenoSolverGameplay) int SolverInteraction;
 
 var LBBlendByAction blendbyaction;
 var LBActor targetactor;
 
+var int SolverPrevAction;
 
 function FirstTickInit()
 {
@@ -59,8 +71,11 @@ event OwnerTick(float deltatime)
     PerformTcik();  
 }   
 
+//основная процедура
 function PerformTcik()
 {
+    UpdateCurrentAction();
+    
     if (SolverCurrentAction==0)
     {
         PerformMovement();
@@ -69,6 +84,9 @@ function PerformTcik()
     }
     else if (SolverCurrentAction==1)
     {
+        PerformHeadRotation();
+        PerformTargeting();
+        PefrormHandling();
     }
     else if (SolverCurrentAction==2)
     {
@@ -92,7 +110,6 @@ function PerformTargeting()
     local vector l, d; 
     local rotator r;
     local vector oh, on;
-    local box b;
 
     p=LBPawn(parent);
     if (parent==none)
@@ -126,25 +143,48 @@ function PefrormHandling()
     {
     }
 }
-  
+ 
+function UpdateCurrentAction()
+{
+    if (bInteracting==true)
+    {
+        SolverPrevAction=SolverCurrentAction;
+        SetNewAction(1);
+    }
+    else
+    {
+        SetNewAction(SolverPrevAction);
+    }
+}
+ 
 function ChangeTargetActor(LBActor a)
 {
     //`log("Changing target from"@targetactor@"to"@a);
+    ChangeInteraction(false);
     if (targetactor!=none)
-        targetactor.SetParamBool(ManageableControllerMechName, 'bTargeted', false);
+        SetTargetParamBool(targetactor, ManageableControllerMechName, 'bTargeted', false);
     targetactor=a;
     if (targetactor!=none)
-        targetactor.SetParamBool(ManageableControllerMechName, 'bTargeted', true);
+        SetTargetParamBool(targetactor, ManageableControllerMechName, 'bTargeted', true);
 }
 
 function ChangeInteraction(bool newinteraction)
 {
+    local LBInteraction v;
+    
+    if (bInteracting==newinteraction)
+        return;
+    
+    v=InteractionList[SolverInteraction];
+    
     if (newinteraction==true)
     {
         if (targetactor!=none)
         {
             bInteracting=true;
-            targetactor.SetParamBool(ManageableControllerMechName, 'bInteracting', true);
+            SetTargetParamBool(targetactor, ManageableControllerMechName, 'bInteracting', true);
+            SetTargetParamFloat(targetactor, v.TargetMechanism, v.TargetParam, v.Value); 
+            LogInfo(v.InteractionName$"->"$targetactor$"."$v.TargetMechanism$"."$v.TargetParam$"<-"$v.Value);
         }
     }
     else
@@ -152,11 +192,29 @@ function ChangeInteraction(bool newinteraction)
         bInteracting=false;
         if (targetactor!=none)
         {
-            targetactor.SetParamBool(ManageableControllerMechName, 'bInteracting', false);
+            SetTargetParamFloat(targetactor, v.TargetMechanism, v.TargetParam, v.DefaultValue);
+            SetTargetParamBool(targetactor, ManageableControllerMechName, 'bInteracting', false); 
+            LogInfo(v.InteractionName$"->"$targetactor$"."$v.TargetMechanism$"."$v.TargetParam$"<-"$v.DefaultValue@"(default)");         
         }
     }
 }
+
+function ChangeInteractionType(int newinteraction)
+{
+    if (newinteraction==SolverInteraction)
+        return;
+        
+    if (newinteraction<0 || newinteraction>=InteractionList.Length)
+        return;
     
+    LogInfo("changed interaction from"@SolverInteraction@"to"@newinteraction);
+    
+    ChangeInteraction(false); //сбрасываем предыдущее взаимодействие
+    SolverInteraction=newinteraction; //устанавливаем новое
+    if (bInteracting)  
+        ChangeInteraction(true); //подтверждаем новое взаимодействие
+}
+
 function actor TraceTargetRay(vector origin, vector target, out vector hitloc, out vector hitnormal, optional bool bDrawTrace=false)
 {
     local LBPawn p;
@@ -182,7 +240,6 @@ function actor TraceTargetRay(vector origin, vector target, out vector hitloc, o
     return hit;
 }
 
-  
 function SetNewAction(int act)
 {
     if (act<0 || act>ActionList.length)
@@ -197,7 +254,7 @@ function SetNewAction(int act)
     }
     
     blendbyaction.UpdateCurrentAction(act);
-    `log(act);
+    //`log(act);
 }
     
 function GetParameters()
@@ -216,6 +273,8 @@ function SetParamInt(name param, int value)
 {
     if (param=='SolverCurrentAction')
         SetNewAction(value);
+    else if (param=='SolverInteraction')
+        ChangeInteractionType(value);    
 } 
 
 function SetParamBool(name param, bool value)
@@ -223,17 +282,20 @@ function SetParamBool(name param, bool value)
     if (param=='bInteracting')
         ChangeInteraction(value);
 }
+
     
 defaultproperties
 {
     
     BlendByActionNode="blendbyaction"
     TargetRayOriginSocket="TargetRayOrigin"
-    ManageableControllerMechName="Managed_Controller"
+    ManageableControllerMechName="Managed_Object_Controller"
     bDisplayTraces=false
     MaxTargetRayLength=2048
     
     SolverCurrentAction=0
+    SolverPrevAction=0
+    SolverInteraction=0
     bInteracting=false
     
     ActionList.Add((ActionName="No Action"))

@@ -69,26 +69,9 @@ function SetParamBool(name param, bool value)
         bInteracting=value;    
 }       
     
-function float GetParamFloat(name param)
-{
-    if (bInteracting==false)
-        return 0;
-
-    return super.GetParamFloat(param);     
-} 
-
-function SetParamFloat(name param, float value)
-{
-    if (bInteracting==false)
-        return;
-        
-    super.SetParamFloat(param, value);    
-}   
-    
-
 defaultproperties
 {
-    mechname="Managed_Controller"
+    mechname="Managed_Object_Controller"
     
     bShowDebugLines=false
     

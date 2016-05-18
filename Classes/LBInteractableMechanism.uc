@@ -73,7 +73,29 @@ function SetTargetParamBool(actor target, name targetmech, name targetparam, boo
     }
 }
 
-function float GetTargetParamFloat(actor target, name targetmech, name targetparam);
+function float GetTargetParamFloat(actor target, name targetmech, name targetparam)
+{
+    local LBActor a;
+    local LBPawn p;
+    local float value;
+
+    a=LBActor(target);
+    
+    if (a!=none)
+    {   
+        value=a.GetParamFloat(targetmech, targetparam);
+        return value;
+    }
+    
+    p=LBPawn(target);
+    
+    if (p!=none)
+    {
+        value=p.GetParamFloat(targetmech, targetparam);
+        return value;
+    }
+}
+
 function int GetTargetParamInt(actor target, name targetmech, name targetparam);
 function bool GetTargetParamBool(actor target, name targetmech, name targetparam);
 

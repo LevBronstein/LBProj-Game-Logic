@@ -10,6 +10,7 @@ struct NamedParam
 {
     var() name ParamName; //The name of this parameter
     var() float ParamValue; //Current value of this parameter
+    var() float ParamDefaultValue; //The default value of this parameter
     var() bool bClampValue; //Set to true, if the value shoul be always between Min and Max 
     var() float ValueMin;
     var() float ValueMax;
