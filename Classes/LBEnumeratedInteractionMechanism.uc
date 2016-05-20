@@ -4,6 +4,9 @@
  *  Creation date: 18.05.2016 00:49
  *  Copyright 2016, Windows7
  */
+ 
+/******************************DEPRECATED******************************/
+ 
 class LBEnumeratedInteractionMechanism extends LBInteractableMechanism;
 
 //Перенести ниже по иерархии!
