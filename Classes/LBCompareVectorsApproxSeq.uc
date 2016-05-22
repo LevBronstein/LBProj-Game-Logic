@@ -21,7 +21,7 @@ event Activated()
     else
         OutputLinks[1].bHasImpulse = TRUE;    
         
-    `log("A:"@ValueA@"B:"@ValueB@"d:"@d);
+    //`log("A:"@ValueA@"B:"@ValueB@"d:"@d);
 }
 
 defaultproperties

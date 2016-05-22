@@ -7,7 +7,8 @@
 class LBManageableController extends LBActorController;
 
 var(ManageableController) bool bManageableBySolver; //Set to true if the Solver can interact with this instance
-var(ManageableController) bool bTargeted;
+var(ManageableController) bool bTargeted; //Only when the solver looks directtly at this object
+var(ManageableController) bool bSelected;  //When the solver adds this object to his list
 var(ManageableController) bool bInteracting; //Set to true eveytime the Solver manages this instance
 var(MechanismDebug) bool bShowDebugLines; //Display debug in game
 
@@ -35,13 +36,18 @@ function PerformTick()
     local Box b;
     local vector v;
     
-    if (bTargeted)
+    if (bShowDebugLines==true)
     {
-        if (bShowDebugLines==true)
+        parent.GetComponentsBoundingBox(b);
+        v=b.max-b.min;
+        if (bTargeted)
         {
-            parent.GetComponentsBoundingBox(b);
-            v=b.max-b.min;
             parent.DrawDebugSphere(parent.location, vsize(v)/3, 16, 255, 0, 0);
+        }
+        
+        if (bSelected)
+        {
+            parent.DrawDebugBox(parent.location, v/2, 0, 0, 128);
         }
     }
 }
@@ -54,17 +60,21 @@ function bool GetParamBool(name param)
         return  bInteracting;
     else if(param=='bTargeted')
         return  bTargeted;
+    else if (param=='bSelected')
+        return bSelected;
     else
         return false;
 }
-    
-function SetParamBool(name param, bool value)
+
+//Приоритет не учитывается?    
+function SetParamBool(name param, bool value, optional int priority=0)
 {
-    //`log(param @ value);
     if (param=='bManageableBySolver')
         bManageableBySolver=value;
     if (param=='bTargeted')
         bTargeted=value;
+    if (param=='bSelected')
+        bSelected=value;
     else if(param=='bInteracting')
         bInteracting=value;    
 }       

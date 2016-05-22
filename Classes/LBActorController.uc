@@ -14,10 +14,42 @@ struct NamedParam
     var() bool bClampValue; //Set to true, if the value shoul be always between Min and Max 
     var() float ValueMin;
     var() float ValueMax;
+    var int Priority; 
 };
 
 //fixed size in editor
 var(Params) array<NamedParam> CurParamValues;
+
+function FirstTickInit()
+{
+    if (bfirsttick==false)
+        return;
+    
+    if (bfirsttick==true)
+        bfirsttick=false;  
+      
+    ResetPriority();     
+}
+    
+event OwnerTick(float deltatime)
+{
+    super.OwnerTick(deltatime);
+    
+    if (benabled==false)
+        return;
+        
+    ResetPriority();
+}   
+
+function ResetPriority()
+{
+    local int i;
+        
+    for (i=0; i<CurParamValues.Length; i++)
+    {
+        CurParamValues[i].Priority=0;
+    }
+}
 
 function float GetParamFloat(name param)
 {
@@ -33,7 +65,7 @@ function float GetParamFloat(name param)
     return 0;   
 }  
 
-function SetParamFloat(name param, float value)
+function SetParamFloat(name param, float value, optional int priority=0)
 {
     local int i;
     
@@ -41,13 +73,18 @@ function SetParamFloat(name param, float value)
     {
         if (CurParamValues[i].ParamName==param)
         {
-            if (CurParamValues[i].bClampValue)
+            if (CurParamValues[i].Priority <= priority)
             {
-                //А что, если значение, выходящее за пределы будет задано из редактора и не будет проверено в SetParamFloat?
-                CurParamValues[i].ParamValue=fclamp(value, CurParamValues[i].ValueMin, CurParamValues[i].ValueMax);
+                if (CurParamValues[i].bClampValue)
+                {
+                    //А что, если значение, выходящее за пределы будет задано из редактора и не будет проверено в SetParamFloat?
+                    CurParamValues[i].ParamValue=fclamp(value, CurParamValues[i].ValueMin, CurParamValues[i].ValueMax);
+                }
+                else
+                    CurParamValues[i].ParamValue=value; 
+                
+                CurParamValues[i].Priority=priority;
             }
-            else
-                CurParamValues[i].ParamValue=value; 
             return;
         }
     }

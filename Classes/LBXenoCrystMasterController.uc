@@ -6,9 +6,6 @@
  */
 class LBXenoCrystMasterController extends LBMechanism;
 
-var(ParamSource) name ParameterSource; //A mechanism, from which we'll get all params via GetParamFloat
-var(ParamSource) bool bUseParamSource; //Defines whether we should get params (from ParameterSource)
-
 var(XenoCrystMasterSystem) name LEyeSocket;
 var(XenoCrystMasterSystem) name REyeSocket;
 var(XenoCrystMasterSystem) name TrueRayOriginSocket;
@@ -33,9 +30,6 @@ event OwnerTick(float deltatime)
     
     if (benabled==false)
         return;
-    
-    if (bUseParamSource)
-        GetParameters();
         
     DrawBeams(); 
 }   

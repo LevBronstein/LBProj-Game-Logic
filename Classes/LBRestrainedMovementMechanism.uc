@@ -131,7 +131,7 @@ function PerformRotation()
     }
 }
 
-function SetParamFloat(name param, float value)
+function SetParamFloat(name param, float value, optional int priority=0)
 {
     if (param=='FwdSpeed')
         FwdSpeed=value;
@@ -143,7 +143,7 @@ function SetParamFloat(name param, float value)
         kAngSpeed=value;  
 } 
     
-function SetParamBool(name param, bool value)
+function SetParamBool(name param, bool value, optional int priority=0)
 {
     if (param=='bReverseOnCompleteMov')
         bReverseOnCompleteMov=value;

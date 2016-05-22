@@ -6,14 +6,12 @@
  */
 class LBBoneRotationMechanism extends LBMechanism;
 
-var(ParamSource) name ParameterSource; //A mechanism, from which we get all params via GetParamFloat
 var(ParamSource) bool bApplyYaw;
 var(ParamSource) name YawRotationParam; //A name for a float param, that sets the yawrot
 var(ParamSource) bool bApplyPitch;
 var(ParamSource) name PitchRotationParam; //A name for a float param, that sets the pitchrot
 var(ParamSource) bool bApplyRoll;
 var(ParamSource) name RollRotationParam; //A name for a float param, that sets the rollrot
-var(ParamSource) bool bUseParamSource; //Defines whether we should get params (from ParameterSource)
 var(Animation) Name BoneRotationController; //Which controller to use for the rotation
 
 var(BoneRotation) float yawrot;
@@ -43,9 +41,6 @@ event OwnerTick(float deltatime)
     
     if(benabled==false)
         return;
-    
-    if (bUseParamSource)
-        GetParameters();
         
     PerformRotation();  
 }

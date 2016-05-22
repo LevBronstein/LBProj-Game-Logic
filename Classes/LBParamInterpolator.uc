@@ -192,7 +192,7 @@ function PlayCurFrame()
     }
 }
 
-function SetParamFloat(name param, float value)
+function SetParamFloat(name param, float value, optional int priority=0)
 {
     
 }    

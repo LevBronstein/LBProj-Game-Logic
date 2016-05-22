@@ -22,7 +22,7 @@ function FirstTickInit()
      LBActor(parent).SetCollision(bCollideActors, bBlockActors, bBlockPlayers);
 }
 
-function SetParamBool(name param, bool value)
+function SetParamBool(name param, bool value, optional int priority=0)
 {
     if (param=='bCollideActors')
         bCollideActors=value;

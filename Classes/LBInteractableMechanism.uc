@@ -6,7 +6,7 @@
  */
 class LBInteractableMechanism extends LBMechanism;
 
-function SetTargetParamFloat(actor target, name targetmech, name targetparam, float value)
+function SetTargetParamFloat(actor target, name targetmech, name targetparam, float value, optional int priority=0)
 {
     local LBActor a;
     local LBPawn p;
@@ -28,7 +28,7 @@ function SetTargetParamFloat(actor target, name targetmech, name targetparam, fl
     }
 }
 
-function SetTargetParamInt(actor target, name targetmech, name targetparam, int value)
+function SetTargetParamInt(actor target, name targetmech, name targetparam, int value, optional int priority=0)
 {
     local LBActor a;
     local LBPawn p;
@@ -51,7 +51,7 @@ function SetTargetParamInt(actor target, name targetmech, name targetparam, int 
     }
 }
 
-function SetTargetParamBool(actor target, name targetmech, name targetparam, bool value)
+function SetTargetParamBool(actor target, name targetmech, name targetparam, bool value, optional int priority=0)
 {
     local LBActor a;
     local LBPawn p;

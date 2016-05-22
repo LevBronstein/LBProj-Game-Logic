@@ -7,17 +7,26 @@
 class LBMechanism extends Object 
 editinlinenew;
 
- var(MechanismBase) actor parent; //parent actor
- var(MechanismBase) class<Actor> parentclass;
+struct LBMechanismParam
+{
+    var() actor ParentActor;
+    var() name MechanismName;
+    var() name ParamName;
+};
+
+var(MechanismBase) actor parent; //parent actor
+var(MechanismBase) class<Actor> parentclass;
+
+var(MechanismBase) bool benabled; //whether this mechanism is currently enabled
+
+var bool bfirsttick; //whether this is the first tick and we should do some inits
+
+var(MechanismBase) name mechname; //id of the current mech to find it out
+var(MechanismDebug) bool bLogDebug;
+var(MechanismDebug) bool bLogFullInfo;
  
- var(MechanismBase) bool benabled; //whether this mechanism is currently enabled
- 
- var bool bfirsttick; //whether this is the first tick and we should do some inits
- 
- var(MechanismBase) name mechname; //id of the current mech to find it out
- var(MechanismDebug) bool bLogDebug;
- var(MechanismDebug) bool bLogFullInfo;
- 
+var(ParamSource) name ParameterSource; //A mechanism, from which we get all params via GetParamFloat
+var(ParamSource) bool bUseParamSource; //Defines whether we should get params (from ParameterSource) 
  
 function FirstTickInit()
 {
@@ -27,22 +36,22 @@ function FirstTickInit()
     }
 }
  
-function SetParam(name param, object value)
+function SetParam(name param, object value, optional int priority=0)
 {}
     
-function SetParamInt(name param, int value)
+function SetParamInt(name param, int value, optional int priority=0)
 {}    
 
-function SetParamFloat(name param, float value)
+function SetParamFloat(name param, float value, optional int priority=0)
 {} 
 
-function SetParamBool(name param, bool value)
+function SetParamBool(name param, bool value, optional int priority=0)
 {}        
 
-function SetParamVector(name param, vector value)
+function SetParamVector(name param, vector value, optional int priority=0)
 {} 
  
-function SetParamRotator(name param, rotator value)
+function SetParamRotator(name param, rotator value, optional int priority=0)
 {}    
     
 function object GetParam(name param)
@@ -66,10 +75,16 @@ function rotator GetParamRotator(name param)
 event OwnerTick(float deltatime)
 {
     FirstTickInit();
+    
     if(benabled==false)
         return;
+        
+    if (bUseParamSource)
+        GetParameters();       
 }
 
+function GetParameters();    
+    
 function LogError(string message)
 {
     if (bLogDebug)
