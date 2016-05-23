@@ -123,6 +123,20 @@ function SetParamRotator(name mechanism, name param, rotator value)
 
 /********************** GET PARAM OVERLOADS **********************/
 
+
+function object GetParam(name mechanism, name param)
+{
+    local LBMechanism m;
+    local object res;
+    
+    m=GetMechanismByName(mechanism);
+    if(m==none)
+        return none;
+        
+    res=m.GetParam(param);    
+    return res;
+}
+
 function float GetParamFloat(name mechanism, name param)
 {
     local LBMechanism m;
@@ -136,7 +150,6 @@ function float GetParamFloat(name mechanism, name param)
     return res;
 }
 
-
 function bool GetParamBool(name mechanism, name param)
 {
     local LBMechanism m;
@@ -149,6 +162,46 @@ function bool GetParamBool(name mechanism, name param)
     res=m.GetParamBool(param);    
     return res;
 }
+
+function int GetParamInt(name mechanism, name param)
+{
+    local LBMechanism m;
+    local int res;
+    
+    m=GetMechanismByName(mechanism);
+    if(m==none)
+        return 0;
+        
+    res=m.GetParamInt(param);    
+    return res;
+}
+
+function vector GetParamVector(name mechanism, name param)
+{
+    local LBMechanism m;
+    local vector res;
+    
+    m=GetMechanismByName(mechanism);
+    if(m==none)
+        return vect(0,0,0);
+        
+    res=m.GetParamVector(param);    
+    return res;
+}
+
+function rotator GetParamRotator(name mechanism, name param)
+{
+    local LBMechanism m;
+    local rotator res;
+    
+    m=GetMechanismByName(mechanism);
+    if(m==none)
+        return rot(0,0,0);
+        
+    res=m.GetParamRotator(param);    
+    return res;
+}
+
 
 event Tick(float deltatime)
 {

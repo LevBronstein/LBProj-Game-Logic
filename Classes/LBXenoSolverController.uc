@@ -81,13 +81,13 @@ function PerformTcik()
     {
         PerformMovement();
         PerformHeadRotation();
-        PerformTargeting();
+        //PerformTargeting();
     }
     else if (SolverCurrentAction==1)
     {
         PerformHeadRotation();
-        PerformTargeting();
-        PefrormHandling();
+        //PerformTargeting();
+        //PefrormHandling();
     }
     else if (SolverCurrentAction==2)
     {

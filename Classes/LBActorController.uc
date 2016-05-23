@@ -4,21 +4,81 @@
  *  Creation date: 15.05.2016 22:11
  *  Copyright 2016, Windows7
  */
-class LBActorController extends LBMechanism;
+class LBActorController extends LBInteractableMechanism;
+
+enum ParamTypes
+{
+    ParamType_Object,
+    ParamType_Float,
+    ParamType_Integer,
+    ParamType_Boolean,
+    ParamType_Vector,
+    ParamType_Rotator,
+};
+
+struct ObjectValue
+{
+    var() object Value;
+    var() object DefaultValue;
+};
+
+struct FloatValue
+{
+    var() float Value;
+    var() float DefaultValue; 
+    var() bool bClampValue; //Set to true, if the value shoul be always between Min and Max 
+    var() float ValueMin;
+    var() float ValueMax;
+};
+
+struct IntegerValue
+{
+    var() int Value;
+    var() int DefaultValue; 
+    var() bool bClampValue; //Set to true, if the value shoul be always between Min and Max 
+    var() int ValueMin;
+    var() int ValueMax;
+};
+
+struct BooleanValue
+{
+    var() bool Value;
+    var() bool DefaultValue; 
+};
+
+struct VectorValue
+{
+    var() vector Value;
+    var() vector DefaultValue; 
+};
+
+struct RotatorValue
+{
+    var() rotator Value;
+    var() rotator DefaultValue; 
+};
 
 struct NamedParam
 {
     var() name ParamName; //The name of this parameter
-    var() float ParamValue; //Current value of this parameter
-    var() float ParamDefaultValue; //The default value of this parameter
-    var() bool bClampValue; //Set to true, if the value shoul be always between Min and Max 
-    var() float ValueMin;
-    var() float ValueMax;
+    var() ParamTypes ParamType; //The type of this parameter, set to identify value types
+    
+    //values of different type, use only that, which is set by @ParamType
+    var() ObjectValue ObjectParam;
+    var() FloatValue FloatParam; 
+    var() IntegerValue IntegerParam;
+    var() BooleanValue BooleanParam;
+    var() VectorValue VectorParam;
+    var() RotatorValue RotatorParam;
+    
+    var() bool bUseSource; //Set to true to get value from anywhere, also @bUseParamSource should be set to true
+    var() LBMechanismParam ValueSource;
+    
+    //priority
     var int Priority; 
 };
 
-//fixed size in editor
-var(Params) array<NamedParam> CurParamValues;
+var(Params) array<NamedParam> CurParamsValues;
 
 function FirstTickInit()
 {
@@ -41,49 +101,156 @@ event OwnerTick(float deltatime)
     ResetPriority();
 }   
 
+function GetParameters()
+{
+    local int i;
+        
+    for (i=0; i<CurParamsValues.Length; i++)
+    {
+        if (CurParamsValues[i].bUseSource)
+        {
+            //гемор с приоритетами? тупо использовать внутренние функции?
+            switch (CurParamsValues[i].ParamType)
+            {
+                case ParamType_Object:
+                
+                   SetParam(CurParamsValues[i].ParamName, GetTargetParam(CurParamsValues[i].ValueSource.ParentActor, CurParamsValues[i].ValueSource.MechanismName, CurParamsValues[i].ValueSource.ParamName));
+                  // `log(CurParamsValues[i].ParamName@CurParamsValues[i].ValueSource.ParentActor@CurParamsValues[i].ValueSource.MechanismName@CurParamsValues[i].ValueSource.ParamName);
+                
+                break;
+                case ParamType_Float:
+                    SetParamFloat(CurParamsValues[i].ParamName, GetTargetParamFloat(CurParamsValues[i].ValueSource.ParentActor, CurParamsValues[i].ValueSource.MechanismName, CurParamsValues[i].ValueSource.ParamName));
+                break;
+                case ParamType_Integer:
+                    SetParamInt(CurParamsValues[i].ParamName, GetTargetParamInt(CurParamsValues[i].ValueSource.ParentActor, CurParamsValues[i].ValueSource.MechanismName, CurParamsValues[i].ValueSource.ParamName));
+                break;
+                case ParamType_Boolean:
+                    SetParamBool(CurParamsValues[i].ParamName, GetTargetParamBool(CurParamsValues[i].ValueSource.ParentActor, CurParamsValues[i].ValueSource.MechanismName, CurParamsValues[i].ValueSource.ParamName));
+                break;
+                case ParamType_Vector:
+                    SetParamVector(CurParamsValues[i].ParamName, GetTargetParamVector(CurParamsValues[i].ValueSource.ParentActor, CurParamsValues[i].ValueSource.MechanismName, CurParamsValues[i].ValueSource.ParamName));
+                break;
+                case ParamType_Rotator:
+                    SetParamRotator(CurParamsValues[i].ParamName, GetTargetParamRotator(CurParamsValues[i].ValueSource.ParentActor, CurParamsValues[i].ValueSource.MechanismName, CurParamsValues[i].ValueSource.ParamName));
+                break;
+            }
+        }
+    }
+}
+
 function ResetPriority()
 {
     local int i;
         
-    for (i=0; i<CurParamValues.Length; i++)
+    for (i=0; i<CurParamsValues.Length; i++)
     {
-        CurParamValues[i].Priority=0;
+        CurParamsValues[i].Priority=0;
     }
 }
+
+function object GetParam(name param)
+{
+    local int i;
+        
+    for (i=0; i<CurParamsValues.Length; i++)
+    {
+        if (CurParamsValues[i].ParamName==param)
+        return CurParamsValues[i].ObjectParam.Value; 
+    }
+    
+    LogError("Parameter name ("@param@") was not found!"); 
+    return none;   
+} 
 
 function float GetParamFloat(name param)
 {
     local int i;
         
-    for (i=0; i<CurParamValues.Length; i++)
+    for (i=0; i<CurParamsValues.Length; i++)
     {
-        if (CurParamValues[i].ParamName==param)
-            return CurParamValues[i].ParamValue; 
+        if (CurParamsValues[i].ParamName==param)
+        return CurParamsValues[i].FloatParam.Value; 
+    }
+    
+    LogError("Parameter name ("@param@") was not found!"); 
+    return 0;   
+} 
+
+function int GetParamInt(name param)
+{
+    local int i;
+        
+    for (i=0; i<CurParamsValues.Length; i++)
+    {
+        if (CurParamsValues[i].ParamName==param)
+        return CurParamsValues[i].IntegerParam.Value; 
     }
     
     LogError("Parameter name ("@param@") was not found!"); 
     return 0;   
 }  
 
+function bool GetParamBool(name param)
+{
+    local int i;
+        
+    for (i=0; i<CurParamsValues.Length; i++)
+    {
+        if (CurParamsValues[i].ParamName==param)
+        return CurParamsValues[i].BooleanParam.Value; 
+    }
+    
+    LogError("Parameter name ("@param@") was not found!"); 
+    return false;   
+}  
+
+function vector GetParamVector(name param)
+{
+    local int i;
+        
+    for (i=0; i<CurParamsValues.Length; i++)
+    {
+        if (CurParamsValues[i].ParamName==param)
+        return CurParamsValues[i].VectorParam.Value; 
+    }
+    
+    LogError("Parameter name ("@param@") was not found!"); 
+    return vect(0,0,0);   
+} 
+
+function rotator GetParamRotator(name param)
+{
+    local int i;
+        
+    for (i=0; i<CurParamsValues.Length; i++)
+    {
+        if (CurParamsValues[i].ParamName==param)
+        return CurParamsValues[i].RotatorParam.Value; 
+    }
+    
+    LogError("Parameter name ("@param@") was not found!"); 
+    return rot(0,0,0);   
+} 
+
 function SetParamFloat(name param, float value, optional int priority=0)
 {
     local int i;
     
-    for (i=0; i<CurParamValues.Length; i++)
+    for (i=0; i<CurParamsValues.Length; i++)
     {
-        if (CurParamValues[i].ParamName==param)
+        if (CurParamsValues[i].ParamName==param)
         {
-            if (CurParamValues[i].Priority <= priority)
+            if (CurParamsValues[i].Priority <= priority)
             {
-                if (CurParamValues[i].bClampValue)
+                if (CurParamsValues[i].FloatParam.bClampValue)
                 {
                     //А что, если значение, выходящее за пределы будет задано из редактора и не будет проверено в SetParamFloat?
-                    CurParamValues[i].ParamValue=fclamp(value, CurParamValues[i].ValueMin, CurParamValues[i].ValueMax);
+                    CurParamsValues[i].FloatParam.Value=fclamp(value, CurParamsValues[i].FloatParam.ValueMin, CurParamsValues[i].FloatParam.ValueMax);
                 }
                 else
-                    CurParamValues[i].ParamValue=value; 
+                    CurParamsValues[i].FloatParam.Value=value; 
                 
-                CurParamValues[i].Priority=priority;
+                CurParamsValues[i].Priority=priority;
             }
             return;
         }
@@ -91,6 +258,126 @@ function SetParamFloat(name param, float value, optional int priority=0)
     
     LogError("Parameter name ("@param@") was not found!");
 }
+
+function SetParamInt(name param, int value, optional int priority=0)
+{
+    local int i;
+    
+    for (i=0; i<CurParamsValues.Length; i++)
+    {
+        if (CurParamsValues[i].ParamName==param)
+        {
+            if (CurParamsValues[i].Priority <= priority)
+            {
+                if (CurParamsValues[i].IntegerParam.bClampValue)
+                {
+                    //А что, если значение, выходящее за пределы будет задано из редактора и не будет проверено в SetParamFloat?
+                    CurParamsValues[i].IntegerParam.Value=clamp(value, CurParamsValues[i].IntegerParam.ValueMin, CurParamsValues[i].IntegerParam.ValueMax);
+                }
+                else
+                    CurParamsValues[i].IntegerParam.Value=value; 
+                
+                CurParamsValues[i].Priority=priority;
+            }
+            return;
+        }
+    }
+    
+    LogError("Parameter name ("@param@") was not found!");
+}
+
+function SetParamBool(name param, bool value, optional int priority=0)
+{
+    local int i;
+    
+    for (i=0; i<CurParamsValues.Length; i++)
+    {
+        if (CurParamsValues[i].ParamName==param)
+        {
+            if (CurParamsValues[i].Priority <= priority)
+            {
+                CurParamsValues[i].BooleanParam.Value=value; 
+                CurParamsValues[i].Priority=priority;
+            }
+            return;
+        }
+    }
+    
+    LogError("Parameter name ("@param@") was not found!");
+}
+
+function SetParam(name param, object value, optional int priority=0)
+{
+    local int i;
+    for (i=0; i<CurParamsValues.Length; i++)
+    {
+        if (CurParamsValues[i].ParamName==param)
+        {
+            if (CurParamsValues[i].Priority <= priority)
+            {
+                CurParamsValues[i].ObjectParam.Value=value; 
+                CurParamsValues[i].Priority=priority;
+            }
+            return;
+        }
+    }
+    
+    LogError("Parameter name ("@param@") was not found, cannot set a value!");
+}
+
+function SetParamVector(name param, vector value, optional int priority=0)
+{
+    local int i;
+    
+    for (i=0; i<CurParamsValues.Length; i++)
+    {
+        if (CurParamsValues[i].ParamName==param)
+        {
+            if (CurParamsValues[i].Priority <= priority)
+            {
+                CurParamsValues[i].VectorParam.Value=value; 
+                CurParamsValues[i].Priority=priority;
+            }
+            return;
+        }
+    }
+    
+    LogError("Parameter name ("@param@") was not found, cannot set a value!");
+}
+
+function SetParamRotator(name param, rotator value, optional int priority=0)
+{
+    local int i;
+    
+    for (i=0; i<CurParamsValues.Length; i++)
+    {
+        if (CurParamsValues[i].ParamName==param)
+        {
+            if (CurParamsValues[i].Priority <= priority)
+            {
+                CurParamsValues[i].RotatorParam.Value=value; 
+                CurParamsValues[i].Priority=priority;
+            }
+            return;
+        }
+    }
+    
+    LogError("Parameter name ("@param@") was not found, cannot set a value!");
+}
+
+function LogTransactions()
+{
+    local int i;
+    
+    `log("ActorController:: Total variables:"@CurParamsValues.Length);
+    
+    for (i=0;i<CurParamsValues.Length;i++)
+    {
+        `log(">"$(i+1)$":"@CurParamsValues[i].ParamName@"="@CurParamsValues[i].ObjectParam.Value$"<");
+        
+    }
+}
+    
 
 defaultproperties
 {
