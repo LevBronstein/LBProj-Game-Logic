@@ -8,7 +8,9 @@ class LBTargetingPawnMechanism extends LBInteractableMechanism;
 
 var(TargetingPawnMechanism) name TargetRayOriginSocket; //A socket in skeletal mesh of the owner, which should be used as a start of ray traces
 var(TargetingPawnMechanism) float MaxTargetRayLength; //The length of the target ray. Warning! Can slow down the game!
-var(TargetingPawnMechanism) bool bDisplayTraces; //When true - the debug lines are drawn
+var(TargetingPawnMechanism) bool bNotifyTarget;
+var(TargetingPawnMechanism) LBParam TargetActorParam; //Set this value to true when targeted, false - when not
+var(MechanismDebug) bool bShowDebugLines; //Display debug in game
 
 var Actor targetactor;
 
@@ -43,7 +45,7 @@ function PerformTargeting()
     d=vect(0,0,1)>>r;
     d=Normal(d);
     
-    hit=TraceTargetRay(l, l+d*MaxTargetRayLength, oh, on, bDisplayTraces);
+    hit=TraceTargetRay(l, l+d*MaxTargetRayLength, oh, on, bShowDebugLines);
     
     if (hit!=none)
     {
@@ -60,21 +62,25 @@ function PerformTargeting()
 function ChangeTargetActor(Actor a)
 {
     LogInfo("changing target from"@targetactor@"to"@a);
-    //if (targetactor!=none)
-    //{
-    //    SetTargetParamBool(targetactor, ManageableControllerMechName, 'bTargeted', false);
-    //}
+    if (targetactor!=none)
+    {
+        if (bNotifyTarget)
+            SetTargetParamBool(targetactor, TargetActorParam.MechanismName, TargetActorParam.ParamName, false);
+    }
     targetactor=a;
-    //if (targetactor!=none)
-    //{
-    //    SetTargetParamBool(targetactor, ManageableControllerMechName, 'bTargeted', true);
-    //}
+    if (targetactor!=none)
+    {
+        if (bNotifyTarget)
+            SetTargetParamBool(targetactor, TargetActorParam.MechanismName, TargetActorParam.ParamName, true);
+    }
 }    
     
 function actor TraceTargetRay(vector origin, vector target, out vector hitloc, out vector hitnormal, optional bool bDrawTrace=false)
 {
     local LBPawn p;
     local Actor hit;
+    local vector v;
+    local box b;
     
     p=LBPawn(parent);
     if (parent==none)
@@ -93,6 +99,13 @@ function actor TraceTargetRay(vector origin, vector target, out vector hitloc, o
     else
         p.DrawDebugLine(origin, target, 0, 0, 255);
         
+    if (hit!=none)
+    {
+        hit.GetComponentsBoundingBox(b);
+        v=b.max-b.min;
+        hit.DrawDebugBox(hit.location, v/2, 255, 0, 0);
+    }
+        
     return hit;
 }    
  
@@ -110,6 +123,6 @@ defaultproperties
 {
     TargetRayOriginSocket="TargetRayOrigin"
     
-    bDisplayTraces=false
+    bShowDebugLines=false
     MaxTargetRayLength=2048
 }

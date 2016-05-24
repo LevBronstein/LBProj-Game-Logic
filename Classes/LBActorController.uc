@@ -9,6 +9,7 @@ class LBActorController extends LBInteractableMechanism;
 enum ParamTypes
 {
     ParamType_Object,
+    ParamType_ObjectArray,
     ParamType_Float,
     ParamType_Integer,
     ParamType_Boolean,
@@ -20,6 +21,12 @@ struct ObjectValue
 {
     var() object Value;
     var() object DefaultValue;
+};
+
+struct ObjectArrayValue
+{
+    var() array<object> Value;
+    var() array<object> DefaultValue;
 };
 
 struct FloatValue
@@ -65,6 +72,7 @@ struct NamedParam
     
     //values of different type, use only that, which is set by @ParamType
     var() ObjectValue ObjectParam;
+    var() ObjectArrayValue ObjectArrayParam;
     var() FloatValue FloatParam; 
     var() IntegerValue IntegerParam;
     var() BooleanValue BooleanParam;
@@ -101,6 +109,8 @@ event OwnerTick(float deltatime)
     ResetPriority();
 }   
 
+//получение значения для каждой переменной, проблема может возникнуть, если до этого 
+//она была установлена с более высоким приоритетом
 function GetParameters()
 {
     local int i;
@@ -161,6 +171,24 @@ function object GetParam(name param)
     LogError("Parameter name ("@param@") was not found!"); 
     return none;   
 } 
+
+function array<object> GetParams(name param)
+{
+    local int i;
+    local array<object> val;    
+    
+    val.Length=0;
+    
+    for (i=0; i<CurParamsValues.Length; i++)
+    {
+        if (CurParamsValues[i].ParamName==param)
+        return CurParamsValues[i].ObjectArrayParam.Value; 
+    }
+    
+    LogError("Parameter name ("@param@") was not found!"); 
+    return val;   
+} 
+
 
 function float GetParamFloat(name param)
 {
@@ -316,6 +344,25 @@ function SetParam(name param, object value, optional int priority=0)
             if (CurParamsValues[i].Priority <= priority)
             {
                 CurParamsValues[i].ObjectParam.Value=value; 
+                CurParamsValues[i].Priority=priority;
+            }
+            return;
+        }
+    }
+    
+    LogError("Parameter name ("@param@") was not found, cannot set a value!");
+}
+
+function SetParams(name param, array<object> value, optional int priority=0)
+{
+    local int i;
+    for (i=0; i<CurParamsValues.Length; i++)
+    {
+        if (CurParamsValues[i].ParamName==param)
+        {
+            if (CurParamsValues[i].Priority <= priority)
+            {
+                CurParamsValues[i].ObjectArrayParam.Value=value; 
                 CurParamsValues[i].Priority=priority;
             }
             return;

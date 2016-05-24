@@ -71,6 +71,17 @@ function SetParam(name mechanism, name param, object value)
     m.SetParam(param, value);    
 }
 
+function SetParams(name mechanism, name param, array<object> value)
+{
+    local LBMechanism m;
+    
+    m=GetMechanismByName(mechanism);
+    if(m==none)
+        return;
+        
+    m.SetParams(param, value);    
+}
+
 function SetParamInt(name mechanism, name param, int value)
 {
     local LBMechanism m;
@@ -139,6 +150,19 @@ function object GetParam(name mechanism, name param)
         return none;
         
     res=m.GetParam(param);    
+    return res;
+}
+
+function array<object> GetParams(name mechanism, name param)
+{
+    local LBMechanism m;
+    local array<object> res;
+    
+    m=GetMechanismByName(mechanism);
+    if(m==none)
+        return res; //!!!
+        
+    res=m.GetParams(param);    
     return res;
 }
 

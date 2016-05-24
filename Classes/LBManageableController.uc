@@ -40,18 +40,14 @@ function PerformTick()
     {
         parent.GetComponentsBoundingBox(b);
         v=b.max-b.min;
-        if (bTargeted)
-        {
-            parent.DrawDebugSphere(parent.location, vsize(v)/3, 16, 255, 0, 0);
-        }
-        
         if (bSelected)
         {
-            parent.DrawDebugBox(parent.location, v/2, 0, 0, 128);
+            parent.DrawDebugSphere(parent.location, vsize(v)/3, 16, 255, 0, 0);
         }
     }
 }
     
+//ПЕРЕКРЫВАЕТ ЭТУ ЖЕ ПРОЦЕДУРУ В БАЗВОМО КЛАССЕ
 function bool GetParamBool(name param)
 {
     if (param=='bManageableBySolver')

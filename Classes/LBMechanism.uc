@@ -14,6 +14,12 @@ struct LBMechanismParam
     var() name ParamName;
 };
 
+struct LBParam
+{
+    var() name MechanismName;
+    var() name ParamName;
+};
+
 var(MechanismBase) actor parent; //parent actor
 var(MechanismBase) class<Actor> parentclass;
 
@@ -39,6 +45,9 @@ function FirstTickInit()
 function SetParam(name param, object value, optional int priority=0)
 {}
     
+function SetParams(name param, array<object> value, optional int priority=0)
+{}    
+    
 function SetParamInt(name param, int value, optional int priority=0)
 {}    
 
@@ -55,6 +64,9 @@ function SetParamRotator(name param, rotator value, optional int priority=0)
 {}    
     
 function object GetParam(name param)
+{}
+    
+function array<object> GetParams(name param)
 {}
     
 function int GetParamInt(name param)

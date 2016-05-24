@@ -23,19 +23,15 @@ struct LBInteraction
 
 var(XenoSolverInteractionSystem) name ManageableControllerMechName;
 
-var(XenoSolverTargetingSystem) name TargetRayOriginSocket; //A socket in skeletal mesh of the owner, which should be used as a start of ray traces
-var(XenoSolverTargetingSystem) float MaxTargetRayLength; //The length of the target ray. Warning! Can slow down the game!
-var(XenoSolverTargetingSystem) bool bDisplayTraces; //When true - the debug lines are drawn
-
 var(XenoSolverAnimationSystem) name BlendByActionNode; //def: blendbyaction
+
+var(XenoSolverSystem) name TargetingMechanism;
+var(XenoSolverSystem) name GroupingMechanism;
 
 var(XenoSolverGameplay) array<LBAction> ActionList;
 var(XenoSolverGameplay) int SolverCurrentAction; //0- no action
 var(XenoSolverGameplay) array<LBInteraction> InteractionList;
 var(XenoSolverGameplay) int SolverInteraction;
-
-var(XenoSolverControlSystem) array<Actor> SelectedObjects; //List of objects, which are currentrly controlled
-var(XenoSolverControlSystem) int CurrentSelectedObject; //Current object from this list
 
 var LBBlendByAction blendbyaction;
 var LBActor targetactor;
@@ -108,40 +104,6 @@ function PerformTracking()
 {
 }
 
-function PerformTargeting()
-{
-    local LBPawn p;
-    local Actor hit;
-    local vector l, d; 
-    local rotator r;
-    local vector oh, on;
-
-    p=LBPawn(parent);
-    if (parent==none)
-    {
-        LogError("proc: PerformTargeting(), parent is not an LBPawn or none:" @parent);   
-        return;    
-    }
-    
-    if (p.Mesh.GetSocketWorldLocationAndRotation(TargetRayOriginSocket, l, r, 0)==false)
-        LogError("proc: PerformTargeting(), the mesh doesn't have a ray origin socket!");    
-    d=vect(0,0,1)>>r;
-    d=Normal(d);
-    
-    hit=TraceTargetRay(l, l+d*MaxTargetRayLength, oh, on, bDisplayTraces);
-    
-    if (LBActor(hit)!=none)
-    {
-        if (LBActor(hit)!=targetactor)
-            ChangeTargetActor(LBActor(hit));
-    }
-    else
-    {   
-        if (LBActor(hit)!=targetactor)
-            ChangeTargetActor(none);
-    }
-}
-
 function PefrormHandling()
 {
     if (targetactor!=none)
@@ -160,17 +122,6 @@ function UpdateCurrentAction()
     {
         SetNewAction(SolverPrevAction);
     }
-}
- 
-function ChangeTargetActor(LBActor a)
-{
-    //`log("Changing target from"@targetactor@"to"@a);
-    ChangeInteraction(false);
-    if (targetactor!=none)
-        SetTargetParamBool(targetactor, ManageableControllerMechName, 'bTargeted', false);
-    targetactor=a;
-    if (targetactor!=none)
-        SetTargetParamBool(targetactor, ManageableControllerMechName, 'bTargeted', true);
 }
 
 function ChangeInteraction(bool newinteraction)
@@ -220,93 +171,29 @@ function ChangeInteractionType(int newinteraction)
         ChangeInteraction(true); //подтверждаем новое взаимодействие
 }
 
-function SelectObject(int newobj)
+function GroupTargetedObject(bool bgroup)
 {
-    if (SelectedObjects.Length==0)
-        CurrentSelectedObject=-1;
-    else
-        CurrentSelectedObject=Clamp(newobj, 0, SelectedObjects.Length-1); 
-}
-
-//Добавление актора в SelectedObjects
-//Лбые ли объекты можно добавлять?
-function AddSelectedObject(actor a)
-{
-    if (LBActor(a)==none && LBPawn(a)==none)
-        return;
+    local actor a;
+    local object o;
     
-    if (SelectedObjects.Find(a)!=-1)
-        return;
-        
-    SetTargetParamBool(a, ManageableControllerMechName, 'bSelected', true); 
-    
-    SelectedObjects.AddItem(a);
-    SelectObject(CurrentSelectedObject);
-}
-
-function RemoveSelectedObjectByID(int id)
-{
-    if (id<0 || id>=SelectedObjects.Length)
-        return;
-    
-    SetTargetParamBool(SelectedObjects[id], ManageableControllerMechName, 'bSelected', false);
-        
-    SelectedObjects.Remove(id, 1);
-    SelectObject(CurrentSelectedObject); //т.к. элементы могли сместиться
-}
-
-function RemoveSelectedObject(actor a)
-{
-    
-    if (LBActor(a)==none && LBPawn(a)==none)
-        return;
-        
-    if (SelectedObjects.Find(a)==-1)
-        return;
-        
-    SetTargetParamBool(a, ManageableControllerMechName, 'bSelected', false);
-        
-    SelectedObjects.RemoveItem(a);
-    SelectObject(CurrentSelectedObject); //т.к. элементы могли сместиться
-}
-
-//Добавление объекта, на который смотрит персонаж, в список выделенных 
-//Если true, пытаемся добавить, если false - убираем
-function SelectTargetedObject(bool b)
-{
-    if (b==true)
-        AddSelectedObject(targetactor);
-    else
-        RemoveSelectedObject(targetactor);
-        
-    LogXenoSolverControlSystem();   
-}
- 
-function actor TraceTargetRay(vector origin, vector target, out vector hitloc, out vector hitnormal, optional bool bDrawTrace=false)
-{
-    local LBPawn p;
-    local Actor hit;
-    
-    p=LBPawn(parent);
-    if (parent==none)
+    o=GetTargetParam(parent, TargetingMechanism, 'TargetedObject');
+    if (actor(o)==none)
     {
-        LogError("proc: TraceTargetRay(), parent is not an LBPawn or none:" @parent);   
-        return none;    
+        LogError("proc: GroupTargetedObject(), targeted object is not an actor or none:"@o); 
+        return;
     }
     
-    hit=p.Trace(hitloc, hitnormal, target, origin);
+    a=actor(o);
     
-    if (bDrawTrace==false)
-        return hit;
-    
-    if (hit!=none)
-        p.DrawDebugLine(origin, hitloc, 255, 0, 0);
+    if (bgroup)
+        SetTargetParam(parent, GroupingMechanism, 'AddSelectedObject', a);
     else
-        p.DrawDebugLine(origin, target, 0, 0, 255);
-        
-    return hit;
-}
-
+        SetTargetParam(parent, GroupingMechanism, 'RemoveObject', a);    
+    
+    //LogInfo(parent$"."$TargetingMechanism$".TargetedObject =" @o);
+    //LogInfo(parent$"."$GroupingMechanism$".AddSelectedObject <-" @ a);
+}    
+    
 function SetNewAction(int act)
 {
     if (act<0 || act>ActionList.length)
@@ -348,41 +235,24 @@ function SetParamBool(name param, bool value, optional int priority=0)
 {
     if (param=='bInteracting')
         ChangeInteraction(value);
-    if (param=='bTargetedObjectSelected')
-        SelectTargetedObject(value);
+    if (param=='GroupTargetedObject')
+        GroupTargetedObject(value);
 }
 
-    
-function LogXenoSolverControlSystem()
-{
-    local int i;
-    
-    `log("XSCS:: Total objects:"@SelectedObjects.Length);
-    
-    for (i=0;i<SelectedObjects.Length;i++)
-    {
-        if (CurrentSelectedObject==i)
-            `log(">"$(i+1)$":"@SelectedObjects[i]$"<");
-        else    
-            `log((i+1)$":"@SelectedObjects[i]);
-    }
-}
-    
+   
 defaultproperties
 {
     
     BlendByActionNode="blendbyaction"
-    TargetRayOriginSocket="TargetRayOrigin"
     ManageableControllerMechName="Managed_Object_Controller"
-    bDisplayTraces=false
-    MaxTargetRayLength=2048
+    
+    TargetingMechanism="XS_Targeting"
+    GroupingMechanism="XS_Grouping"
     
     SolverCurrentAction=0
     SolverPrevAction=0
     SolverInteraction=0
     bInteracting=false
-    
-    CurrentSelectedObject=-1
     
     ActionList.Add((ActionName="No Action"))
     ActionList.Add((ActionName="Manipulation"))
