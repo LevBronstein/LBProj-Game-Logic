@@ -6,65 +6,6 @@
  */
 class LBActorController extends LBInteractableMechanism;
 
-enum ParamTypes
-{
-    ParamType_Object,
-    ParamType_ObjectArray,
-    ParamType_Float,
-    ParamType_Integer,
-    ParamType_Boolean,
-    ParamType_Vector,
-    ParamType_Rotator,
-};
-
-struct ObjectValue
-{
-    var() object Value;
-    var() object DefaultValue;
-};
-
-struct ObjectArrayValue
-{
-    var() array<object> Value;
-    var() array<object> DefaultValue;
-};
-
-struct FloatValue
-{
-    var() float Value;
-    var() float DefaultValue; 
-    var() bool bClampValue; //Set to true, if the value shoul be always between Min and Max 
-    var() float ValueMin;
-    var() float ValueMax;
-};
-
-struct IntegerValue
-{
-    var() int Value;
-    var() int DefaultValue; 
-    var() bool bClampValue; //Set to true, if the value shoul be always between Min and Max 
-    var() int ValueMin;
-    var() int ValueMax;
-};
-
-struct BooleanValue
-{
-    var() bool Value;
-    var() bool DefaultValue; 
-};
-
-struct VectorValue
-{
-    var() vector Value;
-    var() vector DefaultValue; 
-};
-
-struct RotatorValue
-{
-    var() rotator Value;
-    var() rotator DefaultValue; 
-};
-
 struct NamedParam
 {
     var() name ParamName; //The name of this parameter
@@ -123,10 +64,10 @@ function GetParameters()
             switch (CurParamsValues[i].ParamType)
             {
                 case ParamType_Object:
-                
-                   SetParam(CurParamsValues[i].ParamName, GetTargetParam(CurParamsValues[i].ValueSource.ParentActor, CurParamsValues[i].ValueSource.MechanismName, CurParamsValues[i].ValueSource.ParamName));
-                  // `log(CurParamsValues[i].ParamName@CurParamsValues[i].ValueSource.ParentActor@CurParamsValues[i].ValueSource.MechanismName@CurParamsValues[i].ValueSource.ParamName);
-                
+                    SetParam(CurParamsValues[i].ParamName, GetTargetParam(CurParamsValues[i].ValueSource.ParentActor, CurParamsValues[i].ValueSource.MechanismName, CurParamsValues[i].ValueSource.ParamName));
+                break;
+                case ParamType_ObjectArray:
+                    SetParams(CurParamsValues[i].ParamName, GetTargetParams(CurParamsValues[i].ValueSource.ParentActor, CurParamsValues[i].ValueSource.MechanismName, CurParamsValues[i].ValueSource.ParamName));
                 break;
                 case ParamType_Float:
                     SetParamFloat(CurParamsValues[i].ParamName, GetTargetParamFloat(CurParamsValues[i].ValueSource.ParentActor, CurParamsValues[i].ValueSource.MechanismName, CurParamsValues[i].ValueSource.ParamName));

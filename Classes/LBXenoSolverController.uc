@@ -11,18 +11,7 @@ struct LBAction
     var() string ActionName;
     //var name() AnimSecName; //in future
 };
-
-struct LBInteraction
-{
-    var() string InteractionName;
-    var() name TargetMechanism;
-    var() name TargetParam;
-    var() float Value; //A value to set
-    var float DefaultValue; //A value to reset
-};
-
-var(XenoSolverInteractionSystem) name ManageableControllerMechName;
-
+ 
 var(XenoSolverAnimationSystem) name BlendByActionNode; //def: blendbyaction
 
 var(XenoSolverSystem) name TargetingMechanism;
@@ -31,7 +20,8 @@ var(XenoSolverSystem) name GroupingMechanism;
 var(XenoSolverGameplay) array<LBAction> ActionList;
 var(XenoSolverGameplay) int SolverCurrentAction; //0- no action
 var(XenoSolverGameplay) array<LBInteraction> InteractionList;
-var(XenoSolverGameplay) int SolverInteraction;
+
+var int SolverCurInteraction;
 
 var LBBlendByAction blendbyaction;
 var LBActor targetactor;
@@ -124,51 +114,14 @@ function UpdateCurrentAction()
     }
 }
 
-function ChangeInteraction(bool newinteraction)
-{
-    local LBInteraction v;
-    
-    if (bInteracting==newinteraction)
-        return;
-    
-    v=InteractionList[SolverInteraction];
-    
-    if (newinteraction==true)
-    {
-        if (targetactor!=none)
-        {
-            bInteracting=true;
-            SetTargetParamBool(targetactor, ManageableControllerMechName, 'bInteracting', true);
-            SetTargetParamFloat(targetactor, v.TargetMechanism, v.TargetParam, v.Value); 
-            LogInfo(v.InteractionName$"->"$targetactor$"."$v.TargetMechanism$"."$v.TargetParam$"<-"$v.Value);
-        }
-    }
-    else
-    {
-        bInteracting=false;
-        if (targetactor!=none)
-        {
-            SetTargetParamFloat(targetactor, v.TargetMechanism, v.TargetParam, v.DefaultValue);
-            SetTargetParamBool(targetactor, ManageableControllerMechName, 'bInteracting', false); 
-            LogInfo(v.InteractionName$"->"$targetactor$"."$v.TargetMechanism$"."$v.TargetParam$"<-"$v.DefaultValue@"(default)");         
-        }
-    }
-}
-
 function ChangeInteractionType(int newinteraction)
 {
-    if (newinteraction==SolverInteraction)
+    if (newinteraction==SolverCurInteraction)
         return;
+    
+    //как сделать проверку, чтобы не было ненужных значений?
         
-    if (newinteraction<0 || newinteraction>=InteractionList.Length)
-        return;
-    
-    LogInfo("changed interaction from"@SolverInteraction@"to"@newinteraction);
-    
-    ChangeInteraction(false); //сбрасываем предыдущее взаимодействие
-    SolverInteraction=newinteraction; //устанавливаем новое
-    if (bInteracting)  
-        ChangeInteraction(true); //подтверждаем новое взаимодействие
+    SolverCurInteraction=newinteraction;
 }
 
 function GroupTargetedObject(bool bgroup)
@@ -189,9 +142,6 @@ function GroupTargetedObject(bool bgroup)
         SetTargetParam(parent, GroupingMechanism, 'AddSelectedObject', a);
     else
         SetTargetParam(parent, GroupingMechanism, 'RemoveObject', a);    
-    
-    //LogInfo(parent$"."$TargetingMechanism$".TargetedObject =" @o);
-    //LogInfo(parent$"."$GroupingMechanism$".AddSelectedObject <-" @ a);
 }    
     
 function SetNewAction(int act)
@@ -230,13 +180,19 @@ function SetParamInt(name param, int value, optional int priority=0)
     else if (param=='SolverInteraction')
         ChangeInteractionType(value);    
 } 
+    
+function int GetParamInt(name param)
+{
+    if (param=='SolverCurInteraction')
+        return SolverCurInteraction;
+}
 
 function SetParamBool(name param, bool value, optional int priority=0)
 {
-    if (param=='bInteracting')
-        ChangeInteraction(value);
     if (param=='GroupTargetedObject')
         GroupTargetedObject(value);
+    //if (param=='bInteracting')
+    //    ChangeInteraction(value);
 }
 
    
@@ -244,14 +200,13 @@ defaultproperties
 {
     
     BlendByActionNode="blendbyaction"
-    ManageableControllerMechName="Managed_Object_Controller"
     
     TargetingMechanism="XS_Targeting"
     GroupingMechanism="XS_Grouping"
     
     SolverCurrentAction=0
     SolverPrevAction=0
-    SolverInteraction=0
+    SolverCurInteraction=-1
     bInteracting=false
     
     ActionList.Add((ActionName="No Action"))

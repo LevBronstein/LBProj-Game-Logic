@@ -7,6 +7,83 @@
 class LBMechanism extends Object 
 editinlinenew;
 
+enum ParamTypes
+{
+    ParamType_Object,
+    ParamType_ObjectArray,
+    ParamType_Float,
+    ParamType_Integer,
+    ParamType_Boolean,
+    ParamType_Vector,
+    ParamType_Rotator,
+};
+
+struct ObjectValue
+{
+    var() object Value;
+    var() object DefaultValue;
+};
+
+struct ObjectArrayValue
+{
+    var() array<object> Value;
+    var() array<object> DefaultValue;
+};
+
+struct FloatValue
+{
+    var() float Value;
+    var() float DefaultValue; 
+    var() bool bClampValue; //Set to true, if the value shoul be always between Min and Max 
+    var() float ValueMin;
+    var() float ValueMax;
+};
+
+struct IntegerValue
+{
+    var() int Value;
+    var() int DefaultValue; 
+    var() bool bClampValue; //Set to true, if the value shoul be always between Min and Max 
+    var() int ValueMin;
+    var() int ValueMax;
+};
+
+struct BooleanValue
+{
+    var() bool Value;
+    var() bool DefaultValue; 
+};
+
+struct VectorValue
+{
+    var() vector Value;
+    var() vector DefaultValue; 
+};
+
+struct RotatorValue
+{
+    var() rotator Value;
+    var() rotator DefaultValue; 
+};
+
+struct LBParamContainer
+{
+    var() ParamTypes ParamType;
+    var() ObjectValue ObjectParam;
+    var() ObjectArrayValue ObjectArrayParam;
+    var() FloatValue FloatParam; 
+    var() IntegerValue IntegerParam;
+    var() BooleanValue BooleanParam;
+    var() VectorValue VectorParam;
+    var() RotatorValue RotatorParam;
+};
+
+struct LBMechanismParamInfo
+{
+    var() editconst name ParamName;
+    var() editconst string ParamInfo;
+};
+
 struct LBMechanismParam
 {
     var() actor ParentActor;
@@ -22,17 +99,18 @@ struct LBParam
 
 var(MechanismBase) actor parent; //parent actor
 var(MechanismBase) class<Actor> parentclass;
-
 var(MechanismBase) bool benabled; //whether this mechanism is currently enabled
+var(MechanismBase) name mechname; //id of the current mech to find it out
 
 var bool bfirsttick; //whether this is the first tick and we should do some inits
 
-var(MechanismBase) name mechname; //id of the current mech to find it out
 var(MechanismDebug) bool bLogDebug;
 var(MechanismDebug) bool bLogFullInfo;
  
 var(ParamSource) name ParameterSource; //A mechanism, from which we get all params via GetParamFloat
 var(ParamSource) bool bUseParamSource; //Defines whether we should get params (from ParameterSource) 
+
+var(MechanismInfo) array<LBMechanismParamInfo> MechanismParams;
  
 function FirstTickInit()
 {

@@ -95,6 +95,28 @@ function SetTargetParam(actor target, name targetmech, name targetparam, object 
     }
 }
 
+function SetTargetParams(actor target, name targetmech, name targetparam, array<object> value, optional int priority=0)
+{
+    local LBActor a;
+    local LBPawn p;
+
+    a=LBActor(target);
+    
+    if (a!=none)
+    {   
+        a.SetParams(targetmech, targetparam, value);
+        return;
+    }
+    
+    p=LBPawn(target);
+    
+    if (p!=none)
+    {
+        p.SetParams(targetmech, targetparam, value);
+        return;
+    }
+}
+
 function SetTargetParamVector(actor target, name targetmech, name targetparam, vector value, optional int priority=0)
 {
     local LBActor a;
@@ -137,6 +159,34 @@ function SetTargetParamRotator(actor target, name targetmech, name targetparam, 
         p.SetParamRotator(targetmech, targetparam, value);
         return;
     }
+}
+
+function SetTargetParamContainer(actor target, name targetmech, name targetparam, LBParamContainer value, optional int priority=0)
+{
+    switch (value.ParamType)
+    {
+        case ParamType_Object:
+            SetTargetParam(target, targetmech, targetparam, value.ObjectParam.value, priority);
+        break;
+        case ParamType_ObjectArray:
+            SetTargetParams(target, targetmech, targetparam, value.ObjectArrayParam.value, priority);
+        break;
+        case ParamType_Float:
+            SetTargetParamFloat(target, targetmech, targetparam, value.FloatParam.value, priority);
+        break;
+        case ParamType_Integer:
+            SetTargetParamInt(target, targetmech, targetparam, value.IntegerParam.value, priority);
+        break;
+        case ParamType_Boolean:
+            SetTargetParamBool(target, targetmech, targetparam, value.BooleanParam.value, priority);
+        break;
+        case ParamType_Vector:
+            SetTargetParamVector(target, targetmech, targetparam, value.VectorParam.value, priority);
+        break;
+        case ParamType_Rotator:
+            SetTargetParamRotator(target, targetmech, targetparam, value.RotatorParam.value, priority);
+        break;
+    } 
 }
 
 function float GetTargetParamFloat(actor target, name targetmech, name targetparam)
@@ -231,6 +281,29 @@ function object GetTargetParam(actor target, name targetmech, name targetparam)
     }
 }
 
+function array<object> GetTargetParams(actor target, name targetmech, name targetparam)
+{
+    local LBActor a;
+    local LBPawn p;
+    local array<object> value;
+
+    a=LBActor(target);
+    
+    if (a!=none)
+    {   
+        value=a.GetParams(targetmech, targetparam);
+        return value;
+    }
+    
+    p=LBPawn(target);
+    
+    if (p!=none)
+    {
+        value=p.GetParams(targetmech, targetparam);
+        return value;
+    }
+}
+
 function vector GetTargetParamVector(actor target, name targetmech, name targetparam)
 {
     local LBActor a;
@@ -275,6 +348,40 @@ function rotator GetTargetParamRotator(actor target, name targetmech, name targe
         value=p.GetParamRotator(targetmech, targetparam);
         return value;
     }
+}
+
+function LBParamContainer GetTargetParamContainer(actor target, name targetmech, name targetparam, ParamTypes paramtype)
+{
+    local LBParamContainer param;
+    
+    param.ParamType=paramtype;
+    
+    switch (param.ParamType)
+    {
+        case ParamType_Object:
+            param.ObjectParam.value=GetTargetParam(target, targetmech, targetparam);
+        break;
+        case ParamType_ObjectArray:
+            param.ObjectArrayParam.value=GetTargetParams(target, targetmech, targetparam);
+        break;
+        case ParamType_Float:
+            param.FloatParam.value=GetTargetParamFloat(target, targetmech, targetparam);
+        break;
+        case ParamType_Integer:
+            param.IntegerParam.value=GetTargetParamInt(target, targetmech, targetparam);
+        break;
+        case ParamType_Boolean:
+            param.BooleanParam.value=GetTargetParamBool(target, targetmech, targetparam);;
+        break;
+        case ParamType_Vector:
+            param.VectorParam.value=GetTargetParamVector(target, targetmech, targetparam);
+        break;
+        case ParamType_Rotator:
+            param.RotatorParam.value=GetTargetParamRotator(target, targetmech, targetparam);
+        break;
+    } 
+    
+    return param;
 }
 
 defaultproperties
