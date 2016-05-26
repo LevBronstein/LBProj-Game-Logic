@@ -91,6 +91,14 @@ struct LBMechanismParam
     var() name ParamName;
 };
 
+struct LBParamSourcePointer
+{
+    var() actor SourceActor;
+    var() name SourceMechanismName;
+    var() name SourceParamName;
+    var() bool bUseSource;
+};
+
 struct LBParam
 {
     var() name MechanismName;

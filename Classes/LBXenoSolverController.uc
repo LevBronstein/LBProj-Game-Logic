@@ -19,7 +19,9 @@ var(XenoSolverSystem) name GroupingMechanism;
 
 var(XenoSolverGameplay) array<LBAction> ActionList;
 var(XenoSolverGameplay) int SolverCurrentAction; //0- no action
-var(XenoSolverGameplay) array<LBInteraction> InteractionList;
+
+var int ActivateInteractionId;
+var int DeactivateInteractionId;
 
 var int SolverCurInteraction;
 
@@ -114,16 +116,6 @@ function UpdateCurrentAction()
     }
 }
 
-function ChangeInteractionType(int newinteraction)
-{
-    if (newinteraction==SolverCurInteraction)
-        return;
-    
-    //как сделать проверку, чтобы не было ненужных значений?
-        
-    SolverCurInteraction=newinteraction;
-}
-
 function GroupTargetedObject(bool bgroup)
 {
     local actor a;
@@ -142,7 +134,28 @@ function GroupTargetedObject(bool bgroup)
         SetTargetParam(parent, GroupingMechanism, 'AddSelectedObject', a);
     else
         SetTargetParam(parent, GroupingMechanism, 'RemoveObject', a);    
+}
+
+function array<object> GetSelectedObjects()
+{
+    local array<object> os;
+    
+    os=GetTargetParams(parent, GroupingMechanism, 'SelectedObjects');
+    
+    return os;
 }    
+
+function ActivateInteraction(int value)
+{
+    ActivateInteractionId=value;
+    DeactivateInteractionId=-1;
+}
+
+function DeactivateInteraction(int value)
+{
+    DeactivateInteractionId=value;
+    ActivateInteractionId=-1;
+}
     
 function SetNewAction(int act)
 {
@@ -163,30 +176,37 @@ function SetNewAction(int act)
     
 function GetParameters()
 {
-    if (LBPawn(parent)!=none)
-    {
-        
-    }
-    else
-    {
-        LogError("proc: GetParameters(), parent is not an LBPawn or none:" @parent);
-    }
+  
 }
 
 function SetParamInt(name param, int value, optional int priority=0)
 {
     if (param=='SolverCurrentAction')
         SetNewAction(value);
-    else if (param=='SolverInteraction')
-        ChangeInteractionType(value);    
+    //else if (param=='SolverInteraction')
+    //    ChangeInteractionType(value); 
+    else if (param=='ActivatedInteractionID')
+        ActivateInteraction(value);  
+    else if (param=='DeactivatedInteractionID')
+        DeactivateInteraction(value);   
 } 
     
 function int GetParamInt(name param)
 {
     if (param=='SolverCurInteraction')
         return SolverCurInteraction;
+    if (param=='ActivatedInteractionID')
+        return ActivateInteractionId; 
+    if (param=='DeactivatedInteractionID')
+        return DeactivateInteractionId;          
 }
 
+function array<object> GetParams(name param)
+{
+    if (param=='SelectedObjects')
+        return GetSelectedObjects();         
+}
+    
 function SetParamBool(name param, bool value, optional int priority=0)
 {
     if (param=='GroupTargetedObject')
@@ -209,8 +229,18 @@ defaultproperties
     SolverCurInteraction=-1
     bInteracting=false
     
+    ActivateInteractionId=-1
+    DeactivateInteractionId=-1
+    
     ActionList.Add((ActionName="No Action"))
     ActionList.Add((ActionName="Manipulation"))
     ActionList.Add((ActionName="Looking Around"))
+    
+    MechanismParams.Empty
+    
+    MechanismParams(0)=(ParamName="SolverCurInteraction", ParamInfo="Integer. Read, Write.")
+    MechanismParams(1)=(ParamName="SelectedObjects", ParamInfo="Array<Object>. Read.")
+    MechanismParams(2)=(ParamName="ActivatedInteractionID", ParamInfo="Integer. Read, Write.")
+    MechanismParams(3)=(ParamName="DeactivatedInteractionID", ParamInfo="Integer. Read, Write.")
     
 }

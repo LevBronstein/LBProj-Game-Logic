@@ -23,7 +23,7 @@ struct LBInteraction
     
     var() array<LBInteractionValue> Values;
     
-    var bool bIsActive;
+    var() bool bIsActive; //When set to true this interaction will be automatically applied
 };
 
 var(InteractionMechanism) array<Actor> TargetActors;
@@ -31,46 +31,9 @@ var(InteractionMechanism) array<LBInteraction> Interactions;
 var(InteractionMechanism) int CurInteraction; //An interaction to apply to selected actors
 var(InteractionMechanism) bool bNotifyTarget; //Set to true if bInteracting should be sent to the target
 
-var(ParamSource) LBMechanismParam TargetActorsSource;
-
-function FirstTickInit()
-{
-    if (bfirsttick==false)
-        return;
-    
-    if (bfirsttick==true)
-        bfirsttick=false;   
-}
-
-event OwnerTick(float deltatime)
-{
-    super.OwnerTick(deltatime);
-    
-    if (benabled==false)
-        return;
-    
-    PerformActiveInteractions();
-}   
-
-//ЗАЧЕМ КАЖДЫЙ ТИК ПРОИЗВОДИТЬ, ЕСЛИ МОЖНО ПОСТАВИТЬ И СНЯТЬ ТОЛЬКО ПО DEACTIVATE?
-function PerformActiveInteractions()
-{
-    local int i,j,k;
-    
-    for (i=0; i<TargetActors.Length; i++)
-    {
-        //if (bNotifyTarget)
-        //     SetTargetParamBool(TargetActors[i], ); 
-        for (k=0; k<Interactions.Length; k++)
-        {
-            for (j=0; j<Interactions[k].Values.Length; j++)
-            { 
-                LogInfo("applying"@Interactions[k].InteractionName@"to"@TargetActors[i]);
-                SetTargetParamContainer(TargetActors[i], Interactions[k].Values[j].TargetMechanism, Interactions[k].Values[j].TargetParamName, Interactions[k].Values[j].Value);  
-            }
-        }
-    }
-}
+var(ParamSource) LBParamSourcePointer TargetActorsSource;
+var(ParamSource) LBParamSourcePointer ActivateInteractionSource;
+var(ParamSource) LBParamSourcePointer DeactivateInteractionSource;
 
 function PerformInteraction(bool b)
 {
@@ -99,23 +62,80 @@ function PerformInteraction(bool b)
 
 function ActivateInteraction(int id)
 {
-    if (id<0 || id>=Interactions.Length)
+    local int i, j;
+    
+    if (id<0 || id>=Interactions.Length || Interactions[id].bIsActive)
         return;
         
     LogInfo("activating interaction"@id@Interactions[id].InteractionName);    
     Interactions[id].bIsActive=true;
+    
+    for (i=0; i<TargetActors.Length; i++)
+    {
+        for (j=0; j<Interactions[id].Values.Length; j++)
+        {
+            LogInfo("applying"@Interactions[id].InteractionName@"to"@TargetActors[i]);
+            SetTargetParamContainer(TargetActors[i], Interactions[id].Values[j].TargetMechanism, Interactions[id].Values[j].TargetParamName, Interactions[id].Values[j].Value);
+        }
+    }
 }
 
 function DeactivateInteraction(int id)
 {
-    if (id<0 || id>=Interactions.Length)
+    local int i, j;
+    
+    if (id<0 || id>=Interactions.Length || !Interactions[id].bIsActive)
         return;
         
     LogInfo("deactivating interaction"@id@Interactions[id].InteractionName);    
     Interactions[id].bIsActive=false;
+    
+    for (i=0; i<TargetActors.Length; i++)
+    {
+        for (j=0; j<Interactions[id].Values.Length; j++)
+        {
+            LogInfo("applying"@Interactions[id].InteractionName@"(default) to"@TargetActors[i]);
+            SetTargetParamContainer(TargetActors[i], Interactions[id].Values[j].TargetMechanism, Interactions[id].Values[j].TargetParamName, Interactions[id].Values[j].DefaultValue);
+        }
+    }
 }
 
-function GetParameters(); 
+function GetTargetActors(array<object> arr)
+{
+    local int i;
+    
+    TargetActors.Length=0;
+    
+    for (i=0; i<arr.Length; i++)
+    {
+        if (actor(arr[i])!=none)
+            TargetActors.AddItem(actor(arr[i]));
+    }
+}
+
+function GetParameters()
+{
+    local int v;
+    local array<object> vs;
+    
+    if (ActivateInteractionSource.bUseSource)
+    {
+        v=GetTargetParamInt(ActivateInteractionSource.SourceActor, ActivateInteractionSource.SourceMechanismName, ActivateInteractionSource.SourceParamName);    
+        ActivateInteraction(v);
+    } 
+   
+    if (DeactivateInteractionSource.bUseSource)
+    {
+        v=GetTargetParamInt(DeactivateInteractionSource.SourceActor, DeactivateInteractionSource.SourceMechanismName, DeactivateInteractionSource.SourceParamName);    
+        DeactivateInteraction(v);
+    } 
+    
+    if (TargetActorsSource.bUseSource)
+    {
+        vs=GetTargetParams(TargetActorsSource.SourceActor, TargetActorsSource.SourceMechanismName, TargetActorsSource.SourceParamName);    
+        GetTargetActors(vs);
+    } 
+} 
 
 function SetParamBool(name param, bool value, optional int priority=0)
 {
@@ -135,7 +155,8 @@ defaultproperties
 {
     bNotifyTarget=false
     
-    //MechanismParams.Clear()
+    MechanismParams.Empty
+    
     MechanismParams(0)=(ParamName="PerformInteraction", ParamInfo="Boolean. Write. When set to true executes @CurInteraction interaction on @TargetActors. When set to false defaults @CurInteraction interaction on @TargetActors.")
     MechanismParams(1)=(ParamName="ActivateInteraction", ParamInfo="Integer. Write. Set @value to perform @value interaction, until @DeactivateInteraction is called.")
     MechanismParams(2)=(ParamName="DeactivateInteraction", ParamInfo="Integer. Write. Set @value to restrict @value interaction.")
