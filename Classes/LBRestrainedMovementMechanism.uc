@@ -55,7 +55,7 @@ function PerformMovement()
         v=PointB-parent.location;
     else
         v=-1*(PointA-parent.location);
-    
+
     if (v!=vect(0,0,0))
     {
         if (vsize(v)>abs(FwdSpeed))

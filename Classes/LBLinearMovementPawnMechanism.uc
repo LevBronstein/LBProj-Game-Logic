@@ -22,6 +22,8 @@ event OwnerTick(float deltatime)
         return;
     
     UpdateAnimNodes();
+    
+    
 }
 
 function FirstTickInit()
@@ -31,6 +33,8 @@ function FirstTickInit()
     
     if (bfirsttick==true)
         bfirsttick=false;
+        
+    currot=parent.rotation.Yaw*UnrRotToDeg;    
         
     //blendbymovespd=TPBlendByMovementState(parent.Mesh.FindAnimNode(BlendByMoveSpd));
     blendbyangspd=LBBlendByAngSpeed(LBPawn(parent).Mesh.FindAnimNode(BlendByAngSpdNode));

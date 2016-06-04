@@ -19,7 +19,8 @@ function FirstTickInit()
     if (bfirsttick==true)
         bfirsttick=false;   
      
-     LBActor(parent).SetCollision(bCollideActors, bBlockActors, bBlockPlayers);
+     parent.SetCollision(bCollideActors, bBlockActors);
+     parent.bCollideWorld=bCollideWorld;
 }
 
 function SetParamBool(name param, bool value, optional int priority=0)

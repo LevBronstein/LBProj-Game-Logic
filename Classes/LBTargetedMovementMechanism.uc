@@ -1,0 +1,142 @@
+/**
+ *  LBTargetedMovementMechanism
+ *
+ *  Creation date: 02.06.2016 21:59
+ *  Copyright 2016, Windows7
+ */
+class LBTargetedMovementMechanism extends  LBInteractableMechanism;
+
+var(TargetedMovement) vector TargetLocation;
+var(TargetedMovement) float ForwardSpeed;
+var(TargetedMovement) float kForwardSpeed;
+var(TargetedMovement) float TurnSpeed;
+
+var(MovementClamps) float ForwardSpeedMax;
+var(MovementClamps) float ForwardSpeedMin;
+var(MovementClamps) float DistanceToStop; //A value to fix
+
+var(Animation) bool bAnimateMovement; //Should we animate movement via animtree
+var(Animation) name BlendByMoveSpdNode; //Which node to use for animating movement 
+var(Animation) bool bAnimateRotation; //Should we animate rotation via animtree
+var(Animation) name BlendByAngSpdNode; //Which node to use for animating rotation 
+
+var(ParamSource) LBParamSourcePointer TargetLocationSrc;
+
+var(MechanismDebug) bool bShowDebugLines;
+
+//var TPBlendByMovementState blendbymovespd; //Animnode blending by move in the animtree
+var LBBlendByAngSpeed blendbyangspd; //Animnode blending by angspeed in the animtree
+
+var bool bIsPawnMechanism;
+var float dRot;
+
+function FirstTickInit()
+{
+    if (bfirsttick==false)
+        return;
+    
+    if (bfirsttick==true)
+        bfirsttick=false;
+    
+    if (LBPawn(parent)!=none)
+        bIsPawnMechanism=true;
+    else
+        bIsPawnMechanism=false;
+    
+    if (bIsPawnMechanism)
+    {
+        //blendbymovespd=TPBlendByMovementState(parent.Mesh.FindAnimNode(BlendByMoveSpd));
+        blendbyangspd=LBBlendByAngSpeed(LBPawn(parent).Mesh.FindAnimNode(BlendByAngSpdNode));
+    }
+  
+}
+
+event OwnerTick(float deltatime)
+{
+    super.OwnerTick(deltatime);
+    
+    if(benabled==false)
+        return;
+    
+    if (bIsPawnMechanism)
+    {    
+        PerformPawnMovement(deltatime);
+        UpdateAnimNodes();
+    }
+}
+
+function PerformPawnMovement(float dt)
+{
+    local vector v;
+    local rotator r;
+      
+    v=vect(0,0,0); 
+
+    v=TargetLocation-parent.location;
+    v.z=0;
+    
+    r=RInterpTo(parent.rotation, rotator(normal(v)), dt, TurnSpeed*DegToUnrRot, true); //~9000!
+    
+    dRot=(r.Yaw-parent.Rotation.Yaw)*UnrRotToDeg;
+ 
+    r.Pitch=0;
+    r.Roll=0;
+    
+    parent.SetRotation(r);
+    
+    if (vsize(v)>=DistanceToStop)
+    {
+        v=normal(v);
+        parent.Velocity=normal(v)*ForwardSpeed*kForwardSpeed; 
+    }  
+    
+    if (bShowDebugLines)
+    {
+        parent.DrawDebugSphere(TargetLocation, 64, 16, 255, 0, 0);
+        parent.DrawDebugLine(parent.location+vect(0,0,32), TargetLocation, 255, 0, 0);
+    }
+}
+
+function UpdateAnimNodes()
+{
+    //if (blendbymovespd != none)
+    //blendbymovespd.UpdateCurrentMoveState(PawnMovementState);
+    
+    if (blendbyangspd != none)    
+    {
+        blendbyangspd.UpdateAngSpeed(dRot);
+    }
+}
+
+function GetParameters()
+{
+    if (TargetLocationSrc.bUseSource)
+    {
+        TargetLocation=GetTargetParamVector(TargetLocationSrc.SourceActor, TargetLocationSrc.SourceMechanismName, TargetLocationSrc.SourceParamName);
+    }
+}
+
+function vector GetParamVector(name param)
+{
+    if (param=='TargetLocation')
+        return TargetLocation;
+}
+
+function SetParamVector(name param, vector value, optional int priority=0)
+{
+    if (param=='TargetLocation')
+        TargetLocation=value;
+}
+
+defaultproperties
+{
+    ForwardSpeed=0
+    kForwardSpeed=100
+    TurnSpeed=250
+    
+    ForwardSpeedMax=3
+    ForwardSpeedMin=0.7
+    DistanceToStop=5.0
+    
+    dRot=0
+}

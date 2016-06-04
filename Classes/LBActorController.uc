@@ -369,4 +369,5 @@ function LogTransactions()
 
 defaultproperties
 {
+    mechname="Actor_Controller"
 }

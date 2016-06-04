@@ -10,6 +10,7 @@ function SetTargetParamFloat(actor target, name targetmech, name targetparam, fl
 {
     local LBActor a;
     local LBPawn p;
+    local LBDynamicActor d;
 
     a=LBActor(target);
     
@@ -26,12 +27,21 @@ function SetTargetParamFloat(actor target, name targetmech, name targetparam, fl
         p.SetParamFloat(targetmech, targetparam, value);
         return;
     }
+    
+    d=LBDynamicActor(target);
+    
+    if (d!=none)
+    {
+        d.SetParamFloat(targetmech, targetparam, value);
+        return;
+    }
 }
 
 function SetTargetParamInt(actor target, name targetmech, name targetparam, int value, optional int priority=0)
 {
     local LBActor a;
     local LBPawn p;
+    local LBDynamicActor d;
 
     a=LBActor(target);
     
@@ -49,12 +59,21 @@ function SetTargetParamInt(actor target, name targetmech, name targetparam, int 
         p.SetParamInt(targetmech, targetparam, value);
         return;
     }
+    
+    d=LBDynamicActor(target);
+    
+    if (d!=none)
+    {
+        d.SetParamInt(targetmech, targetparam, value);
+        return;
+    }
 }
 
 function SetTargetParamBool(actor target, name targetmech, name targetparam, bool value, optional int priority=0)
 {
     local LBActor a;
     local LBPawn p;
+    local LBDynamicActor d;
 
     a=LBActor(target);
     
@@ -71,12 +90,21 @@ function SetTargetParamBool(actor target, name targetmech, name targetparam, boo
         p.SetParamBool(targetmech, targetparam, value);
         return;
     }
+    
+    d=LBDynamicActor(target);
+    
+    if (d!=none)
+    {
+        d.SetParamBool(targetmech, targetparam, value);
+        return;
+    }
 }
 
 function SetTargetParam(actor target, name targetmech, name targetparam, object value, optional int priority=0)
 {
     local LBActor a;
     local LBPawn p;
+    local LBDynamicActor d;
 
     a=LBActor(target);
     
@@ -93,12 +121,21 @@ function SetTargetParam(actor target, name targetmech, name targetparam, object 
         p.SetParam(targetmech, targetparam, value);
         return;
     }
+    
+    d=LBDynamicActor(target);
+    
+    if (d!=none)
+    {
+        d.SetParam(targetmech, targetparam, value);
+        return;
+    }
 }
 
 function SetTargetParams(actor target, name targetmech, name targetparam, array<object> value, optional int priority=0)
 {
     local LBActor a;
     local LBPawn p;
+    local LBDynamicActor d;
 
     a=LBActor(target);
     
@@ -115,12 +152,21 @@ function SetTargetParams(actor target, name targetmech, name targetparam, array<
         p.SetParams(targetmech, targetparam, value);
         return;
     }
+    
+    d=LBDynamicActor(target);
+    
+    if (d!=none)
+    {
+        d.SetParams(targetmech, targetparam, value);
+        return;
+    }
 }
 
 function SetTargetParamVector(actor target, name targetmech, name targetparam, vector value, optional int priority=0)
 {
     local LBActor a;
     local LBPawn p;
+    local LBDynamicActor d;
 
     a=LBActor(target);
     
@@ -137,12 +183,21 @@ function SetTargetParamVector(actor target, name targetmech, name targetparam, v
         p.SetParamVector(targetmech, targetparam, value);
         return;
     }
+    
+    d=LBDynamicActor(target);
+    
+    if (d!=none)
+    {
+        d.SetParamVector(targetmech, targetparam, value);
+        return;
+    }
 }
 
 function SetTargetParamRotator(actor target, name targetmech, name targetparam, rotator value, optional int priority=0)
 {
     local LBActor a;
     local LBPawn p;
+    local LBDynamicActor d;
 
     a=LBActor(target);
     
@@ -157,6 +212,14 @@ function SetTargetParamRotator(actor target, name targetmech, name targetparam, 
     if (p!=none)
     {
         p.SetParamRotator(targetmech, targetparam, value);
+        return;
+    }
+    
+    d=LBDynamicActor(target);
+    
+    if (d!=none)
+    {
+        d.SetParamRotator(targetmech, targetparam, value);
         return;
     }
 }
@@ -193,6 +256,7 @@ function float GetTargetParamFloat(actor target, name targetmech, name targetpar
 {
     local LBActor a;
     local LBPawn p;
+    local LBDynamicActor d;
     local float value;
 
     a=LBActor(target);
@@ -210,12 +274,21 @@ function float GetTargetParamFloat(actor target, name targetmech, name targetpar
         value=p.GetParamFloat(targetmech, targetparam);
         return value;
     }
+    
+    d=LBDynamicActor(target);
+    
+    if (d!=none)
+    {
+        value=d.GetParamFloat(targetmech, targetparam);
+        return value;
+    }
 }
 
 function int GetTargetParamInt(actor target, name targetmech, name targetparam)
 {
     local LBActor a;
     local LBPawn p;
+    local LBDynamicActor d;
     local int value;
 
     a=LBActor(target);
@@ -233,12 +306,21 @@ function int GetTargetParamInt(actor target, name targetmech, name targetparam)
         value=p.GetParamInt(targetmech, targetparam);
         return value;
     }
+    
+    d=LBDynamicActor(target);
+    
+    if (d!=none)
+    {
+        value=d.GetParamInt(targetmech, targetparam);
+        return value;
+    }
 }
 
 function bool GetTargetParamBool(actor target, name targetmech, name targetparam)
 {
     local LBActor a;
     local LBPawn p;
+    local LBDynamicActor d;
     local bool value;
 
     a=LBActor(target);
@@ -256,12 +338,21 @@ function bool GetTargetParamBool(actor target, name targetmech, name targetparam
         value=p.GetParamBool(targetmech, targetparam);
         return value;
     }
+    
+    d=LBDynamicActor(target);
+    
+    if (d!=none)
+    {
+        value=d.GetParamBool(targetmech, targetparam);
+        return value;
+    }
 }
 
 function object GetTargetParam(actor target, name targetmech, name targetparam)
 {
     local LBActor a;
     local LBPawn p;
+    local LBDynamicActor d;
     local object value;
 
     a=LBActor(target);
@@ -279,12 +370,21 @@ function object GetTargetParam(actor target, name targetmech, name targetparam)
         value=p.GetParam(targetmech, targetparam);
         return value;
     }
+    
+    d=LBDynamicActor(target);
+    
+    if (d!=none)
+    {
+        value=d.GetParam(targetmech, targetparam);
+        return value;
+    }
 }
 
 function array<object> GetTargetParams(actor target, name targetmech, name targetparam)
 {
     local LBActor a;
     local LBPawn p;
+    local LBDynamicActor d;
     local array<object> value;
 
     a=LBActor(target);
@@ -302,12 +402,21 @@ function array<object> GetTargetParams(actor target, name targetmech, name targe
         value=p.GetParams(targetmech, targetparam);
         return value;
     }
+    
+    d=LBDynamicActor(target);
+    
+    if (d!=none)
+    {
+        value=d.GetParams(targetmech, targetparam);
+        return value;
+    }
 }
 
 function vector GetTargetParamVector(actor target, name targetmech, name targetparam)
 {
     local LBActor a;
     local LBPawn p;
+    local LBDynamicActor d;
     local vector value;
 
     a=LBActor(target);
@@ -325,12 +434,21 @@ function vector GetTargetParamVector(actor target, name targetmech, name targetp
         value=p.GetParamVector(targetmech, targetparam);
         return value;
     }
+    
+    d=LBDynamicActor(target);
+    
+    if (d!=none)
+    {
+        value=d.GetParamVector(targetmech, targetparam);
+        return value;
+    }
 }
 
 function rotator GetTargetParamRotator(actor target, name targetmech, name targetparam)
 {
     local LBActor a;
     local LBPawn p;
+    local LBDynamicActor d;
     local rotator value;
 
     a=LBActor(target);
@@ -346,6 +464,14 @@ function rotator GetTargetParamRotator(actor target, name targetmech, name targe
     if (p!=none)
     {
         value=p.GetParamRotator(targetmech, targetparam);
+        return value;
+    }
+    
+    d=LBDynamicActor(target);
+    
+    if (d!=none)
+    {
+        value=d.GetParamRotator(targetmech, targetparam);
         return value;
     }
 }

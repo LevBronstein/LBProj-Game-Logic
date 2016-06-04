@@ -7,12 +7,13 @@
 class LBBlendByAngSpeed extends UDKAnimBlendBase;
 
 var LbPawn p;
+var() float Accuracy;
 
 function UpdateAngSpeed(float s)
 {
     if (p!=none)
     {
-        if (s!=0)
+        if (abs(s)>abs(Accuracy))
         {
             if (s<0)
                 SetActiveChild(0, BlendTime);    
@@ -44,5 +45,7 @@ defaultproperties
     Children(1)=(Name="ZeroAngularSpeed")
     Children(2)=(Name="NegativeAngularSpeed")
     
-    BlendTime=0.5
+    BlendTime=0.25
+    
+    Accuracy=0.8
 }

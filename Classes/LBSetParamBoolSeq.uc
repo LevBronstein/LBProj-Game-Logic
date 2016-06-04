@@ -6,8 +6,7 @@
  */
 class LBSetParamBoolSeq extends SequenceAction;
 
-var LBActor targetactor;
-var LBPawn targetpawn;
+var Actor targetactor;
 var bool value;
 
 var() name mechname;
@@ -16,10 +15,12 @@ var() name paramname;
 event Activated()
 {
     //`log(">>> ("@targetactor@"|"@targetpawn@")"@mechname@"."@paramname@"->"@value);
-    if(targetactor!=none)
-        targetactor.SetParamBool(mechname,paramname,value); 
-    if(targetpawn!=none)
-        targetpawn.SetParamBool(mechname,paramname,value);
+    if(LBActor(targetactor)!=none)
+        LBActor(targetactor).SetParamBool(mechname,paramname,value); 
+    if(LBDynamicActor(targetactor)!=none)
+        LBDynamicActor(targetactor).SetParamBool(mechname,paramname,value); 
+    if(LBPawn(targetactor)!=none)
+        LBPawn(targetactor).SetParamBool(mechname,paramname,value);
     //`log(">>> ("@targetactor@"|"@targetpawn@")"@mechname@"."@paramname@"="@targetactor.GetParamFloat(mechname, paramname)); 
 }
 
@@ -32,6 +33,5 @@ defaultproperties
     ObjCategory="LevBronstein"
     
     VariableLinks(0)=(ExpectedType=class'SeqVar_Object',LinkDesc="Target Actor",PropertyName=targetactor)
-    VariableLinks(1)=(ExpectedType=class'SeqVar_Object',LinkDesc="Target Pawn",PropertyName=targetpawn)
-    VariableLinks(2)=(ExpectedType=class'SeqVar_Bool',LinkDesc="Bool Value",PropertyName=value)
+    VariableLinks(1)=(ExpectedType=class'SeqVar_Bool',LinkDesc="Bool Value",PropertyName=value)
 }

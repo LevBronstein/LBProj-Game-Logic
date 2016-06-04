@@ -30,7 +30,7 @@ event OwnerTick(float deltatime)
     
     if (bUseParamSource)
         GetParameters();
-        
+          
     PerformMovement();  
 }
 
@@ -40,6 +40,8 @@ function PerformMovement()
     local rotator r;
   
     r=rot(0,0,0);
+    currot=parent.Rotation.Yaw * UnrRotToDeg;
+    
     r.pitch=LBActor(parent).Rotation.pitch;
     r.roll=LBActor(parent).Rotation.roll;
     currot=currot+AngSpeed;
@@ -53,6 +55,7 @@ function PerformMovement()
     
     v=v*kFwdSpeed;
     parent.MoveSmooth(v);
+    //parent.Velocity=v;
     
     if (bShowDebugLines)
         parent.DrawDebugLine(parent.location+vect(0,0,25), parent.location+parent.Velocity+vect(0,0,25), 0, 255, 0);

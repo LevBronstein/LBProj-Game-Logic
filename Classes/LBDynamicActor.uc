@@ -1,18 +1,16 @@
 /**
- *  MyProjMechanismDrivenActor
+ *  LBDynamicActor
  *
- *  Creation date: 21.02.2016 22:46
+ *  Creation date: 31.05.2016 20:05
  *  Copyright 2016, Windows7
  */
-class LBActor extends Actor
+class LBDynamicActor extends InterpActor
 placeable
 ClassGroup(LevBronstein);
 
 var(Mechanisms) instanced array<LBMechanism> AllMechanisms; //mechanisms used for this actor
-var(LBActor) const StaticMeshComponent Mesh; //Mesh for this actor
-var(LBActor) const editconst DynamicLightEnvironmentComponent LightEnvironment;
 
-event PostBeginPlay()
+simulated event PostBeginPlay()
 {
     super.PostBeginPlay();
     
@@ -233,35 +231,11 @@ event Tick(float deltatime)
 }
 
 
-
 defaultproperties
 {
-    //bShouldShadowParentAllAttachedActors=TRUE
-    
-    bStatic=false
-    bWorldGeometry=false
-    //bPawnCanBaseOn=true
-    bShadowParented=true
-    
     bEdShouldSnap=true
     
     bCollideActors=true
     bCollideWorld=true
     bBlockActors=true
-    
-    Begin Object Class=DynamicLightEnvironmentComponent Name=MyLightEnvironment
-        bEnabled=TRUE
-    End Object
- 
-    LightEnvironment=MyLightEnvironment
-    Components.Add(MyLightEnvironment)
-    
-    Begin Object Class=StaticMeshComponent Name=BaseMesh
-        StaticMesh=StaticMesh'EngineMeshes.Sphere'
-        LightEnvironment=MyLightEnvironment
-    End Object
-    
-    Components.Add(BaseMesh)
-    Mesh=BaseMesh
-    CollisionComponent=BaseMesh
 }

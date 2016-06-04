@@ -105,9 +105,9 @@ function PefrormHandling()
  
 function UpdateCurrentAction()
 {
-    if (bInteracting==true)
+    //костыль!
+    if (ActivateInteractionId!=-1)
     {
-        SolverPrevAction=SolverCurrentAction;
         SetNewAction(1);
     }
     else
