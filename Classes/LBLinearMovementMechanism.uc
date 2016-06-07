@@ -12,9 +12,12 @@ var(LinearMovement) float FwdSpeed; //Forward speed if < 0 then moves backwards
 var(LinearMovement) float kFwdSpeed; //Coefficient that modifies the FwdSpeed: k*FwdSpeed
 var(LinearMovement) float AngSpeed; //Angular speed turns right or left if <0
 var(LinearMovement) float kAngSpeed; //Coefficient that modifies the AngSpeed: k*AngSpeed
+var(SoftMovement) bool bUSeLinearAcceleration;
+var(SoftMovement) float LinearAcceleration;
 var(MechanismDebug) bool bShowDebugLines; //Display debug in game
 
 var float currot;
+var float curspeed;
 
 function FirstTickInit()
 {
@@ -31,10 +34,10 @@ event OwnerTick(float deltatime)
     if (bUseParamSource)
         GetParameters();
           
-    PerformMovement();  
+        PerformMovement(deltatime);  
 }
 
-function PerformMovement()
+function PerformMovement(float dt)
 {
     local vector v;
     local rotator r;
@@ -50,7 +53,18 @@ function PerformMovement()
     parent.SetRotation(r);
     
     v=vect(0,0,0);
-    v.x=FwdSpeed;
+    
+    if(bUSeLinearAcceleration)
+    {
+        curspeed=FInterpTo(curspeed, FwdSpeed, dt, LinearAcceleration);
+        v.x=curspeed;
+    }
+    else
+    {
+        curspeed=FwdSpeed;
+        v.x=FwdSpeed;
+    }
+    
     v=v>>parent.rotation;
     
     v=v*kFwdSpeed;
@@ -90,5 +104,9 @@ defaultproperties
     AngSpeed=0
     kAngSpeed=1
     
+    bUSeLinearAcceleration=false
+    LinearAcceleration=10
+    
     currot=0
+    curspeed=0 //если объект был в движении?
 }

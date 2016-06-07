@@ -6,8 +6,7 @@
  */
 class LBAddParamFloatSeq extends SequenceAction;
 
-var LBActor targetactor;
-var LBPawn targetpawn;
+var Actor targetactor;
 var float value;
 
 var() name mechname;
@@ -17,15 +16,23 @@ event Activated()
 {
     local float v;
     
-    if(targetactor!=none)
+    if(LBActor(targetactor)!=none)
     {
-        v=value+targetactor.GetParamFloat(mechname,paramname);
-        targetactor.SetParamFloat(mechname,paramname,v); 
+        v=LBActor(targetactor).GetParamFloat(mechname,paramname);
+        v=v+value;
+        LBActor(targetactor).SetParamFloat(mechname,paramname,v);
     }
-    if(targetpawn!=none)
+    if(LBDynamicActor(targetactor)!=none)
     {
-        v=value+targetpawn.GetParamFloat(mechname,paramname);
-        targetpawn.SetParamFloat(mechname,paramname,v);
+        v=LBDynamicActor(targetactor).GetParamFloat(mechname,paramname);
+        v=v+value;
+        LBDynamicActor(targetactor).SetParamFloat(mechname,paramname,v);
+    }
+    if(LBPawn(targetactor)!=none)
+    {
+        v=LBPawn(targetactor).GetParamFloat(mechname,paramname);
+        v=v+value;
+        LBPawn(targetactor).SetParamFloat(mechname,paramname,v);
     }
 }
 
@@ -38,7 +45,6 @@ defaultproperties
     ObjCategory="LevBronstein"
     
     VariableLinks(0)=(ExpectedType=class'SeqVar_Object',LinkDesc="Target Actor",PropertyName=targetactor)
-    VariableLinks(1)=(ExpectedType=class'SeqVar_Object',LinkDesc="Target Pawn",PropertyName=targetpawn)
-    VariableLinks(2)=(ExpectedType=class'SeqVar_Float',LinkDesc="Float Value",PropertyName=value)
+    VariableLinks(1)=(ExpectedType=class'SeqVar_Float',LinkDesc="Float Value",PropertyName=value)
 }
 
