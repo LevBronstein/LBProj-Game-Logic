@@ -6,8 +6,7 @@
  */
 class LBGetParamFloatSeq extends SequenceAction;
 
-var LBActor targetactor;
-var LBPawn targetpawn;
+var Actor targetactor;
 var float value;
 
 var() name mechname;
@@ -15,10 +14,12 @@ var() name paramname;
 
 event Activated()
 {
-    if(targetactor!=none)
-        value=targetactor.GetParamFloat(mechname,paramname); 
-    if(targetpawn!=none)
-        value=targetpawn.GetParamFloat(mechname,paramname);
+    if(LBActor(targetactor)!=none)
+        value=LBActor(targetactor).GetParamFloat(mechname,paramname);
+    if(LBDynamicActor(targetactor)!=none)
+        value=LBDynamicActor(targetactor).GetParamFloat(mechname,paramname);
+    if(LBPawn(targetactor)!=none)
+        value=LBPawn(targetactor).GetParamFloat(mechname,paramname);
 }
 
 
@@ -30,6 +31,5 @@ defaultproperties
     ObjCategory="LevBronstein"
     
     VariableLinks(0)=(ExpectedType=class'SeqVar_Object',LinkDesc="Target Actor",PropertyName=targetactor)
-    VariableLinks(1)=(ExpectedType=class'SeqVar_Object',LinkDesc="Target Pawn",PropertyName=targetpawn)
-    VariableLinks(2)=(ExpectedType=class'SeqVar_Float',LinkDesc="Float Value",bWriteable=true,PropertyName=value)
+    VariableLinks(1)=(ExpectedType=class'SeqVar_Float',LinkDesc="Float Value",bWriteable=true,PropertyName=value)
 }

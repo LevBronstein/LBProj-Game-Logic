@@ -105,6 +105,13 @@ struct LBParam
     var() name ParamName;
 };
 
+struct LBTypedParamPtr
+{
+    var() LBMechanismParam ParamPtr;
+    var() ParamTypes ParamType;
+};
+
+
 var(MechanismBase) actor parent; //parent actor
 var(MechanismBase) class<Actor> parentclass;
 var(MechanismBase) bool benabled; //whether this mechanism is currently enabled

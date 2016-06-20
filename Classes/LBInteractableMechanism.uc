@@ -6,6 +6,7 @@
  */
 class LBInteractableMechanism extends LBMechanism;
 
+
 function SetTargetParamFloat(actor target, name targetmech, name targetparam, float value, optional int priority=0)
 {
     local LBActor a;
@@ -250,6 +251,26 @@ function SetTargetParamContainer(actor target, name targetmech, name targetparam
             SetTargetParamRotator(target, targetmech, targetparam, value.RotatorParam.value, priority);
         break;
     } 
+}
+
+function SetTargetParamContainerPtr(LBMechanismParam target, LBParamContainer value)
+{
+    SetTargetParamContainer(target.ParentActor, target.MechanismName, target.ParamName, value);
+}
+
+function SetTargetParamContainerStr(LBMechanismParam target, LBParamContainer value, LBParamSourcePointer source, optional int priority=0)
+{
+    local LBParamContainer v;
+    
+    if (source.bUseSource)
+    {
+        v=GetTargetParamContainer(source.SourceActor, source.SourceMechanismName, source.SourceParamName, value.ParamType);
+        SetTargetParamContainer(target.ParentActor, target.MechanismName, target.ParamName, v);
+    }
+    else
+    {
+        SetTargetParamContainer(target.ParentActor, target.MechanismName, target.ParamName, value);
+    }
 }
 
 function float GetTargetParamFloat(actor target, name targetmech, name targetparam)
@@ -508,6 +529,25 @@ function LBParamContainer GetTargetParamContainer(actor target, name targetmech,
     } 
     
     return param;
+}
+
+function LBParamContainer GetTargetParamContainerPtr(LBMechanismParam target, ParamTypes paramtype)
+{
+    local LBParamContainer v;
+    v=GetTargetParamContainer(target.ParentActor, target.MechanismName, target.ParamName, paramtype);
+    return v;
+}
+
+function LBParamContainer GetTargetParamContainerSrc(LBParamSourcePointer source, ParamTypes paramtype)
+{
+    local LBParamContainer v;
+    
+    if (source.bUseSource)
+    {
+        v=GetTargetParamContainer(source.SourceActor, source.SourceMechanismName, source.SourceParamName, paramtype);
+    }
+    
+    return v;
 }
 
 defaultproperties

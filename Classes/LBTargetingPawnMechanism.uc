@@ -121,8 +121,11 @@ function object GetParam(name param)
    
 defaultproperties
 {
+    mechname="Targeting_Mechanism"
     TargetRayOriginSocket="TargetRayOrigin"
     
     bShowDebugLines=false
     MaxTargetRayLength=2048
+    
+    MechanismParams(0)=(ParamName="TargetedObject", ParamInfo="Object. Read. Get current visible (ray-traced) object.")
 }

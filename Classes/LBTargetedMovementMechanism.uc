@@ -63,6 +63,10 @@ event OwnerTick(float deltatime)
         PerformPawnMovement(deltatime);
         UpdateAnimNodes();
     }
+    else
+    {
+        PerformActorMovement(deltatime);
+    }
 }
 
 function PerformPawnMovement(float dt)
@@ -88,6 +92,29 @@ function PerformPawnMovement(float dt)
     {
         v=normal(v);
         parent.Velocity=normal(v)*ForwardSpeed*kForwardSpeed; 
+    }  
+    
+    if (bShowDebugLines)
+    {
+        parent.DrawDebugSphere(TargetLocation, 64, 16, 255, 0, 0);
+        parent.DrawDebugLine(parent.location+vect(0,0,32), TargetLocation, 255, 0, 0);
+    }
+}
+
+function PerformActorMovement(float dt)
+{
+    local vector v;
+    //local rotator r;
+      
+    v=vect(0,0,0); 
+
+    v=TargetLocation-parent.location;
+    
+    if (vsize(v)>=DistanceToStop)
+    {
+        v=normal(v);
+        parent.MoveSmooth(normal(v)*ForwardSpeed*kForwardSpeed);
+        //paertn.Velocity=normal(v)*ForwardSpeed*kForwardSpeed; 
     }  
     
     if (bShowDebugLines)
@@ -127,7 +154,19 @@ function SetParamVector(name param, vector value, optional int priority=0)
     if (param=='TargetLocation')
         TargetLocation=value;
 }
+    
+function float GetParamFloat(name param)
+{
+   if (param=='ForwardSpeed')
+    return ForwardSpeed; 
+}
 
+function SetParamFloat(name param, float value, optional int priority=0) 
+{
+    if (param=='ForwardSpeed')
+        ForwardSpeed=value;
+}
+    
 defaultproperties
 {
     ForwardSpeed=0
@@ -139,4 +178,7 @@ defaultproperties
     DistanceToStop=5.0
     
     dRot=0
+    
+    MechanismParams(0)=(ParamName="TargetLocation", ParamInfo="Vector. Read, Write. A destination of movement.")
+    MechanismParams(1)=(ParamName="ForwardSpeed", ParamInfo="Float. Read, Write. Forward speed of the parent actor.")
 }
