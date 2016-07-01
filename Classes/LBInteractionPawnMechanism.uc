@@ -20,6 +20,7 @@ struct LBInteraction
     
     var() actor TargetActor;
     var() bool bUsePresetActor; //Set to true if @TargetActor should be used as an override 
+    var() bool bIsInstant; //Set to true if this interaction is executed once, with no need to default its value
     
     var() array<LBInteractionValue> Values;
     

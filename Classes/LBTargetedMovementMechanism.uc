@@ -14,6 +14,8 @@ var(TargetedMovement) float TurnSpeed;
 var(MovementClamps) float ForwardSpeedMax;
 var(MovementClamps) float ForwardSpeedMin;
 var(MovementClamps) float DistanceToStop; //A value to fix
+var(MovementClamps) bool bEnableMovement; //set to true to enable movement
+var(MovementClamps) bool bEnableRotation; //set to true to enable rotation
 
 var(Animation) bool bAnimateMovement; //Should we animate movement via animtree
 var(Animation) name BlendByMoveSpdNode; //Which node to use for animating movement 
@@ -21,6 +23,8 @@ var(Animation) bool bAnimateRotation; //Should we animate rotation via animtree
 var(Animation) name BlendByAngSpdNode; //Which node to use for animating rotation 
 
 var(ParamSource) LBParamSourcePointer TargetLocationSrc;
+var(ParamSource) LBParamSourcePointer bEnableMovementSrc;
+var(ParamSource) LBParamSourcePointer bEnableRotationSrc;
 
 var(MechanismDebug) bool bShowDebugLines;
 
@@ -59,7 +63,7 @@ event OwnerTick(float deltatime)
         return;
     
     if (bIsPawnMechanism)
-    {    
+    {   
         PerformPawnMovement(deltatime);
         UpdateAnimNodes();
     }
@@ -86,13 +90,16 @@ function PerformPawnMovement(float dt)
     r.Pitch=0;
     r.Roll=0;
     
-    parent.SetRotation(r);
+    if (bEnableRotation)
+        parent.SetRotation(r);
     
     if (vsize(v)>=DistanceToStop)
     {
         v=normal(v);
-        parent.Velocity=normal(v)*ForwardSpeed*kForwardSpeed; 
-    }  
+        
+        if (bEnableMovement)
+            parent.Velocity=normal(v)*ForwardSpeed*kForwardSpeed; 
+    }
     
     if (bShowDebugLines)
     {
@@ -113,7 +120,9 @@ function PerformActorMovement(float dt)
     if (vsize(v)>=DistanceToStop)
     {
         v=normal(v);
-        parent.MoveSmooth(normal(v)*ForwardSpeed*kForwardSpeed);
+        
+        if (bEnableMovement)
+            parent.MoveSmooth(normal(v)*ForwardSpeed*kForwardSpeed);
         //paertn.Velocity=normal(v)*ForwardSpeed*kForwardSpeed; 
     }  
     
@@ -141,6 +150,16 @@ function GetParameters()
     {
         TargetLocation=GetTargetParamVector(TargetLocationSrc.SourceActor, TargetLocationSrc.SourceMechanismName, TargetLocationSrc.SourceParamName);
     }
+    
+    if (bEnableMovementSrc.bUseSource)
+    {
+        bEnableMovement=GetTargetParamBool(bEnableMovementSrc.SourceActor, bEnableMovementSrc.SourceMechanismName, bEnableMovementSrc.SourceParamName);
+    }
+    
+    if (bEnableRotationSrc.bUseSource)
+    {
+        bEnableRotation=GetTargetParamBool(bEnableRotationSrc.SourceActor, bEnableRotationSrc.SourceMechanismName, bEnableRotationSrc.SourceParamName);
+    }
 }
 
 function vector GetParamVector(name param)
@@ -167,6 +186,14 @@ function SetParamFloat(name param, float value, optional int priority=0)
         ForwardSpeed=value;
 }
     
+function SetParamBool(name param, bool value, optional int priority=0) 
+{
+    if (param=='bEnableMovement')
+        bEnableMovement=value;
+    else if (param=='bEnableRotation')
+        bEnableRotation=value;
+}
+    
 defaultproperties
 {
     ForwardSpeed=0
@@ -176,6 +203,9 @@ defaultproperties
     ForwardSpeedMax=3
     ForwardSpeedMin=0.7
     DistanceToStop=5.0
+    
+    bEnableMovement=true
+    bEnableRotation=true
     
     dRot=0
     

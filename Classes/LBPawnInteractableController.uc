@@ -12,18 +12,22 @@ struct LBAction
     //var name() AnimSecName; //in future
 };
  
-var(XenoSolverAnimationSystem) name BlendByActionNode; //def: blendbyaction
+var(Animation) name BlendByActionNode; //def: blendbyaction
 
-var(XenoSolverSystem) name TargetingMechanism;
-var(XenoSolverSystem) name GroupingMechanism;
+var(System) name TargetingMechanism;
+var(System) name GroupingMechanism;
+var(System) name InteractingMechanism;
 
-var(XenoSolverGameplay) array<LBAction> ActionList;
-var(XenoSolverGameplay) int PawnCurrentAction; //0- no action
+var(Gameplay) array<LBAction> ActionList;
+var(Gameplay) int PawnCurrentAction; //0- no action
 
 var LBBlendByAction blendbyaction;
 var LBActor targetactor;
 
 var int PawnPrevAction;
+
+var int ActivateInteractionId;
+var int DeactivateInteractionId;
 
 function FirstTickInit()
 {
@@ -49,11 +53,11 @@ event OwnerTick(float deltatime)
     if (benabled==false)
         return;
     
-    PerformTcik();
+    PerformTick();
 }   
 
 //основная процедура
-function PerformTcik()
+function PerformTick()
 {
     //UpdateCurrentAction();
     
@@ -156,17 +160,35 @@ function array<object> GetSelectedObjects()
     return os;
 }    
 
-//function ActivateInteraction(int value)
-//{
-//    ActivateInteractionId=value;
-//    DeactivateInteractionId=-1;
-//}
-//
-//function DeactivateInteraction(int value)
-//{
-//    DeactivateInteractionId=value;
-//    ActivateInteractionId=-1;
-//}
+function ActivateInteraction(int value)
+{
+    //local actor a;
+    //local object o;
+    //
+    //ActivateInteractionId=value;
+    //DeactivateInteractionId=-1;
+    //
+    //o=GetTargetParam(parent, InteractingMechanism, 'TargetedObject');
+    //
+    //if (actor(o)==none)
+    //{
+    //    LogError("proc: ActivateInteraction(), targeted object is not an actor or none:"@o); 
+    //    return;
+    //}
+    //
+    //a=actor(o);
+    //
+    //if (bgroup)
+    //    SetTargetParam(parent, GroupingMechanism, 'AddSelectedObject', a);
+    //else
+    //    SetTargetParam(parent, GroupingMechanism, 'RemoveSelectedObject', a);  
+}
+
+function DeactivateInteraction(int value)
+{
+    //DeactivateInteractionId=value;
+    //ActivateInteractionId=-1;
+}
     
 //function SetNewAction(int act)
 //{
@@ -199,7 +221,8 @@ function SetParamInt(name param, int value, optional int priority=0)
     //else if (param=='ActivatedInteractionID')
     //    ActivateInteraction(value);  
     //else if (param=='DeactivatedInteractionID')
-    //    DeactivateInteraction(value);   
+    //    DeactivateInteraction(value); 
+    //if (param=='CurInteraction')  
 } 
     
 function int GetParamInt(name param)
@@ -243,8 +266,8 @@ defaultproperties
     //SolverCurInteraction=-1
     //bInteracting=false
     
-    //ActivateInteractionId=-1
-    //DeactivateInteractionId=-1
+    ActivateInteractionId=-1
+    DeactivateInteractionId=-1
     
     ActionList.Add((ActionName="No Action"))
     
