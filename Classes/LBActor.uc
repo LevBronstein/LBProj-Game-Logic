@@ -232,8 +232,6 @@ event Tick(float deltatime)
     TickAllMechanisms(deltatime);
 }
 
-
-
 defaultproperties
 {
     //bShouldShadowParentAllAttachedActors=TRUE

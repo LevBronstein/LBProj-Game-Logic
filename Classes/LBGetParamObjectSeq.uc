@@ -4,7 +4,7 @@
  *  Creation date: 13.06.2016 23:10
  *  Copyright 2016, Windows7
  */
-class LBGetParamObjectSec extends SequenceAction;
+class LBGetParamObjectSeq extends SequenceAction;
 
 var Actor targetactor;
 var object value;

@@ -7,11 +7,11 @@
 class LBLinearMovementPawnMechanism extends LBLinearMovementMechanism;
 
 var(Animation) bool bAnimateMovement; //Should we animate movement via animtree
-var(Animation) array<name> BlendByMoveSpdNodes; //Which node to use for animating movement
+//var(Animation) array<name> BlendByMoveSpdNodes; //Which node to use for animating movement
 var(Animation) float AnimMinSpeed; 
 var(Animation) float AnimMaxSpeed;   
 var(Animation) bool bAnimateRotation; //Should we animate rotation via animtree
-var(Animation) array<name> BlendByAngSpdNodes; //Which node to use for animating rotation 
+//var(Animation) array<name> BlendByAngSpdNodes; //Which node to use for animating rotation 
 var(Animation) float AnimBlendTime;
 
 var array<AnimNodeBlend> blendbymovespd; //Animnode blending by move in the animtree
@@ -30,7 +30,8 @@ event OwnerTick(float deltatime)
 function FirstTickInit()
 {
     local int i;
-    local AnimNode a;
+    local LBBlendByMovSpeed spd;
+    local LBBlendByAngSpeed ang;
     
     if (bfirsttick==false)
         return;
@@ -39,19 +40,17 @@ function FirstTickInit()
         bfirsttick=false;
         
     currot=parent.rotation.Yaw*UnrRotToDeg;    
-        
-    for (i=0;i<BlendByMoveSpdNodes.Length;i++)
+     
+    foreach LBPawn(parent).Mesh.AllAnimNodes(class'LBBlendByMovSpeed', spd)
     {
-        a=LBPawn(parent).Mesh.FindAnimNode(BlendByMoveSpdNodes[i]);
-        if (AnimNodeBlend(a)!=none)
-            blendbymovespd.AddItem(AnimNodeBlend(a));
+        if (spd!=none)
+            blendbymovespd.AddItem(spd);
     }
     
-    for (i=0;i<BlendByAngSpdNodes.Length;i++)  
-    {  
-        a=LBPawn(parent).Mesh.FindAnimNode(BlendByAngSpdNodes[i]);
-        if (LBBlendByAngSpeed(a)!=none)
-            blendbyangspd.AddItem(LBBlendByAngSpeed(a));
+    foreach LBPawn(parent).Mesh.AllAnimNodes(class'LBBlendByAngSpeed', ang)
+    {
+        if (ang!=none)
+            blendbyangspd.AddItem(ang);
     }
     
     for (i=0;i<blendbymovespd.Length;i++)
@@ -120,8 +119,8 @@ function UpdateAnimNodes()
 
 defaultproperties
 {
-    BlendByAngSpdNodes(0)="BlendByAngularSpeed"
-    BlendByMoveSpdNodes(0)="BlendByMoveSpeed"
+    //BlendByAngSpdNodes(0)="BlendByAngularSpeed"
+    //BlendByMoveSpdNodes(0)="BlendByMoveSpeed"
     
     AnimMinSpeed=0
     AnimMaxSpeed=250

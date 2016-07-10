@@ -16,7 +16,7 @@ event OwnerTick(float deltatime)
     if (benabled==false)
         return;
         
-    if (bCheckEveryTick)
+    if (bCheckOnTick)
     {
         if (CheckConditions())
             TriggerKismetEvent();    
@@ -72,5 +72,4 @@ function bool CheckConditions()
     
 defaultproperties
 {
-    bCheckEveryTick=false
 }

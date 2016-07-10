@@ -16,6 +16,9 @@ var(ParamSource) LBParamSourcePointer AngSpeedRollSrc;
 var(Movement) float SpeedX;
 var(Movement) float SpeedY;
 var(Movement) float SpeedZ;
+var(Movement) float AngularSpeedYaw;
+var(Movement) float AngularSpeedPitch;
+var(Movement) float AngularSpeedRoll;
 
 var(MechanismDebug) bool bShowDebugLines; //Display debug in game
 
@@ -25,16 +28,16 @@ function FirstTickInit()
 {
     super.FirstTickInit();
     
-    currotY=parent.Rotation.Yaw * UnrRotToDeg;
-    currotP=parent.Rotation.Pitch * UnrRotToDeg;
-    currotR=parent.Rotation.Roll * UnrRotToDeg;
+    currotY = parent.Rotation.Yaw * UnrRotToDeg;
+    currotP = parent.Rotation.Pitch * UnrRotToDeg;
+    currotR = parent.Rotation.Roll * UnrRotToDeg;
 }
 
 event OwnerTick(float deltatime)
 {
     super.OwnerTick(deltatime);
     
-    if(benabled==false)
+    if (benabled == false)
         return;
         
     PerformMovement(); 
@@ -45,16 +48,22 @@ function PerformMovement()
 {
     local vector v;
     
-    v.X=SpeedX;
-    v.Y=SpeedY;
-    v.Z=SpeedZ;
+    v.X = SpeedX;
+    v.Y = SpeedY;
+    v.Z = SpeedZ;
   
     parent.SetLocation(parent.location+v);
 }
 
 function PerformRotation()
 {
-    //local rotator r;
+    local rotator r;
+    
+    r.Yaw = parent.Rotation.Yaw + AngularSpeedYaw * DegToUnrRot;
+    r.Pitch = parent.Rotation.Pitch + AngularSpeedPitch * DegToUnrRot;
+    r.Roll = parent.Rotation.Roll + AngularSpeedRoll * DegToUnrRot;
+    
+    parent.SetRotation(r);
 }
 
 function GetParameters()

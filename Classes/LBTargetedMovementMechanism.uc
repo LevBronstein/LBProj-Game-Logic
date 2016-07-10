@@ -77,7 +77,7 @@ function PerformPawnMovement(float dt)
 {
     local vector v;
     local rotator r;
-      
+   
     v=vect(0,0,0); 
 
     v=TargetLocation-parent.location;
@@ -117,7 +117,7 @@ function PerformActorMovement(float dt)
 
     v=TargetLocation-parent.location;
     
-    if (vsize(v)>=DistanceToStop)
+    if (vsize(v)>=DistanceToStop) //дистаниця нулевая - не работает (дергается)!!!
     {
         v=normal(v);
         
@@ -188,7 +188,9 @@ function SetParamFloat(name param, float value, optional int priority=0)
     
 function SetParamBool(name param, bool value, optional int priority=0) 
 {
-    if (param=='bEnableMovement')
+    if (param=='bEnabled')
+        benabled=value;
+    else if (param=='bEnableMovement')
         bEnableMovement=value;
     else if (param=='bEnableRotation')
         bEnableRotation=value;

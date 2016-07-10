@@ -8,8 +8,10 @@ class LBKismetEventActivator extends LBInteractableMechanism
 dependson(LBConditionalProgramm);
 
 var(EventActivation) name EventName;
+var(EventActivation) bool bCheckOnTick;
+var(EventActivation) int CheckEveryNthTick; //0 means check every tick
 
-var(EventActivation) bool bCheckEveryTick;
+var int curtick;
 
 function FirstTickInit()
 {
@@ -27,9 +29,21 @@ event OwnerTick(float deltatime)
     if (benabled==false)
         return;
         
-    if (bCheckEveryTick)
+    if (bCheckOnTick)
     {
-        TriggerKismetEvent();    
+        if (CheckEveryNthTick==0)
+            TriggerKismetEvent(); 
+        else
+        {
+            if (curtick>=CheckEveryNthTick)
+            {
+                TriggerKismetEvent();
+                curtick=0;
+            }     
+            else
+                curtick=curtick+1;
+                
+        }   
     }
 } 
     
@@ -41,9 +55,9 @@ function TriggerKismetEvent()
 
     GameSeq = parent.WorldInfo.GetGameSequence();
     
-    if(GameSeq != None)
+    if(GameSeq != None && EventName!='')
     {
-        GameSeq.FindSeqObjectsByClass(class'LBSequenceEvent',true, AllSeqEvents);
+        GameSeq.FindSeqObjectsByClass(class'LBSequenceEvent', true, AllSeqEvents);
         for(i=0; i<AllSeqEvents.Length; i++)
         {
             //originator - instigator?
