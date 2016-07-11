@@ -18,6 +18,16 @@ enum ParamTypes
     ParamType_Rotator,
 };
 
+//AnimNotifyTypes_None - the action can be interrupted
+//AnimNotifyTypes_ActionStart - the action should go until it receives AnimNotifyTypes_ActionEnd
+enum AnimNotifyTypes
+{
+    AnimNotifyTypes_None,
+    AnimNotifyTypes_ActionStart,
+    AnimNotifyTypes_PerformAction,
+    AnimNotifyTypes_ActionEnd,
+};
+
 struct ObjectValue
 {
     var() object Value;
@@ -188,6 +198,8 @@ event OwnerTick(float deltatime)
         GetParameters();       
 }
 
+event OwnerAnimNotify(AnimNodeSequence notifynode, AnimNotifyTypes notifytype);
+    
 function GetParameters();    
     
 function LogError(string message)
