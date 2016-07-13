@@ -34,6 +34,12 @@ event Activated()
         v=v+value;
         LBPawn(targetactor).SetParamFloat(mechname,paramname,v);
     }
+    if(LBCamera(targetactor)!=none)
+    {
+        v=LBCamera(targetactor).GetParamFloat(mechname,paramname);
+        v=v+value;
+        LBCamera(targetactor).SetParamFloat(mechname,paramname,v);
+    }
 }
 
 

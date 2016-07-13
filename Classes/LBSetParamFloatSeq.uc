@@ -21,6 +21,8 @@ event Activated()
         LBDynamicActor(targetactor).SetParamFloat(mechname,paramname,value);
     if(LBPawn(targetactor)!=none)
         LBPawn(targetactor).SetParamFloat(mechname,paramname,value);
+    if(LBCamera(targetactor)!=none)
+        LBCamera(targetactor).SetParamFloat(mechname,paramname,value);
     //`log(">>> ("@targetactor@"|"@targetpawn@")"@mechname@"."@paramname@"="@targetactor.GetParamFloat(mechname, paramname)); 
 }
 

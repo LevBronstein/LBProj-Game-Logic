@@ -21,6 +21,8 @@ event Activated()
         LBDynamicActor(targetactor).SetParam(mechname,paramname,value);
     if(LBPawn(targetactor)!=none)
         LBPawn(targetactor).SetParam(mechname,paramname,value);
+    if(LBCamera(targetactor)!=none)
+        LBCamera(targetactor).SetParam(mechname,paramname,value);    
 }
 
 
