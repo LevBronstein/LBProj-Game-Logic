@@ -165,6 +165,10 @@ function SetParamVector(name param, vector value, optional int priority=0)
  
 function SetParamRotator(name param, rotator value, optional int priority=0)
 {}    
+
+//not fully supported for now    
+function SetParamName(name param, name value, optional int priority=0)
+{}     
     
 function object GetParam(name param)
 {}
@@ -185,7 +189,11 @@ function vector GetParamVector(name param)
 {} 
  
 function rotator GetParamRotator(name param)
-{}        
+{}  
+
+//not fully supported for now    
+function name GetParamName(name param)
+{}     
     
 event OwnerTick(float deltatime)
 {

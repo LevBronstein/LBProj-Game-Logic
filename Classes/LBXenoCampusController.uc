@@ -11,15 +11,17 @@ var(MechanismInfo) editconst string InteractionInfo[3];
 var(System) name InfoMechanism;
 var(System) name OtherActorsMechanism;
 
-var(Animation) name BlendByHeadActionNode; //A node in animtree, which blends through all head actions
-var(Animation) array<name> HeadActionSequences; //An array of all sequences, which represent certain actions
+var(Animation) name BlendByActionNode; //A node in animtree, which blends through all head actions
+var(Animation) array<name> ActionSequences; //An array of all sequences, which represent certain actions
 
-var AnimNodeBlendList blendbyheadaction; 
-var array<AnimNodeSequence> headactionseqs;
+var AnimNodeBlendList blendbyaction; 
+var array<AnimNodeSequence> actionseqs;
 
 var int curinteraction;
 
 var int curaction; //действие пауна
+
+var actor otheractor; //актор, с которым предполаагется взаимодействие
 
 function FirstTickInit()
 {
@@ -37,28 +39,29 @@ function InitAnimation()
     local int i;
     local AnimNodeSequence anim;
     
-    blendbyheadaction=AnimNodeBlendList(LBPawn(parent).Mesh.FindAnimNode(BlendByHeadActionNode));  
+    //Head animations init
+    blendbyaction=AnimNodeBlendList(LBPawn(parent).Mesh.FindAnimNode(BlendByActionNode));  
 
-    if (blendbyheadaction == none)
+    if (blendbyaction == none)
     {
-        LogError("BlendByHeadActionNode" @ BlendByHeadActionNode @ "not found in" @ LBPawn(parent) @ " in " @ LBPawn(parent).Mesh);
+        LogError("BlendByActionNode" @ BlendByActionNode @ "not found in" @ LBPawn(parent) @ " in " @ LBPawn(parent).Mesh);
         return;
     }
     
-    LogInfo("Head animations blender found:" @ BlendByHeadActionNode @ blendbyheadaction);
+    LogInfo("Action animations blender found:" @ BlendByActionNode @ blendbyaction);
     
-    blendbyheadaction.SetActiveChild(0, 0.5); //сброс на исходное состояние
+    blendbyaction.SetActiveChild(0, 0.5); //сброс на исходное состояние
     
-    for (i=0; i<HeadActionSequences.Length; i++)
+    for (i=0; i<ActionSequences.Length; i++)
     {
-        anim=AnimNodeSequence(LBPawn(parent).Mesh.FindAnimNode(HeadActionSequences[i]));
+        anim=AnimNodeSequence(LBPawn(parent).Mesh.FindAnimNode(ActionSequences[i]));
         
         if (anim != none)
         {
-            headactionseqs.AddItem(anim);
-            LogInfo("Head animation found:" @ HeadActionSequences[i] @ anim);
+            actionseqs.AddItem(anim);
+            LogInfo("Action animation found:" @ ActionSequences[i] @ anim);
         }
-    }
+    }    
 }
 
 event OwnerTick(float deltatime)
@@ -76,12 +79,6 @@ function PerformTick()
 
 function ActivateInteraction(int value)
 {
-    //if (curinteraction != 0)
-    //{
-    //    //выход, если на данный момент выполняется какое-либо взаимодействие
-    //    return;
-    //}
-        
     if (value == 1)
     {
         //activate interaction: Call
@@ -93,9 +90,9 @@ function ActivateInteraction(int value)
         //set action
         
         //play call animation (from animtree)
-        blendbyheadaction.SetActiveChild(1, 0.5);
-        headactionseqs[0].SetPosition(0.0, false);
-        headactionseqs[0].PlayAnim(false, 0.5, 0.0);
+        blendbyaction.SetActiveChild(1, 0.5);
+        actionseqs[0].SetPosition(0.0, false);
+        actionseqs[0].PlayAnim(false, 0.5, 0.0);
         
         //play sound (plays in animtree)    
     }
@@ -107,9 +104,9 @@ function ActivateInteraction(int value)
         if (curaction != 0)
             return; //если выполняется другое действие - выход
         
-        blendbyheadaction.SetActiveChild(2, 0.5);
-        headactionseqs[1].SetPosition(0.0, false);
-        headactionseqs[1].PlayAnim(false, 0.8, 0.0);
+        blendbyaction.SetActiveChild(2, 0.5);
+        actionseqs[1].SetPosition(0.0, false);
+        actionseqs[1].PlayAnim(false, 0.8, 0.0);
     }
     else if (value == 3)
     {
@@ -119,9 +116,9 @@ function ActivateInteraction(int value)
         if (curaction != 0)
             return; //если выполняется другое действие - выход
         
-        blendbyheadaction.SetActiveChild(3, 0.5);
-        headactionseqs[2].SetPosition(0.0, false);
-        headactionseqs[2].PlayAnim(false, 0.8, 0.0);
+        blendbyaction.SetActiveChild(3, 0.5);
+        actionseqs[2].SetPosition(0.0, false);
+        actionseqs[2].PlayAnim(false, 0.8, 0.0);
     }
     else if (value == 4)
     {
@@ -131,10 +128,95 @@ function ActivateInteraction(int value)
         if (curaction != 0)
             return; //если выполняется другое действие - выход
         
-        blendbyheadaction.SetActiveChild(4, 0.5);
-        headactionseqs[3].SetPosition(0.0, false);
-        headactionseqs[3].PlayAnim(false, 0.8, 0.0);
+        blendbyaction.SetActiveChild(4, 0.5);
+        actionseqs[3].SetPosition(0.0, false);
+        actionseqs[3].PlayAnim(false, 0.8, 0.0);
     }
+    else if (value == 5)
+    {
+        //activate interaction: Pick up
+        
+        if (curaction != 0)
+            return; //если выполняется другое действие - выход
+        
+        //get the targeted actor whcih we will use later or exit    
+        if (!SetOtherActorFromTarget())
+        {
+            LogError("proc: ActivateInteraction() return: OtherActor is not actor or none:"@otheractor); 
+            return;
+        }
+        
+        if (!CheckInteractioConditions(2))
+        {
+            LogError("proc: ActivateInteraction() return: [CheckInteractioConditions(2)] returned false!"); 
+            return; 
+        }
+            
+        blendbyaction.SetActiveChild(5, 0.5);
+        actionseqs[4].SetPosition(0.0, false);
+        actionseqs[4].PlayAnim(false, 0.8, 0.0);    
+    }
+    else if (value == 6)
+    {
+        //activate interaction: Drop down
+        
+        if (curaction != 0)
+            return; //если выполняется другое действие - выход
+        
+        if (!CheckInteractioConditions(3))
+        {
+            //надо чтобы было что-то в инвентаре
+            LogError("proc: ActivateInteraction() return: [CheckInteractioConditions(3)] returned false!"); 
+            return; 
+        }
+            
+        blendbyaction.SetActiveChild(6, 0.5);
+        actionseqs[5].SetPosition(0.0, false);
+        actionseqs[5].PlayAnim(false, 0.8, 0.0);    
+    }
+}
+
+function bool SetOtherActorFromTarget()
+{
+    //Set otheractor = targeted object from targeting mechanism
+    //If set - true, otherwise - false
+    
+    local object o;
+    
+    o=GetTargetParam(parent, TargetingMechanism, 'TargetedObject');
+    otheractor=actor(o);
+    
+    if (otheractor!=none) 
+        return true; 
+    else 
+        return false;
+}
+
+function bool CheckInteractioConditions(int value)
+{
+    local vector v;
+    local object o;
+    local bool b;
+    
+    if (value == 1)
+    {
+    }
+    else if (value == 2)
+    {
+        //проверка возможности взять предмет
+        o=GetTargetParam(parent, TargetingMechanism, 'TargetedObject');
+        SetTargetParam(parent, InventoryMechanism, 'CheckingObject', o);
+        b=GetTargetParamBool(parent, InventoryMechanism, 'CanAddToIvnentory');
+        return b;
+    }
+    else if (value == 3)
+    {
+        //проверка возможности положить предмет
+        b=GetTargetParamBool(parent, InventoryMechanism, 'CanRemoveFromIvnentory');
+        return b;
+    }
+    
+    return false;
 }
 
 function PerformInteraction(int value)
@@ -159,20 +241,32 @@ function PerformInteraction(int value)
         SetTargetParamInt(actor(o), OtherActorsMechanism, 'ActorState', 1);
         //SetTargetParamBool(actor(o), OtherActorsMechanism, 'bEnableMovement', true);
     }
-    //else if (value == 3)
-    //{
-    //    o=GetTargetParam(parent, TargetingMechanism, 'TargetedObject');
-    //    
-    //    if (actor(o)==none)
-    //    {
-    //        LogError("proc: ActivateInteraction(), targeted object is not an actor or none:"@o); 
-    //        return;
-    //    }
-    //    
-    //    SetTargetParamInt(actor(o), OtherActorsMechanism, 'ActorState', 3);
-    //    curinteraction=3;
-    //}
-    
+    else if (value == 2)
+    {
+        //взять предмет
+        //v=GetTargetParamVector(parent, InfoMechanism, 'Location');
+        //o=GetTargetParam(parent, TargetingMechanism, 'TargetedObject');
+        
+        if (otheractor==none)
+        {
+            LogError("proc: PickUp interaction failed, targeted object is not an actor or none:"@o); 
+            return;
+        }
+        
+        SetTargetParam(parent, InventoryMechanism, 'AddObject', otheractor);
+        
+        otheractor=none;
+        
+        //схватить - т.е. Attach
+    }
+    else if (value == 3)
+    {
+        //положить предмет
+        //v=GetTargetParamVector(parent, InfoMechanism, 'Location');
+        //o=GetTargetParam(parent, TargetingMechanism, 'TargetedObject');
+       
+        SetTargetParamBool(parent, InventoryMechanism, 'RemoveAllObjects', true);
+    }
 }
 
 function DeactivateInteraction(int value)
@@ -194,15 +288,13 @@ event OwnerAnimNotify(AnimNodeSequence notifynode, AnimNotifyTypes notifytype)
 {
     local int i;
     
-    for (i=0; i<headactionseqs.Length; i++)
+    for (i=0; i<actionseqs.Length; i++)
     {
-        if (notifynode == headactionseqs[i])
+        if (notifynode == actionseqs[i])
         {
             //Performing call animation
             if (notifynode.NodeName == 'Sound_Call') //захардкодено!!!
             {
-                //здесь баг: почему-то можно зажать сначала зов, а потом другое действие
-                //и будет проиграна анимация другого действия, но звук будет зова
                 if (notifytype == AnimNotifyTypes_ActionStart)
                 {
                      curaction=1; //закрепляем действие, чтобы не было прервано
@@ -213,6 +305,7 @@ event OwnerAnimNotify(AnimNodeSequence notifynode, AnimNotifyTypes notifytype)
                 }
                 else if (notifytype == AnimNotifyTypes_ActionEnd)
                 {
+                    blendbyaction.SetActiveChild(0, 0.5); //возвращаем переключатель на исходное состояние
                     curaction=0; //сообщаем, что действие было завершено
                 }
             }
@@ -224,6 +317,7 @@ event OwnerAnimNotify(AnimNodeSequence notifynode, AnimNotifyTypes notifytype)
                 }
                 else if (notifytype == AnimNotifyTypes_ActionEnd)
                 {
+                    blendbyaction.SetActiveChild(0, 0.5); //возвращаем переключатель на исходное состояние
                     curaction=0; //сообщаем, что действие было завершено
                 }
             }  
@@ -235,6 +329,7 @@ event OwnerAnimNotify(AnimNodeSequence notifynode, AnimNotifyTypes notifytype)
                 }
                 else if (notifytype == AnimNotifyTypes_ActionEnd)
                 {
+                    blendbyaction.SetActiveChild(0, 0.5); //возвращаем переключатель на исходное состояние
                     curaction=0; //сообщаем, что действие было завершено
                 }
             }  
@@ -246,9 +341,45 @@ event OwnerAnimNotify(AnimNodeSequence notifynode, AnimNotifyTypes notifytype)
                 }
                 else if (notifytype == AnimNotifyTypes_ActionEnd)
                 {
+                    blendbyaction.SetActiveChild(0, 0.5); //возвращаем переключатель на исходное состояние
                     curaction=0; //сообщаем, что действие было завершено
                 }
-            }  
+            } 
+            else if (notifynode.NodeName == 'Interaction_PickUp') //захардкодено!!!
+            {
+                if (notifytype == AnimNotifyTypes_ActionStart)
+                {
+                    curaction=5; //закрепляем действие, чтобы не было прервано
+                }
+                else if (notifytype == AnimNotifyTypes_PerformAction)
+                {
+                    PerformInteraction(2); //выполняем действие
+                }
+                else if (notifytype == AnimNotifyTypes_ActionEnd)
+                {
+                    //AnimNodeSequence(LBPawn(parent).Mesh.FindAnimNode('blendperbone')).SetActiveChild(0, 0.5);
+                    blendbyaction.SetActiveChild(0, 0.5); //возвращаем переключатель на исходное состояние
+                    curaction=0; //сообщаем, что действие было завершено
+                }
+            } 
+            else if (notifynode.NodeName == 'Interaction_DropDown') //захардкодено!!!
+            {
+                if (notifytype == AnimNotifyTypes_ActionStart)
+                {
+                    curaction=6; //закрепляем действие, чтобы не было прервано
+                }
+                else if (notifytype == AnimNotifyTypes_PerformAction)
+                {
+                    PerformInteraction(3); //выполняем действие
+                }
+                else if (notifytype == AnimNotifyTypes_ActionEnd)
+                {
+                    LogInfo("!!!");
+                    //AnimNodeSequence(LBPawn(parent).Mesh.FindAnimNode('blendperbone')).SetActiveChild(0, 0.5);
+                    blendbyaction.SetActiveChild(0, 0.5); //возвращаем переключатель на исходное состояние
+                    curaction=0; //сообщаем, что действие было завершено
+                }
+            }       
         }
     }
 }
@@ -260,8 +391,10 @@ defaultproperties
     
     InteractionInfo(0)="No interaction"
     InteractionInfo(1)="Call"
+    InteractionInfo(2)="Pick up"
+    InteractionInfo(3)="Drop down"
     
-    BlendByHeadActionNode="BlendByHeadAction"
+    BlendByActionNode="BlendByAction"
     
     curinteraction=0
 }

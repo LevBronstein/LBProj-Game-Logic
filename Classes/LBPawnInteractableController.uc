@@ -15,6 +15,7 @@ struct LBAction
 var(Animation) name BlendByActionNode; //def: blendbyaction
 
 var(System) name TargetingMechanism;
+var(System) name InventoryMechanism;
 var(System) name GroupingMechanism;
 var(System) name InteractingMechanism;
 
@@ -259,6 +260,7 @@ defaultproperties
     BlendByActionNode="blendbyaction"
     
     TargetingMechanism="Targeting_Mechanism"
+    InventoryMechanism="Inventory_Mechanism"
     GroupingMechanism="Grouping_Mechanism"
     
     //SolverCurrentAction=0

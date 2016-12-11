@@ -132,6 +132,17 @@ function SetParamRotator(name mechanism, name param, rotator value)
     m.SetParamRotator(param, value);    
 }
 
+function SetParamName(name mechanism, name param, name value)
+{
+    local LBMechanism m;
+    
+    m=GetMechanismByName(mechanism);
+    if(m==none)
+        return;
+        
+    m.SetParamName(param, value);    
+}
+
 /********************** GET PARAM OVERLOADS **********************/
 
 
@@ -226,6 +237,18 @@ function rotator GetParamRotator(name mechanism, name param)
     return res;
 }
 
+function name GetParamName(name mechanism, name param)
+{
+    local LBMechanism m;
+    local name res;
+    
+    m=GetMechanismByName(mechanism);
+    if(m==none)
+        return '';
+        
+    res=m.GetParamName(param);    
+    return res;
+}
 
 event Tick(float deltatime)
 {
