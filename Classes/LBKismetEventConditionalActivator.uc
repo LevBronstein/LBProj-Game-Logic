@@ -9,19 +9,19 @@ dependson(LBConditionalProgramm);
 
 var(EventActivation) LBCondition Condition;  
 
-event OwnerTick(float deltatime)
-{
-    super.OwnerTick(deltatime);
-    
-    if (benabled==false)
-        return;
-        
-    if (bCheckOnTick)
-    {
-        if (CheckConditions())
-            TriggerKismetEvent();    
-    }
-} 
+//event OwnerTick(float deltatime)
+//{
+//    super.OwnerTick(deltatime);
+//    
+//    if (benabled==false)
+//        return;
+//        
+//    if (bCheckOnTick)
+//    {
+//        if (CheckConditions())
+//            TriggerKismetEvent();    
+//    }
+//} 
 
 function bool CheckConditions()
 {

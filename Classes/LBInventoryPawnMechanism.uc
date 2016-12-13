@@ -9,12 +9,6 @@ class LBInventoryPawnMechanism extends LBInteractableMechanism;
 var(InventoryMechanismSystem) name AttachSocket; //a socket in the mesh, where object is attached
 var(InventoryMechanismSystem) name OtherObjectMechanism; //A mechanism, which is used in interacted objects
 
-var(InventoryMechanismSystem) bool bUsePickArea;
-var(InventoryMechanismSystem) vector PickAreaCenter; //A center of an area, from where the object can be picked up (local coordinates) 
-var(InventoryMechanismSystem) float PickAreaRadius; //A radius of the pick area
-
-var(MechanismDebug) bool bShowDebugLines;
-
 var actor HeldObject; //currently held object
 
 var actor CheckingObject; //object to be tested in CanAddToIvnentory
@@ -27,9 +21,6 @@ event OwnerTick(float deltatime)
         return;
     
     PerformTick();
-    
-    if (bShowDebugLines)
-        DrawDebugLines();
 } 
 
 function PerformTick()
@@ -134,16 +125,7 @@ function bool CanAddToIvnentory()
         return false;     
     } 
     
-    if (bUsePickArea)
-    {
-        l=parent.Location+VSize(PickAreaCenter)*Vector(parent.Rotation);  
-        if (VSize(CheckingObject.Location-l) <= PickAreaRadius)
-            return true;
-        else 
-            return false;
-    }
-    else
-        return true;    
+    return true;
 }
     
 function bool CanRemoveFromIvnentory()
@@ -152,13 +134,6 @@ function bool CanRemoveFromIvnentory()
         return false;
     else
         return true;
-}
-    
-function DrawDebugLines()
-{
-    local vector v;
-    v=parent.Location+VSize(PickAreaCenter)*Vector(parent.Rotation);
-    parent.DrawDebugSphere(v,PickAreaRadius,16,0,128,128);
 }
 
 function SetParam(name param, object value, optional int priority=0)
@@ -204,15 +179,12 @@ defaultproperties
     AttachSocket="InventorySocket"
     
     bLogFullInfo=true
-    
-    bUsePickArea=true
-    PickAreaRadius=32.0
         
     MechanismParams(0)=(ParamName="AddObject", ParamInfo="Object. Write. Add corresponding object to the inventory. Only one object can be held.")
     MechanismParams(1)=(ParamName="RemoveObject", ParamInfo="Bool. Write. Remove held object from the inventory.")
     MechanismParams(2)=(ParamName="RemoveAllObjects", ParamInfo="Bool. Write. Same as [RemoveAllObjects].")
     MechanismParams(3)=(ParamName="HeldObject", ParamInfo="Object. Read. Get held object, that is currently held.")
     MechanismParams(4)=(ParamName="CheckingObject", ParamInfo="Object. Write. Set to an object which is check, whether it can be added to invetory.")
-    MechanismParams(5)=(ParamName="CanAddToIvnentory", ParamInfo="Bool. Read. Returns true if [CheckingObject] can be added to inventory, otherwise - false."
-    MechanismParams(6)=(ParamName="CanRemoveFromIvnentory", ParamInfo="Bool. Read. Returns true if there is any object in inventory and it can be dropped down."
+    MechanismParams(5)=(ParamName="CanAddToIvnentory", ParamInfo="Bool. Read. Returns true if [CheckingObject] can be added to inventory, otherwise - false.")
+    MechanismParams(6)=(ParamName="CanRemoveFromIvnentory", ParamInfo="Bool. Read. Returns true if there is any object in inventory and it can be dropped down.")
 }

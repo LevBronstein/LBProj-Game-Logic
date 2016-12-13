@@ -12,13 +12,26 @@ enum LBCameraMode
     LBCameraMode_TargetActor,
 };
 
+enum LBTargetMode
+{
+    LBTargetMode_WorldCoordinates,
+    LBCameraMode_LocalCoordinates,
+};
+
 var (LBCamera) LBCameraMode CameraMode;
+var (LBCamera) LBTargetMode TargetMode;
+
 var (LBCamera) actor TargetActor;
 var (LBCamera) vector TargetPoint;
+
 var (LBCamera) vector LocationOffset;
-var (LBCamera) float DistanceToTarget;
+var (LBCamera) vector TargetOffset;
 var (LBCamera) rotator RotationOffset;
 
+var (Smooth) bool bSmooth;
+var (Smooth) float VInterpSpeed; //Interpolation speed for vectors
+var (Smooth) float RInterpSpeed; //Interpolation speed for rotator
+ 
 event PostBeginPlay()
 {
     super.PostBeginPlay();
@@ -26,9 +39,33 @@ event PostBeginPlay()
 
 event Tick(float deltatime)
 {
-    local vector p;
-    local vector v;
+    local vector t;
+    local vector l;
     local rotator r;
+    
+    t=CalcTargetLocation();
+    l=CalcCameraLocation(t);
+    r=CaclCameraRotation(t);
+    
+    if (bSmooth)
+    {
+        SetLocation(VInterpTo(Location, l, DeltaTime, VInterpSpeed));        
+    }
+    else
+        SetLocation(l);
+    
+    if (bSmooth)
+    {
+        SetRotation(RInterpTo(Rotation, r, DeltaTime, RInterpSpeed*DegToUnrRot, true));    
+    }
+    else
+        SetRotation(r);
+}
+
+function vector CalcTargetLocation()
+{
+    local vector X, Y, Z;
+    local vector p;
     
     if (CameraMode == LBCameraMode_TargetPoint)
     {
@@ -36,15 +73,39 @@ event Tick(float deltatime)
     }
     else
     {
-        p = TargetActor.Location;
-    }
-        
-    v = p - Location;
-    v = ((vect(1,0,0) * DistanceToTarget) << RotationOffset) + p + LocationOffset;
-    r = rotator(p - v);
+        if (TargetMode == LBCameraMode_LocalCoordinates)
+        {
+            GetAxes(TargetActor.Rotation,X,Y,Z);
+            p = TargetActor.Location+TargetOffset.X*X+TargetOffset.Y*Y+TargetOffset.Z*Z;    
+        }
+        else
+            p = TargetActor.Location+TargetOffset;
+    }   
     
-    SetLocation(v);   
-    SetRotation(r);
+    return p;    
+}
+
+function vector CalcCameraLocation(vector target)
+{
+    local vector X, Y, Z;  
+    local vector l;
+  
+    GetAxes(RotationOffset,X,Y,Z);
+    
+    l=target+LocationOffset.X*X+LocationOffset.Y*Y+LocationOffset.Z*Z;
+    
+    return l;
+}
+
+function rotator CaclCameraRotation(vector target)
+{
+    local vector v;
+    local rotator r;    
+ 
+    v=(target-Location);
+    r=rotator(v);
+    
+    return r;   
 }
 
 function float GetParamFloat(name mechanism, name param)
@@ -53,7 +114,7 @@ function float GetParamFloat(name mechanism, name param)
     {
         if (param == 'DistanceToTarget')
         {
-            return DistanceToTarget;
+            return 0;
         }
         else if (param == 'Location-X')
         {
@@ -81,7 +142,6 @@ function float GetParamFloat(name mechanism, name param)
         }
         else if (param == 'RotationOffset-X')
         {
-            `log (RotationOffset * unrrottodeg);
             return RotationOffset.Yaw * UnrRotToDeg;
         }
         else if (param == 'RotationOffset-Y')
@@ -91,6 +151,18 @@ function float GetParamFloat(name mechanism, name param)
         else if (param == 'RotationOffset-Z')
         {
             return RotationOffset.Roll * UnrRotToDeg;
+        }
+        else if (param == 'LocationOffset-X')
+        {
+            return LocationOffset.X;
+        }
+        else if (param == 'LocationOffset-Y')
+        {
+            return LocationOffset.Y;
+        }
+        else if (param == 'LocationOffset-Z')
+        {
+            return LocationOffset.Z;
         }
     }
 }
@@ -104,7 +176,7 @@ function SetParamFloat(name mechanism, name param, float value)
     {
         if (param == 'DistanceToTarget')
         {
-            DistanceToTarget = value;
+            //what?!
         }
         else if (param == 'Location-X')
         {
@@ -153,6 +225,18 @@ function SetParamFloat(name mechanism, name param, float value)
         else if (param == 'RotationOffset-Z')
         {
             RotationOffset.Roll = value * DegToUnrRot;
+        }
+         else if (param == 'LocationOffset-X')
+        {
+            LocationOffset.X = value;
+        }
+        else if (param == 'LocationOffset-Y')
+        {
+            LocationOffset.Y = value;
+        }
+        else if (param == 'LocationOffset-Z')
+        {
+            LocationOffset.Z = value;
         }
     }
 }
@@ -230,6 +314,11 @@ function SetParam(name mechanism, name param, object value)
 
 defaultproperties
 {
+    bSmooth=true  
+  
+    VInterpSpeed=2
+    RInterpSpeed=200
+   
     Physics=PHYS_Flying 
     
     DistanceToTarget=128

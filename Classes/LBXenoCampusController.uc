@@ -6,10 +6,12 @@
  */
 class LBXenoCampusController extends LBPawnInteractableController;
 
-var(MechanismInfo) editconst string InteractionInfo[3];
+var(MechanismInfo) editconst string InteractionInfo[4];
 
 var(System) name InfoMechanism;
 var(System) name OtherActorsMechanism;
+
+var(System) name AreaCheckingMechanism;
 
 var(Animation) name BlendByActionNode; //A node in animtree, which blends through all head actions
 var(Animation) array<name> ActionSequences; //An array of all sequences, which represent certain actions
@@ -140,13 +142,13 @@ function ActivateInteraction(int value)
             return; //если выполняется другое действие - выход
         
         //get the targeted actor whcih we will use later or exit    
-        if (!SetOtherActorFromTarget())
+        if (!SetOtherActorFromArea())
         {
             LogError("proc: ActivateInteraction() return: OtherActor is not actor or none:"@otheractor); 
             return;
         }
         
-        if (!CheckInteractioConditions(2))
+        if (!CheckInteractioConditions(2)) //interactioN
         {
             LogError("proc: ActivateInteraction() return: [CheckInteractioConditions(2)] returned false!"); 
             return; 
@@ -191,6 +193,19 @@ function bool SetOtherActorFromTarget()
     else 
         return false;
 }
+    
+function bool SetOtherActorFromArea()
+{
+    local object o;
+    
+    o=GetTargetParam(parent, AreaCheckingMechanism, 'NearestObject');
+    otheractor=actor(o);
+    
+    if (otheractor!=none) 
+        return true; 
+    else 
+        return false;
+}
 
 function bool CheckInteractioConditions(int value)
 {
@@ -204,8 +219,8 @@ function bool CheckInteractioConditions(int value)
     else if (value == 2)
     {
         //проверка возможности взять предмет
-        o=GetTargetParam(parent, TargetingMechanism, 'TargetedObject');
-        SetTargetParam(parent, InventoryMechanism, 'CheckingObject', o);
+        //o=GetTargetParam(parent, TargetingMechanism, 'TargetedObject');
+        SetTargetParam(parent, InventoryMechanism, 'CheckingObject', OtherActor);
         b=GetTargetParamBool(parent, InventoryMechanism, 'CanAddToIvnentory');
         return b;
     }
@@ -389,6 +404,8 @@ defaultproperties
     InfoMechanism="Actor_Info"
     OtherActorsMechanism="Actor_Controller"
     
+    AreaCheckingMechanism="Area_Checking_Mechanism"
+
     InteractionInfo(0)="No interaction"
     InteractionInfo(1)="Call"
     InteractionInfo(2)="Pick up"
