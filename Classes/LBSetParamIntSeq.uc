@@ -14,7 +14,7 @@ var() name paramname;
 
 event Activated()
 {
-    //`log(">>> ("@targetactor@"|"@targetpawn@")"@mechname@"."@paramname@"->"@value);
+    //`log(">>> ("@LBActor(targetactor)@")"@mechname@"."@paramname@"->"@value);
     if(LBActor(targetactor)!=none)
         LBActor(targetactor).SetParamInt(mechname,paramname,value); 
     if(LBDynamicActor(targetactor)!=none)

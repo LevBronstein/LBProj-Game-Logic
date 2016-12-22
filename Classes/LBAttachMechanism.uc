@@ -46,15 +46,15 @@ function PerfrormTick()
     parent.SetRotation(r+RotOffset); 
 }
 
-function Attach()
+function bool Attach()
 {
     if (AttachPawn == none && AttachSocket =='')
     {
         LogError("proc: Attach(), AttachPawn is not valid:"@AttachPawn@"or AttachSocket is not valid:"@AttachSocket);      
-        return;
+        return false;
     }
     
-    if (bIsAttached) //if it has been already attached
+    if (bIsAttached) //if something has been already attached
         Detach();    
         
     phys=parent.Physics;
@@ -66,17 +66,27 @@ function Attach()
     parent.SetCollision(false,false,false);
     
     bIsAttached=true;
+    
+    return true;
 }
 
-function Detach()
+function bool Detach()
 {
     if (!bIsAttached)
-        return;
+        return false;
         
     parent.SetPhysics(phys);
     parent.SetCollision(bColActors,bBlockActors,bIgnoreEncroachers);
     
-    bIsAttached=false;  
+    bIsAttached=false; 
+   
+    return true; 
+}
+
+function bool GetParamBool(name param)
+{
+    if (param=='IsAttached')
+        return bIsAttached;
 }
 
 function SetParam(name param, object value, optional int priority=0)
@@ -112,9 +122,11 @@ function SetParamBool(name param, bool value, optional int priority=0)
 
 defaultproperties
 {
+    mechname="Attach_Mechanism"
+    
     MechanismParams(0)=(ParamName="AttachPawn", ParamInfo="Object (LBPawn). Write. The pawn, to which parent is attached.")
     MechanismParams(1)=(ParamName="AttachSocket", ParamInfo="Name. Write. The name of the socket in pawn's mesh, to which parent is attached.")
-    MechanismParams(2)=(ParamName="IsAttached", ParamInfo="Bool. Write. Set to true to attach the parent to [AttachPawn] and [AttachSocket]. Set false to detach.")
+    MechanismParams(2)=(ParamName="IsAttached", ParamInfo="Bool. Read, write. Get the attached state. Or set to true to attach the parent to [AttachPawn] and [AttachSocket]. Set false to detach.")
     MechanismParams(3)=(ParamName="Attach", ParamInfo="Bool. Write. Attach the parent to [AttachPawn] and [AttachSocket].")
     MechanismParams(4)=(ParamName="Detach", ParamInfo="Bool. Write. Detach the parent and restore its physics.")
 }

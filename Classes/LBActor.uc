@@ -84,7 +84,7 @@ function SetParamInt(name mechanism, name param, int value)
     m=GetMechanismByName(mechanism);
     if(m==none)
         return;
-        
+ 
     m.SetParamInt(param, value);    
 }
 

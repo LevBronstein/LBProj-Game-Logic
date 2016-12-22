@@ -34,16 +34,16 @@ function PerformTick()
         
     p=LBPawn(parent);
     
-    if (p == none)
-        return;
-        
-    if (p.Mesh.GetSocketWorldLocationAndRotation(AttachSocket, l, r, 0)==false)
-        return;  
-       
-    HeldObject.SetLocation(l); 
+    //if (p == none)
+    //    return;
+    //    
+    //if (p.Mesh.GetSocketWorldLocationAndRotation(AttachSocket, l, r, 0)==false)
+    //    return;  
+    // 
+    //HeldObject.SetLocation(l); 
 }
 
-function AddToIvnentory(actor a)
+function bool AddToIvnentory(actor a)
 {
     local LBPawn p;
     local vector l;
@@ -54,25 +54,25 @@ function AddToIvnentory(actor a)
     if (p == none)
     {
         LogError("proc: AddToIvnentory(), parent is not a pawn or none:"@p);  
-        return;
+        return false;
     }
     
     if (HeldObject != none)
     {
         LogError("proc: AddToIvnentory(), there's already an object held:"@HeldObject); 
-        return;
+        return false;
     }
     
     if (p.Mesh.GetSocketWorldLocationAndRotation(AttachSocket, l, r, 0)==false)
     {
         LogError("proc: AddToIvnentory(), parent mesh doesn't have socket"@AttachSocket@"or is none:"@p.Mesh); 
-        return;   
+        return false;   
     }
     
     if (LBActor(a) == none || LBActor(a).GetMechanismByName(OtherObjectMechanism) == none)
     {
         LogError("proc: AddToIvnentory(), other object is not an LBActor:"@LBActor(a)@"or doesn't have a"@OtherObjectMechanism@"mechanism!"); 
-        return;     
+        return false;     
     }
     
     LBActor(a).SetParam(OtherObjectMechanism, 'AttachPawn', parent);
@@ -80,14 +80,16 @@ function AddToIvnentory(actor a)
     LBActor(a).SetParamBool(OtherObjectMechanism, 'Attach', true);
     
     HeldObject=a;
+    
+    return true;
 }
 
-function ClearInventory()
+function bool ClearInventory()
 {
     if (HeldObject == none)
     {
         LogError("proc: ClearInventory(), the inventory is already empty:"@HeldObject); 
-        return;
+        return false;
     }
     
     LBActor(HeldObject).SetParam(OtherObjectMechanism, 'AttachPawn', none);
@@ -95,6 +97,8 @@ function ClearInventory()
     LBActor(HeldObject).SetParamBool(OtherObjectMechanism, 'Detach', true);
     
     HeldObject=none;
+    
+    return true;
 }
 
 function bool CanAddToIvnentory()

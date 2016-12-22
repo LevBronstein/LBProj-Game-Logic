@@ -36,7 +36,7 @@ event OwnerTick(float deltatime)
           
         PerformMovement(deltatime);  
 }
-
+    
 function PerformMovement(float dt)
 {
     local vector v;
