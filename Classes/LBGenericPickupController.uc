@@ -16,7 +16,11 @@ var bool currattachstatus;
 
 function FirstTickInit()
 {
-    super.FirstTickInit();
+    if (bfirsttick==false)
+        return;
+    
+    if (bfirsttick==true)
+        bfirsttick=false;
     
     ActivateDefaultMovMech();   
 }

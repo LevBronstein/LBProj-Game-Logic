@@ -73,10 +73,16 @@ event OwnerTick(float deltatime)
     }
 }
 
-function PerformPawnMovement(float dt)
+function SetTargetLocation(vector newloc)
+{
+    TargetLocation=newloc;    
+}
+
+function bool PerformPawnMovement(float dt)
 {
     local vector v;
     local rotator r;
+    local bool b;
    
     v=vect(0,0,0); 
 
@@ -98,20 +104,29 @@ function PerformPawnMovement(float dt)
         v=normal(v);
         
         if (bEnableMovement)
+        {
             parent.Velocity=normal(v)*ForwardSpeed*kForwardSpeed; 
+            b=true;
+        }
+        else
+            b=false;
     }
+    else
+        b=false;
     
     if (bShowDebugLines)
     {
         parent.DrawDebugSphere(TargetLocation, 64, 16, 255, 0, 0);
         parent.DrawDebugLine(parent.location+vect(0,0,32), TargetLocation, 255, 0, 0);
     }
+    
+    return b;
 }
 
-function PerformActorMovement(float dt)
+function bool PerformActorMovement(float dt)
 {
     local vector v;
-    //local rotator r;
+    local bool b;
       
     v=vect(0,0,0); 
 
@@ -122,15 +137,23 @@ function PerformActorMovement(float dt)
         v=normal(v);
         
         if (bEnableMovement)
+        {
             parent.MoveSmooth(normal(v)*ForwardSpeed*kForwardSpeed);
-        //paertn.Velocity=normal(v)*ForwardSpeed*kForwardSpeed; 
+            b=true;
+        }
+        else
+            b=false;
     }  
+    else
+        b=false;
     
     if (bShowDebugLines)
     {
         parent.DrawDebugSphere(TargetLocation, 64, 16, 255, 0, 0);
         parent.DrawDebugLine(parent.location+vect(0,0,32), TargetLocation, 255, 0, 0);
     }
+    
+    return b;
 }
 
 function UpdateAnimNodes()
@@ -148,7 +171,7 @@ function GetParameters()
 {
     if (TargetLocationSrc.bUseSource)
     {
-        TargetLocation=GetTargetParamVector(TargetLocationSrc.SourceActor, TargetLocationSrc.SourceMechanismName, TargetLocationSrc.SourceParamName);
+        SetTargetLocation(GetTargetParamVector(TargetLocationSrc.SourceActor, TargetLocationSrc.SourceMechanismName, TargetLocationSrc.SourceParamName));
     }
     
     if (bEnableMovementSrc.bUseSource)
@@ -171,7 +194,7 @@ function vector GetParamVector(name param)
 function SetParamVector(name param, vector value, optional int priority=0)
 {
     if (param=='TargetLocation')
-        TargetLocation=value;
+        SetTargetLocation(value);
 }
     
 function float GetParamFloat(name param)

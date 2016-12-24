@@ -4,44 +4,42 @@
  *  Creation date: 13.12.2016 19:58
  *  Copyright 2016, Windows7
  */
-class LBLocationTriggerMechanism extends LBKismetEventActivator;
+class LBLocationTriggerMechanism extends LBTriggerMechanism;
 
-var(LocationTriggerMechanismSystem) vector TriggerAreaCenter; //A center of a trigger area (a sphere)
-var(LocationTriggerMechanismSystem) bool bUseLocalCoords; 
-var(LocationTriggerMechanismSystem) float TriggerAreaRadius; //A radius of the trigger area
+var(LocationTrigger) vector TriggerAreaCenter; //A center of a trigger area (a sphere) 
+var(LocationTrigger) float TriggerAreaRadius; //A radius of the trigger area
+
+var(LocationTrigger) bool bCheckParent;
+var(LocationTrigger) actor CheckingObject;
 
 var(MechanismDebug) bool bShowDebugLines;
 
-var(LocationTriggerMechanismGameplay) actor CheckingObject;
-
 event OwnerTick(float deltatime)
 {
-    super.OwnerTick(deltatime);
-        
+    //super.OwnerTick(deltatime);
+    
+    PerformTick();
+    
     if (bShowDebugLines)
         DrawDebugLines();  
 } 
 
+function PerformTick()
+{
+    if (CheckConditions())
+        SetTrigger();
+    else 
+        SetUnTrigger();
+}  
+   
 function bool CheckActor(actor a)
 {
-    local vector v;
-    local vector X, Y, Z;
     local float l;
     
     if (a==none)
         return false;
-    
-    if (bUseLocalCoords)
-    {
-        GetAxes(parent.Rotation,X,Y,Z);
-        v=parent.Location+X*TriggerAreaCenter.X+Y*TriggerAreaCenter.Y+Z*TriggerAreaCenter.Z;
-    }
-    else
-    {
-        v=parent.Location+TriggerAreaCenter;   
-    }    
-    
-    l=VSize(a.Location-v);  
+        
+    l=VSize(a.Location-TriggerAreaCenter);  
     
     if (l <= TriggerAreaRadius)
         return true;
@@ -53,19 +51,31 @@ function bool CheckConditions()
 {
     local bool b;
     
-    b=CheckActor(CheckingObject);
-    
-    if (bLogFullInfo)
+    if (bCheckParent)
     {
-        if (b)
-            LogInfo("Object"@CheckingObject@"is INSIDE the area ("$TriggerAreaCenter$") with radius"$TriggerAreaRadius);
-        else
-            LogInfo("Object"@CheckingObject@"is OUTSIDE of the area ("$TriggerAreaCenter$") with radius"$TriggerAreaRadius);
-    } 
+        b=CheckActor(parent);
+    }
+    else
+    {
+        b=CheckActor(CheckingObject);   
+    }
       
     return b;  
 }  
-    
+
+function OnChangedTriggerState(bool bnewstate)
+{
+    if (bnewstate)
+    {
+        LogInfo("The checking actor is INSIDE the area ("$TriggerAreaCenter$") with radius "@TriggerAreaRadius);
+        ActivateKismetEvent(OnTriggerEventName,parent,parent.WorldInfo);    
+    } 
+    else
+    {
+        LogInfo("The checking actor is OUTSIDE the area ("$TriggerAreaCenter$") with radius "@TriggerAreaRadius);
+        ActivateKismetEvent(OnUnTriggerEventName,parent,parent.WorldInfo);    
+    }   
+}    
 
 function DrawDebugLines()
 {
@@ -74,17 +84,7 @@ function DrawDebugLines()
     
     if (bShowDebugLines)
     {
-        if (bUseLocalCoords)
-        {
-            GetAxes(parent.Rotation,X,Y,Z);
-            v=parent.Location+X*TriggerAreaCenter.X+Y*TriggerAreaCenter.Y+Z*TriggerAreaCenter.Z;
-            parent.DrawDebugSphere(v,TriggerAreaRadius,16,0,128,128);     
-        }
-        else
-        {
-            v=parent.Location+TriggerAreaCenter;
-            parent.DrawDebugSphere(v,TriggerAreaRadius,16,0,128,128);         
-        }  
+        parent.DrawDebugSphere(TriggerAreaCenter,TriggerAreaRadius,16,0,128,128);          
     }
 }
 
@@ -106,5 +106,5 @@ defaultproperties
 {
     mechname="Location_Trigger_Mechanism"
     
-    bUseLocalCoords=true
+    bCheckParent=true
 }
