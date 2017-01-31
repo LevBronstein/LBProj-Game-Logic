@@ -32,7 +32,10 @@ function bool PerformPawnMovement(float dt)
         bnewloc=false;
         TriggerKismetEvent(OnTargetLocReached,parent,parent.WorldInfo);
         LogInfo("Target location"@TargetLocation@"was reached");
+        return true;
     }
+    else
+        return false;
 }
 
 function bool PerformActorMovement(float dt)
@@ -46,7 +49,10 @@ function bool PerformActorMovement(float dt)
         bnewloc=false;
         TriggerKismetEvent(OnTargetLocReached,parent,parent.WorldInfo);
         LogInfo("Target location"@TargetLocation@"was reached");
-    }    
+        return true;
+    } 
+    else
+        return false;   
 }
 
 function TriggerKismetEvent(name EventName, actor Originator, actor Instigator)

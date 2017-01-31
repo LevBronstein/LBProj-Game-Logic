@@ -7,6 +7,7 @@
 class LBLocationTriggerMechanism extends LBTriggerMechanism;
 
 var(LocationTrigger) vector TriggerAreaCenter; //A center of a trigger area (a sphere) 
+var(LocationTrigger) bool bLocalCoords; //If center shoul be used as an offset from parent's coordinates
 var(LocationTrigger) float TriggerAreaRadius; //A radius of the trigger area
 
 var(LocationTrigger) bool bCheckParent;
@@ -35,11 +36,17 @@ function PerformTick()
 function bool CheckActor(actor a)
 {
     local float l;
+    local vector loc;
     
     if (a==none)
         return false;
+    
+    if (bLocalCoords)
+        loc=parent.Location+TriggerAreaCenter;
+    else
+        loc=TriggerAreaCenter;    
         
-    l=VSize(a.Location-TriggerAreaCenter);  
+    l=VSize(a.Location-loc);  
     
     if (l <= TriggerAreaRadius)
         return true;
@@ -80,11 +87,16 @@ function OnChangedTriggerState(bool bnewstate)
 function DrawDebugLines()
 {
     local vector v;
-    local vector X, Y, Z;
+    //local vector X, Y, Z;
+    
+    if (bLocalCoords)
+        v=parent.Location+TriggerAreaCenter;
+    else
+        v=TriggerAreaCenter;
     
     if (bShowDebugLines)
     {
-        parent.DrawDebugSphere(TriggerAreaCenter,TriggerAreaRadius,16,0,128,128);          
+        parent.DrawDebugSphere(v,TriggerAreaRadius,16,0,128,128);          
     }
 }
 

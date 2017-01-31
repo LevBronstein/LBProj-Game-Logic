@@ -34,7 +34,7 @@ event OwnerTick(float deltatime)
     if (bUseParamSource)
         GetParameters();
           
-        PerformMovement(deltatime);  
+    PerformMovement(deltatime);  
 }
     
 function PerformMovement(float dt)
@@ -92,6 +92,14 @@ function GetParameters()
         FwdSpeed=LBPawn(parent).GetParamFloat(ParameterSource,ForwardSpeedParam);
         AngSpeed=LBPawn(parent).GetParamFloat(ParameterSource,AngularSpeedParam);
         return;
+    }
+}
+
+function SetParamBool(name param, bool value, optional int priority=0) 
+{
+    if (param=='bEnabled')
+    {
+        benabled=value;
     }
 }
 

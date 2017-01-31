@@ -4,34 +4,27 @@
  *  Creation date: 31.05.2016 19:18
  *  Copyright 2016, Windows7
  */
-class LBMovementMechanism extends LBInteractableMechanism;
+class LBMovementMechanism extends LBTransposeMechanism;
+
+//var(Movement) float SpeedX;
+//var(Movement) float SpeedY;
+//var(Movement) float SpeedZ;
+var(Movement) vector ForwardSpeed;
+//var(Movement) float AngularSpeedYaw;
+//var(Movement) float AngularSpeedPitch;
+//var(Movement) float AngularSpeedRoll;
+var(Movement) rotator AngularSpeed;
 
 var(ParamSource) LBParamSourcePointer SpeedXSrc;
 var(ParamSource) LBParamSourcePointer SpeedYSrc;
 var(ParamSource) LBParamSourcePointer SpeedZSrc;
 var(ParamSource) LBParamSourcePointer AngSpeedYawSrc;
-var(ParamSource) LBParamSourcePointer AngSpeedPtichSrc;
+var(ParamSource) LBParamSourcePointer AngSpeedPitchSrc;
 var(ParamSource) LBParamSourcePointer AngSpeedRollSrc;
 
-var(Movement) float SpeedX;
-var(Movement) float SpeedY;
-var(Movement) float SpeedZ;
-var(Movement) float AngularSpeedYaw;
-var(Movement) float AngularSpeedPitch;
-var(Movement) float AngularSpeedRoll;
-
-var(MechanismDebug) bool bShowDebugLines; //Display debug in game
+var(MechanismDebug) bool bShowDebugLines; //Display debug lines in game
 
 var float currotY, currotP, currotR;
-
-function FirstTickInit()
-{
-    super.FirstTickInit();
-    
-    currotY = parent.Rotation.Yaw * UnrRotToDeg;
-    currotP = parent.Rotation.Pitch * UnrRotToDeg;
-    currotR = parent.Rotation.Roll * UnrRotToDeg;
-}
 
 event OwnerTick(float deltatime)
 {
@@ -40,47 +33,58 @@ event OwnerTick(float deltatime)
     if (benabled == false)
         return;
         
-    PerformMovement(); 
-    PerformRotation(); 
+    PerformTick(deltatime);
 }
 
-function PerformMovement()
+function PerformTick(float dt)
 {
-    local vector v;
-    
-    v.X = SpeedX;
-    v.Y = SpeedY;
-    v.Z = SpeedZ;
-  
-    parent.SetLocation(parent.location+v);
+    if (bEnableMovement) 
+        PerformMovement(dt);
+        
+    if (bEnableRotation) 
+        PerformRotation(dt);    
 }
 
-function PerformRotation()
+function PerformMovement(float dt)
 {
-    local rotator r;
-    
-    r.Yaw = parent.Rotation.Yaw + AngularSpeedYaw * DegToUnrRot;
-    r.Pitch = parent.Rotation.Pitch + AngularSpeedPitch * DegToUnrRot;
-    r.Roll = parent.Rotation.Roll + AngularSpeedRoll * DegToUnrRot;
-    
-    parent.SetRotation(r);
+    parent.SetLocation(parent.location+ForwardSpeed);
+}
+
+function PerformRotation(float dt)
+{    
+    parent.SetRotation(parent.Rotation+AngularSpeed);
 }
 
 function GetParameters()
 {
     if (SpeedXSrc.bUseSource)
     {
-        SpeedX=GetTargetParamFloat(SpeedXSrc.SourceActor, SpeedXSrc.SourceMechanismName, SpeedXSrc.SourceParamName);
+        ForwardSpeed.X=GetTargetParamFloat(SpeedXSrc.SourceActor, SpeedXSrc.SourceMechanismName, SpeedXSrc.SourceParamName);
     }
     
     if (SpeedYSrc.bUseSource)
     {
-        SpeedY=GetTargetParamFloat(SpeedYSrc.SourceActor, SpeedYSrc.SourceMechanismName, SpeedYSrc.SourceParamName);
+        ForwardSpeed.Y=GetTargetParamFloat(SpeedYSrc.SourceActor, SpeedYSrc.SourceMechanismName, SpeedYSrc.SourceParamName);
     }
     
     if (SpeedZSrc.bUseSource)
     {
-        SpeedZ=GetTargetParamFloat(SpeedZSrc.SourceActor, SpeedZSrc.SourceMechanismName, SpeedZSrc.SourceParamName);
+        ForwardSpeed.Z=GetTargetParamFloat(SpeedZSrc.SourceActor, SpeedZSrc.SourceMechanismName, SpeedZSrc.SourceParamName);
+    }
+    
+    if (AngSpeedYawSrc.bUseSource)
+    {
+        AngularSpeed.Yaw=GetTargetParamFloat(AngSpeedYawSrc.SourceActor, AngSpeedYawSrc.SourceMechanismName, AngSpeedYawSrc.SourceParamName);
+    }
+    
+    if (AngSpeedPitchSrc.bUseSource)
+    {
+        AngularSpeed.Pitch=GetTargetParamFloat(AngSpeedPitchSrc.SourceActor, AngSpeedPitchSrc.SourceMechanismName, AngSpeedPitchSrc.SourceParamName);
+    }
+    
+    if (AngSpeedRollSrc.bUseSource)
+    {
+        AngularSpeed.Roll=GetTargetParamFloat(AngSpeedRollSrc.SourceActor, AngSpeedRollSrc.SourceMechanismName, AngSpeedRollSrc.SourceParamName);
     }
 }
 
@@ -93,21 +97,37 @@ function vector GetParamVector(name param)
 function SetParamFloat(name param, float value, optional int priority=0)
 {
     if (param=='SpeedX')
-        SpeedX=value;
+        ForwardSpeed.X=value;
     else if (param=='SpeedY')
-        SpeedY=value;
+        ForwardSpeed.Y=value;
     else if (param=='SpeedZ')
-        SpeedZ=value;
+        ForwardSpeed.Z=value;
+    else if (param=='AngSpeedYaw')
+        AngularSpeed.Yaw=value;
+    else if (param=='AngSpeedPitch')
+        AngularSpeed.Pitch=value;
+    else if (param=='AngSpeedRoll')
+        AngularSpeed.Roll=value;    
+}
+    
+function SetParamBool(name param, bool value, optional int priority=0) 
+{
+    if (param=='bEnabled')
+        benabled=value;
+    else if (param=='bEnableMovement')
+        bEnableMovement=value;
+    else if (param=='bEnableRotation')
+        bEnableRotation=value;
 }
     
 defaultproperties
 {
+    mechname="Movement_Mechanism"
+    
     MechanismParams.Empty
     
     MechanismParams(0)=(ParamName="Location", ParamInfo="Vector. Read. Gets the location of the parent actor.")
     MechanismParams(1)=(ParamName="SpeedX", ParamInfo="Float. Read, Write. Sets the speed on X axis.")
     MechanismParams(2)=(ParamName="SpeedY", ParamInfo="Float. Read, Write. Sets the speed on Y axis.")
     MechanismParams(3)=(ParamName="SpeedZ", ParamInfo="Float. Read, Write. Sets the speed on Z axis.")
-
-    mechname="Movement_Mechanism"
 }
