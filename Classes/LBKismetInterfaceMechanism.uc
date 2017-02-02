@@ -4,7 +4,7 @@
  *  Creation date: 24.12.2016 20:57
  *  Copyright 2016, Windows7
  */
-class LBKismetInterfaceMechanism extends LBMechanism;
+class LBKismetInterfaceMechanism extends LBInteractableMechanism;
 
 function ActivateKismetEvent(name EventName, actor Originator, actor Instigator)
 {

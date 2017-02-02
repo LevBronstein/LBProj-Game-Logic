@@ -4,7 +4,7 @@
  *  Creation date: 01.02.2017 00:13
  *  Copyright 2017, Windows7
  */
-class LBMovementManager extends LBMechanism;
+class LBMovementManagementMechanism extends LBMechanism;
 
 var(MovementManager) name DefaultMovementMechanism; //The default movement mechanism, which is used primarily
 var(MovementManager) array<name> MovementMechanisms; //Other movement mechanism, each can be activated by ActivateMovement

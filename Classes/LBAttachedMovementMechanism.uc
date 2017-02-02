@@ -133,6 +133,23 @@ function SetParamBool(name param, bool value, optional int priority=0)
             Detach();
     }
 }
+    
+function SetParam(name param, object value, optional int priority=0)
+{
+    super.SetParam(param, value, priority); 
+ 
+    if (param=='AttachActor') 
+    {
+        AttachActor=Actor(value);    
+    }
+}
+
+//Может работать неправильно?
+function SetParamName(name param, name value, optional int priority=0)
+{
+    if (param=='AttachSocket')
+        AttachSocket=value;
+}    
 
 defaultproperties
 {
