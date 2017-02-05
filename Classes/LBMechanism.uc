@@ -136,11 +136,17 @@ var(ParamSource) name ParameterSource; //A mechanism, from which we get all para
 var(ParamSource) bool bUseParamSource; //Defines whether we should get params (from ParameterSource) 
 
 var(MechanismInfo) array<LBMechanismParamInfo> MechanismParams;
+
+function InitMechanism()
+{
+    
+}
  
 function FirstTickInit()
 {
     if (bfirsttick==true)
     {
+        InitMechanism();
         bfirsttick=false;
     }
 }

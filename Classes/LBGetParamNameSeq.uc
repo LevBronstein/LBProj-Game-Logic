@@ -6,7 +6,7 @@
  */
 class LBGetParamNameSeq extends SequenceAction;
 
-var Actor targetactor;
+var Object targetactor;
 var name value;
 
 var() name mechname;

@@ -6,7 +6,7 @@
  */
 class LBSetParamBoolSeq extends SequenceAction;
 
-var Actor targetactor;
+var Object targetactor;
 var bool value;
 
 var() name mechname;

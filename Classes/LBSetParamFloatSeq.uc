@@ -6,7 +6,7 @@
  */
 class LBSetParamFloatSeq extends SequenceAction;
 
-var Actor targetactor;
+var Object targetactor;
 var float value;
 
 var() name mechname;

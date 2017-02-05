@@ -6,7 +6,7 @@
  */
 class LBSetParamRotatorSeq extends SequenceAction;
 
-var Actor targetactor;
+var Object targetactor;
 var vector value;
 var rotator rvalue;
 

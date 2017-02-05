@@ -4,114 +4,44 @@
  *  Creation date: 04.07.2016 22:52
  *  Copyright 2016, Windows7
  */
-class LBRadialMovementMechanism extends LBInteractableMechanism;
+class LBRadialMovementMechanism extends LBTransposeMechanism;
 
 var(RadialMovement) vector CenterPoint; //A point which is used as a center for rotation
-var(RadialMovement) float CenterDistance; //A value which is used to calculate an offset from the center point
-var(RadialMovement) rotator AngSpeed; //Angular speed turns right or left if <0
-var(RadialMovement) float kAngSpeed; //Coefficient that modifies the AngSpeed: k*AngSpeed
-var(RadialMovement) float FwdSpeed; //Forward speed, moves forward or backward if <0
-var(RadialMovement) float kFwdSpeed; //Coefficient that modifies the FwdSpeed: k*FwdSpeed
+var(RadialMovement) vector LocationOffset; 
+var(RadialMovement) bool bUseInitialLocation;
+
+var(RadialMovement) rotator AngularSpeed; //Angular speed
+var(RadialMovement) rotator LocalAngularSpeed; 
+var(RadialMovement) rotator CurrentRotation;
 
 var(MechanismDebug) bool bShowDebugLines;
 
-var(MovementClamps) float DistanceToStop;
-var(MovementClamps) bool bEnableMovement; //set to true to enable movement
-var(MovementClamps) bool bEnableRotation; //set to true to enable rotation
-
-var(ParamSource) LBParamSourcePointer bEnableMovementSrc;
-var(ParamSource) LBParamSourcePointer bEnableRotationSrc;
-
-var rotator currot;
-var float curspeed;
-var vector curtrajpoint;
-
-function FirstTickInit()
+function InitMechanism()
 {
-    if (bfirsttick==false)
-        return;
-    
-    if (bfirsttick==true)
-        bfirsttick=false;   
+    if (bUseInitialLocation)
+        LocationOffset=parent.Location-CenterPoint;
 }
 
-event OwnerTick(float deltatime)
+function PerformMovement(float dt)
 {
-     FirstTickInit();
+    local vector X, Y, Z;  
+    local vector l;
+  
+    GetAxes(CurrentRotation,X,Y,Z);
     
-    if(benabled==false)
-        return;
-        
-    if (bUseParamSource)
-        GetParameters();
-       
-    UpdateTrajectory(); //строим идеальную траекторию
+    l=CenterPoint+LocationOffset.X*X+LocationOffset.Y*Y+LocationOffset.Z*Z;
     
-    PerformMovement(deltatime);  //производим непосредственное движение 
+    parent.SetLocation(l);  
+  
+    CurrentRotation=CurrentRotation+AngularSpeed;   
 }
 
-function UpdateTrajectory()
-{
-    local vector v;
-    
-    v=vect(1,0,0)*CenterDistance;
-    v=v<<currot;
-    curtrajpoint=v+CenterPoint; //точка на идеальной траектории 
-    currot=currot+AngSpeed*DegToUnrRot*kAngSpeed;
-    
-    if (bShowDebugLines)
-    {
-        parent.DrawDebugSphere(curtrajpoint, 64, 16, 255, 0, 0);
-        parent.DrawDebugLine(parent.location+vect(0,0,32), curtrajpoint, 255, 0, 0);
-    }
-}
-
-function PerformMovement(float deltatime)
-{
-    local vector v;
-    local vector offset;
-    
-    if (!bEnableMovement)
-        return;
-    
-    v=curtrajpoint-parent.location;
-    
-    if (VSize(v) >= DistanceToStop)
-    {
-        offset=(normal(v)*FwdSpeed*kFwdSpeed);
-        
-        parent.MoveSmooth(offset);
-    }
-}
-
-function GetParameters()
-{
-    if (bEnableMovementSrc.bUseSource)
-    {
-        bEnableMovement=GetTargetParamBool(bEnableMovementSrc.SourceActor, bEnableMovementSrc.SourceMechanismName, bEnableMovementSrc.SourceParamName);
-    }
-    
-    if (bEnableRotationSrc.bUseSource)
-    {
-        bEnableRotation=GetTargetParamBool(bEnableRotationSrc.SourceActor, bEnableRotationSrc.SourceMechanismName, bEnableRotationSrc.SourceParamName);
-    }
-}
-
-function SetParamBool(name param, bool value, optional int priority=0) 
-{
-    if (param=='bEnabled')
-        benabled=value;
+function PerformRotation(float dt)
+{   
+    parent.SetRotation(parent.Rotation+LocalAngularSpeed);           
 }
 
 defaultproperties
 {
     mechname="Radial_Movement_Mechanism"
-    
-    kFwdSpeed=1.0;
-    kAngSpeed=1.0;
-    
-    DistanceToStop=4.0
-    
-    bEnableMovement=true
-    bEnableRotation=true
 }

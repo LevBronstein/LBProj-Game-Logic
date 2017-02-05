@@ -75,9 +75,8 @@ function bool AddToIvnentory(actor a)
         return false;     
     }
     
-    LBActor(a).SetParam(OtherObjectMechanism, 'AttachPawn', parent);
-    LBActor(a).SetParamName(OtherObjectMechanism, 'AttachSocket', AttachSocket);
-    LBActor(a).SetParamBool(OtherObjectMechanism, 'Attach', true);
+    LBActor(a).SetParam(OtherObjectMechanism, 'PickUpBy', parent);
+    //LBActor(a).SetParamName(OtherObjectMechanism, 'AttachSocket', AttachSocket);
     
     HeldObject=a;
     
@@ -92,9 +91,7 @@ function bool ClearInventory()
         return false;
     }
     
-    LBActor(HeldObject).SetParam(OtherObjectMechanism, 'AttachPawn', none);
-    LBActor(HeldObject).SetParamName(OtherObjectMechanism, 'AttachSocket', '');
-    LBActor(HeldObject).SetParamBool(OtherObjectMechanism, 'Detach', true);
+    LBActor(HeldObject).SetParamBool(OtherObjectMechanism, 'PutDown', true);
     
     HeldObject=none;
     
@@ -125,6 +122,11 @@ function bool CanAddToIvnentory()
     }
     
     if (LBActor(CheckingObject) == none || LBActor(CheckingObject).GetMechanismByName(OtherObjectMechanism) == none)
+    {
+        return false;     
+    } 
+    
+    if (!GetTargetParamBool(CheckingObject,OtherObjectMechanism,'bCanBePickedUp'))
     {
         return false;     
     } 

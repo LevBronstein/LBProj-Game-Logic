@@ -31,13 +31,14 @@ function SetUnTrigger()
 
 function OnChangedTriggerState(bool bnewstate)
 {
+    //Activating kismet event, parent is used as instigator
     if (bnewstate)
     {
-         ActivateKismetEvent(OnTriggerEventName,none,none);    
+        ActivateKismetEvent(OnTriggerEventName,parent.WorldInfo,parent);    
     } 
     else
     {
-        ActivateKismetEvent(OnUnTriggerEventName,none,none);    
+        ActivateKismetEvent(OnUnTriggerEventName,parent.WorldInfo,parent);    
     }   
 }
 

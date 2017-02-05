@@ -13,8 +13,6 @@ defaultproperties
     ObjName="Named Remote-Triggered Event"
     ObjCategory="LevBronstein"
 
-    VariableLinks.Empty
-
     bPlayerOnly=false
     MaxTriggerCount=0
 }

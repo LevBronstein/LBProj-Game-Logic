@@ -75,13 +75,15 @@ function OnChangedTriggerState(bool bnewstate)
     if (bnewstate)
     {
         LogInfo("The checking actor is INSIDE the area ("$TriggerAreaCenter$") with radius "@TriggerAreaRadius);
-        ActivateKismetEvent(OnTriggerEventName,parent,parent.WorldInfo);    
+        //ActivateKismetEvent(OnTriggerEventName,parent,parent.WorldInfo);    
     } 
     else
     {
         LogInfo("The checking actor is OUTSIDE the area ("$TriggerAreaCenter$") with radius "@TriggerAreaRadius);
-        ActivateKismetEvent(OnUnTriggerEventName,parent,parent.WorldInfo);    
-    }   
+        //ActivateKismetEvent(OnUnTriggerEventName,parent,parent.WorldInfo);    
+    }  
+   
+   super.OnChangedTriggerState(bnewstate); 
 }    
 
 function DrawDebugLines()
