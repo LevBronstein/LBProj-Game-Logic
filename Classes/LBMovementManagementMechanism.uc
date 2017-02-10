@@ -89,4 +89,6 @@ function SetParamInt(name param, int value, optional int priority=0)
 defaultproperties
 {
     mechname="Movement_Manager"
+    
+    MechanismParams(0)=(ParamName="ActivateMovementMechanism", ParamInfo="Integer. Write. Activate movement mechanism by given ID.")
 }

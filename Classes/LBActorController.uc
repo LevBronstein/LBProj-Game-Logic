@@ -8,10 +8,14 @@ class LBActorController extends LBInteractableMechanism;
 
 struct NamedParam
 {
-    var() name ParamName; //The name of this parameter
-    var() ParamTypes ParamType; //The type of this parameter, set to identify value types
+    /*The name of this parameter*/
+    var() name ParamName; 
+    /*The type of this parameter, set to identify value types*/
+    var() ParamTypes ParamType; 
     
-    //values of different type, use only that, which is set by @ParamType
+    /*Values of different type, use only that, 
+    which is set by @ParamType*/
+   
     var() ObjectValue ObjectParam;
     var() ObjectArrayValue ObjectArrayParam;
     var() FloatValue FloatParam; 
@@ -20,7 +24,11 @@ struct NamedParam
     var() VectorValue VectorParam;
     var() RotatorValue RotatorParam;
     
-    var() bool bUseSource; //Set to true to get value from anywhere, also @bUseParamSource should be set to true
+    /*Set to true to get value from anywhere, 
+    also @bUseParamSource in the mechanism should be set to true*/
+    var() bool bUseSource; 
+    /*The source for the value. The @ValueSource.ParentActor can be
+    set to none, this feature is used in certaine mechanisms*/
     var() LBMechanismParam ValueSource;
     
     //priority
@@ -47,7 +55,7 @@ event OwnerTick(float deltatime)
     if (benabled==false)
         return;
         
-    ResetPriority();
+    ResetPriority();   
 }   
 
 //получение значения для каждой переменной, проблема может возникнуть, если до этого 
@@ -106,7 +114,10 @@ function object GetParam(name param)
     for (i=0; i<CurParamsValues.Length; i++)
     {
         if (CurParamsValues[i].ParamName==param)
-        return CurParamsValues[i].ObjectParam.Value; 
+        {
+            OnGetParam();
+            return CurParamsValues[i].ObjectParam.Value; 
+        }
     }
     
     LogError("Parameter name ("@param@") was not found!"); 
@@ -123,7 +134,10 @@ function array<object> GetParams(name param)
     for (i=0; i<CurParamsValues.Length; i++)
     {
         if (CurParamsValues[i].ParamName==param)
-        return CurParamsValues[i].ObjectArrayParam.Value; 
+        {
+            OnGetParam();
+            return CurParamsValues[i].ObjectArrayParam.Value; 
+        }
     }
     
     LogError("Parameter name ("@param@") was not found!"); 
@@ -138,7 +152,10 @@ function float GetParamFloat(name param)
     for (i=0; i<CurParamsValues.Length; i++)
     {
         if (CurParamsValues[i].ParamName==param)
-        return CurParamsValues[i].FloatParam.Value; 
+        {
+            OnGetParam();
+            return CurParamsValues[i].FloatParam.Value; 
+        }
     }
     
     LogError("Parameter name ("@param@") was not found!"); 
@@ -152,7 +169,10 @@ function int GetParamInt(name param)
     for (i=0; i<CurParamsValues.Length; i++)
     {
         if (CurParamsValues[i].ParamName==param)
-        return CurParamsValues[i].IntegerParam.Value; 
+        {
+            OnGetParam();
+            return CurParamsValues[i].IntegerParam.Value; 
+        }
     }
     
     LogError("Parameter name ("@param@") was not found!"); 
@@ -166,7 +186,10 @@ function bool GetParamBool(name param)
     for (i=0; i<CurParamsValues.Length; i++)
     {
         if (CurParamsValues[i].ParamName==param)
-        return CurParamsValues[i].BooleanParam.Value; 
+        {
+            OnGetParam();
+            return CurParamsValues[i].BooleanParam.Value; 
+        }
     }
     
     LogError("Parameter name ("@param@") was not found!"); 
@@ -180,7 +203,10 @@ function vector GetParamVector(name param)
     for (i=0; i<CurParamsValues.Length; i++)
     {
         if (CurParamsValues[i].ParamName==param)
-        return CurParamsValues[i].VectorParam.Value; 
+        {
+            OnGetParam();
+            return CurParamsValues[i].VectorParam.Value; 
+        }
     }
     
     LogError("Parameter name ("@param@") was not found!"); 
@@ -194,7 +220,10 @@ function rotator GetParamRotator(name param)
     for (i=0; i<CurParamsValues.Length; i++)
     {
         if (CurParamsValues[i].ParamName==param)
-        return CurParamsValues[i].RotatorParam.Value; 
+        {
+            OnGetParam();
+            return CurParamsValues[i].RotatorParam.Value; 
+        }
     }
     
     LogError("Parameter name ("@param@") was not found!"); 
@@ -221,6 +250,9 @@ function SetParamFloat(name param, float value, optional int priority=0)
                 
                 CurParamsValues[i].Priority=priority;
             }
+            
+            OnSetParam();
+            
             return;
         }
     }
@@ -248,6 +280,9 @@ function SetParamInt(name param, int value, optional int priority=0)
                 
                 CurParamsValues[i].Priority=priority;
             }
+            
+            OnSetParam();
+            
             return;
         }
     }
@@ -268,6 +303,9 @@ function SetParamBool(name param, bool value, optional int priority=0)
                 CurParamsValues[i].BooleanParam.Value=value; 
                 CurParamsValues[i].Priority=priority;
             }
+            
+            OnSetParam();
+            
             return;
         }
     }
@@ -287,6 +325,9 @@ function SetParam(name param, object value, optional int priority=0)
                 CurParamsValues[i].ObjectParam.Value=value; 
                 CurParamsValues[i].Priority=priority;
             }
+            
+            OnSetParam();
+            
             return;
         }
     }
@@ -306,6 +347,9 @@ function SetParams(name param, array<object> value, optional int priority=0)
                 CurParamsValues[i].ObjectArrayParam.Value=value; 
                 CurParamsValues[i].Priority=priority;
             }
+            
+            OnSetParam();
+            
             return;
         }
     }
@@ -326,6 +370,9 @@ function SetParamVector(name param, vector value, optional int priority=0)
                 CurParamsValues[i].VectorParam.Value=value; 
                 CurParamsValues[i].Priority=priority;
             }
+            
+            OnSetParam();
+            
             return;
         }
     }
@@ -346,6 +393,9 @@ function SetParamRotator(name param, rotator value, optional int priority=0)
                 CurParamsValues[i].RotatorParam.Value=value; 
                 CurParamsValues[i].Priority=priority;
             }
+            
+            OnSetParam();
+            
             return;
         }
     }
@@ -353,20 +403,56 @@ function SetParamRotator(name param, rotator value, optional int priority=0)
     LogError("Parameter name ("@param@") was not found, cannot set a value!");
 }
 
+function OnGetParam()
+{
+    if (bLogFullInfo)
+        LogTransactions();    
+}
+
+function OnSetParam()
+{
+    if (bLogFullInfo)
+        LogTransactions(); 
+}
+
 function LogTransactions()
 {
-    local int i;
+    local int i,j;
     
-    `log("ActorController:: Total variables:"@CurParamsValues.Length);
+    `log("ActorController"@mechname@":: Total variables:"@CurParamsValues.Length);
     
     for (i=0;i<CurParamsValues.Length;i++)
     {
-        `log(">"$(i+1)$":"@CurParamsValues[i].ParamName@"="@CurParamsValues[i].ObjectParam.Value$"<");
-        
+        switch (CurParamsValues[i].ParamType)
+        {
+            case ParamType_Object:
+                `log(">"$(i)$":"@CurParamsValues[i].ParamName@"="@CurParamsValues[i].ObjectParam.Value$"<");
+            break;
+            case ParamType_ObjectArray:
+                `log("Object list"@CurParamsValues[i].ParamName@":: Total elements:"@CurParamsValues[i].ObjectArrayParam.Value.Length);
+                for (j=0;j<CurParamsValues[i].ObjectArrayParam.Value.Length;j++)
+                    `log(">"$(i)$":"@CurParamsValues[i].ParamName@"["@j@"]"@"="@CurParamsValues[i].ObjectArrayParam.Value[j]$"<");
+            break;
+            case ParamType_Float:
+                `log(">"$(i)$":"@CurParamsValues[i].ParamName@"="@CurParamsValues[i].FloatParam.Value$"<");
+            break;
+            case ParamType_Integer:
+                `log(">"$(i)$":"@CurParamsValues[i].ParamName@"="@CurParamsValues[i].IntegerParam.Value$"<");    
+            break;
+            case ParamType_Boolean:
+                `log(">"$(i)$":"@CurParamsValues[i].ParamName@"="@CurParamsValues[i].BooleanParam.Value$"<");    
+            break;
+            case ParamType_Vector:
+                `log(">"$(i)$":"@CurParamsValues[i].ParamName@"="@CurParamsValues[i].VectorParam.Value$"<");    
+            break;
+            case ParamType_Rotator:
+                `log(">"$(i)$":"@CurParamsValues[i].ParamName@"="@CurParamsValues[i].RotatorParam.Value$"<");    
+            break;
+        }
+  
     }
 }
     
-
 defaultproperties
 {
     mechname="Actor_Controller"

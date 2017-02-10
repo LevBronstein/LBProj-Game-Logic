@@ -4,35 +4,49 @@
  *  Creation date: 13.12.2016 19:58
  *  Copyright 2016, Windows7
  */
-class LBLocationTriggerMechanism extends LBTriggerMechanism;
+class LBLocationTriggerMechanism extends LBActorTriggerMechanism;
 
-var(LocationTrigger) vector TriggerAreaCenter; //A center of a trigger area (a sphere) 
-var(LocationTrigger) bool bLocalCoords; //If center shoul be used as an offset from parent's coordinates
-var(LocationTrigger) float TriggerAreaRadius; //A radius of the trigger area
+/*A center of a trigger area (a sphere). Objects, that intersect
+with this sphere pass the condition test*/
+var(LocationTrigger) vector TriggerAreaCenter;
+/*If the center pont shoul be used as an offset from 
+parent's coordinates. Use with caution, when @bIncludeParent is TRUE!*/
+var(LocationTrigger) bool bLocalCoords;
+/*A radius of the trigger area (a radius of the shpere)*/
+var(LocationTrigger) float TriggerAreaRadius;
 
-var(LocationTrigger) bool bCheckParent;
-var(LocationTrigger) actor CheckingObject;
-
+/*Display debug info in game*/
 var(MechanismDebug) bool bShowDebugLines;
 
-event OwnerTick(float deltatime)
+//event OwnerTick(float deltatime)
+//{
+//    if(benabled==false)
+//        return;
+//
+//    PerformTick(deltatime);           
+//}
+
+//event OwnerTick(float deltatime)
+//{
+//    if(benabled==false)
+//        return;
+//
+//    PerformTick(deltatime);
+//    
+//    if (bShowDebugLines)
+//        DrawDebugLines();  
+//
+//    `log(mechname@"Checking actors:"@CheckingActors.Length);    
+//}
+
+function PerformTick(float dt)
 {
-    //super.OwnerTick(deltatime);
-    
-    PerformTick();
+    super.PerformTick(dt);
     
     if (bShowDebugLines)
-        DrawDebugLines();  
-} 
+        DrawDebugLines(); 
+}
 
-function PerformTick()
-{
-    if (CheckConditions())
-        SetTrigger();
-    else 
-        SetUnTrigger();
-}  
-   
 function bool CheckActor(actor a)
 {
     local float l;
@@ -54,37 +68,37 @@ function bool CheckActor(actor a)
         return false;     
 }
   
-function bool CheckConditions()
-{
-    local bool b;
-    
-    if (bCheckParent)
-    {
-        b=CheckActor(parent);
-    }
-    else
-    {
-        b=CheckActor(CheckingObject);   
-    }
-      
-    return b;  
-}  
+//function bool CheckConditions()
+//{
+//    local bool b;
+//    
+//    if (bCheckParent)
+//    {
+//        b=CheckActor(parent);
+//    }
+//    else
+//    {
+//        b=CheckActor(CheckingObject);   
+//    }
+//      
+//    return b;  
+//}  
 
-function OnChangedTriggerState(bool bnewstate)
-{
-    if (bnewstate)
-    {
-        LogInfo("The checking actor is INSIDE the area ("$TriggerAreaCenter$") with radius "@TriggerAreaRadius);
-        //ActivateKismetEvent(OnTriggerEventName,parent,parent.WorldInfo);    
-    } 
-    else
-    {
-        LogInfo("The checking actor is OUTSIDE the area ("$TriggerAreaCenter$") with radius "@TriggerAreaRadius);
-        //ActivateKismetEvent(OnUnTriggerEventName,parent,parent.WorldInfo);    
-    }  
-   
-   super.OnChangedTriggerState(bnewstate); 
-}    
+//function OnChangedTriggerState(bool bnewstate)
+//{
+//    if (bnewstate)
+//    {
+//        LogInfo("The checking actor is INSIDE the area ("$TriggerAreaCenter$") with radius "@TriggerAreaRadius);
+//        //ActivateKismetEvent(OnTriggerEventName,parent,parent.WorldInfo);    
+//    } 
+//    else
+//    {
+//        LogInfo("The checking actor is OUTSIDE the area ("$TriggerAreaCenter$") with radius "@TriggerAreaRadius);
+//        //ActivateKismetEvent(OnUnTriggerEventName,parent,parent.WorldInfo);    
+//    }  
+//   
+//   super.OnChangedTriggerState(bnewstate); 
+//}    
 
 function DrawDebugLines()
 {
@@ -102,17 +116,15 @@ function DrawDebugLines()
     }
 }
 
-function SetParam(name param, object value, optional int priority=0)
-{
-    if (param=='CheckingObject')
-        CheckingObject=actor(value);  
-} 
     
 function bool GetParamBool(name param)
 {
-    if (param=='IsCheckingObjectInArea')
+    super.GetParamBool(param);
+    
+    if (param=='bHasActorInTriggerArea' || param=='HasActorInTriggerArea' ||
+    param=='bHasTriggeredActor' || param=='HasTriggeredActor')
     {
-        return CheckActor(CheckingObject);
+        return TriggerState;
     } 
 }
 

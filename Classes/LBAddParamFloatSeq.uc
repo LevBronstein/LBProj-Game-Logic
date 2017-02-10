@@ -6,7 +6,7 @@
  */
 class LBAddParamFloatSeq extends SequenceAction;
 
-var Actor targetactor;
+var object targetactor;
 var float value;
 
 var() name mechname;

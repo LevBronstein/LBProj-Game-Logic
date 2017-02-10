@@ -6,7 +6,7 @@
  */
 class LBAddParamVectorSeq extends SequenceAction;
 
-var Actor targetactor;
+var object targetactor;
 var vector value;
 
 var() name mechname;

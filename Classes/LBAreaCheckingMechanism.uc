@@ -6,9 +6,9 @@
  */
 class LBAreaCheckingMechanism extends LBMechanism;
 
-var(LocationTriggerMechanismSystem) vector CheckingAreaCenter; //A center of a trigger area (a sphere)
-var(LocationTriggerMechanismSystem) bool bUseLocalCoords; 
-var(LocationTriggerMechanismSystem) float CheckingAreaRadius; //A radius of the trigger area
+var(AreaCheckingMechanism) vector CheckingAreaCenter; //A center of a trigger area (a sphere)
+var(AreaCheckingMechanism) bool bUseLocalCoords; 
+var(AreaCheckingMechanism) float CheckingAreaRadius; //A radius of the trigger area
 
 var(MechanismDebug) bool bShowDebugLines;
 
@@ -70,6 +70,22 @@ function actor GetNearestObject()
     }
     else
         return none;       
+}
+    
+function array<actor> GetAllObjectsInArea()
+{
+    local lbactor a;
+    local array<actor> actors;
+    
+    foreach parent.DynamicActors(class 'LBActor', a)
+    {
+        if (CheckActor(a))
+        {
+            actors.AddItem(a);
+        }  
+    } 
+
+    return actors;     
 }
 
 function float GetObjectDistance(actor a)
@@ -157,10 +173,19 @@ function bool GetParamBool(name param)
     } 
 }
 
+function array<object> GetParams(name param)
+{
+    if (param=='AllObjectsInArea')
+    {
+        return GetAllObjectsInArea();
+    } 
+}
+
 defaultproperties
 {
     mechname="Area_Checking_Mechanism"
     
     MechanismParams(0)=(ParamName="AreaHasObjects", ParamInfo="Boolean. Read. Checks whether defined area has any objects, returns true if there are any.")
-    MechanismParams(1)=(ParamName="NearestObject", ParamInfo="Object (Actor). Read. Gets the nearest to the center of the area object, returns none if there aren't any.") 
+    MechanismParams(1)=(ParamName="NearestObject", ParamInfo="Object (Actor). Read. Gets the nearest to the center of the area object, returns none if there aren't any.")
+    MechanismParams(2)=(ParamName="AllObjectsInArea", ParamInfo="Object Array. Read. Gets a list of objects within the area, returns empty list if there aren't any.")
 }

@@ -42,6 +42,15 @@ function OnChangedTriggerState(bool bnewstate)
     }   
 }
 
+function bool GetParamBool(name param)
+{
+    if (param=='bTriggerState' || param=='TriggerState')
+    {
+        return TriggerState;
+    } 
+}
+
 defaultproperties
 {
+    mechname="Trigger_Mechanism"
 }

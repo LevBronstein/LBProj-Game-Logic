@@ -550,6 +550,30 @@ function LBParamContainer GetTargetParamContainerSrc(LBParamSourcePointer source
     return v;
 }
 
+function bool TargetHasMechanism(actor target, name targetmech)
+{
+    local LBActor a;
+    local LBPawn p;
+
+    a=LBActor(target);
+    
+    if (a!=none)
+    {   
+        if (a.GetMechanismByName(targetmech)!=none)
+            return true;
+    }
+    
+    p=LBPawn(target);
+    
+    if (p!=none)
+    {
+        if (p.GetMechanismByName(targetmech)!=none)
+            return true;
+    }
+        
+    return false;
+}
+
 defaultproperties
 {
 }

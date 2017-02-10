@@ -109,6 +109,12 @@ struct LBParamSourcePointer
     var() bool bUseSource;
 };
 
+struct LBParamValueSource
+{
+    var() editconst name ParamName;
+    var() LBParamSourcePointer ValueSource;
+};
+
 struct LBParam
 {
     var() name MechanismName;
@@ -131,11 +137,14 @@ var bool bfirsttick; //whether this is the first tick and we should do some init
 
 var(MechanismDebug) bool bLogDebug;
 var(MechanismDebug) bool bLogFullInfo;
- 
-var(ParamSource) name ParameterSource; //A mechanism, from which we get all params via GetParamFloat
-var(ParamSource) bool bUseParamSource; //Defines whether we should get params (from ParameterSource) 
 
-var(MechanismInfo) array<LBMechanismParamInfo> MechanismParams;
+/*A mechanism, from which we get all params via GetParamFloat. Soon will be deprecated!*/ 
+var(ParamSource) name ParameterSource; 
+var(ParamSource) bool bUseParamSource; //Defines whether we should get params (from ParameterSource) 
+/*An array, which contains a source pointer for each param*/
+var(ParamSource) editfixedsize array<LBParamValueSource> ParamSource;
+
+var(MechanismInfo) editfixedsize array<LBMechanismParamInfo> MechanismParams;
 
 function InitMechanism()
 {
@@ -200,6 +209,10 @@ function rotator GetParamRotator(name param)
 //not fully supported for now    
 function name GetParamName(name param)
 {}     
+  
+function PerfromTick(float dt)
+{   
+}
     
 event OwnerTick(float deltatime)
 {
@@ -209,7 +222,9 @@ event OwnerTick(float deltatime)
         return;
         
     if (bUseParamSource)
-        GetParameters();       
+        GetParameters(); 
+  
+    PerfromTick(deltatime);      
 }
 
 event OwnerAnimNotify(AnimNodeSequence notifynode, AnimNotifyTypes notifytype);

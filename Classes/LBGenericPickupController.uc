@@ -57,6 +57,8 @@ function bool GetParamBool(name param)
         return TriggerState;
     else if (param== 'bCanBeAttached' || param=='bCanBePickedUp')
         return bCanBePickedUp;
+    else
+        return super.GetParamBool(param);
 }
     
 function SetParamBool(name param, bool value, optional int priority=0)
