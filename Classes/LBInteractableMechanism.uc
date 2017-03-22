@@ -6,12 +6,14 @@
  */
 class LBInteractableMechanism extends LBMechanism;
 
-
 function SetTargetParamFloat(actor target, name targetmech, name targetparam, float value, optional int priority=0)
 {
     local LBActor a;
     local LBPawn p;
+    local LBSkeletalMeshActor s;
     local LBDynamicActor d;
+    local LBSKMPhysicsActor skmph;
+    local LBSMPhysicsActor smph;
 
     a=LBActor(target);
     
@@ -36,6 +38,30 @@ function SetTargetParamFloat(actor target, name targetmech, name targetparam, fl
         d.SetParamFloat(targetmech, targetparam, value);
         return;
     }
+    
+    s=LBSkeletalMeshActor(target);
+    
+    if (s!=none)
+    {   
+        s.SetParamFloat(targetmech, targetparam, value);
+        return;
+    }
+    
+    skmph=LBSKMPhysicsActor(target);
+    
+    if (skmph!=none)
+    {   
+        skmph.SetParamFloat(targetmech, targetparam, value);
+        return;
+    }
+    
+    smph=LBSMPhysicsActor(target);
+    
+    if (smph!=none)
+    {   
+        smph.SetParamFloat(targetmech, targetparam, value);
+        return;
+    }
 }
 
 function SetTargetParamInt(actor target, name targetmech, name targetparam, int value, optional int priority=0)
@@ -43,6 +69,9 @@ function SetTargetParamInt(actor target, name targetmech, name targetparam, int 
     local LBActor a;
     local LBPawn p;
     local LBDynamicActor d;
+    local LBSkeletalMeshActor s;
+    local LBSKMPhysicsActor skmph;
+    local LBSMPhysicsActor smph;
 
     a=LBActor(target);
     
@@ -68,6 +97,30 @@ function SetTargetParamInt(actor target, name targetmech, name targetparam, int 
         d.SetParamInt(targetmech, targetparam, value);
         return;
     }
+    
+    s=LBSkeletalMeshActor(target);
+    
+    if (s!=none)
+    {   
+        s.SetParamInt(targetmech, targetparam, value);
+        return;
+    }
+    
+    skmph=LBSKMPhysicsActor(target);
+    
+    if (skmph!=none)
+    {   
+        skmph.SetParamInt(targetmech, targetparam, value);
+        return;
+    }
+    
+    smph=LBSMPhysicsActor(target);
+    
+    if (smph!=none)
+    {   
+        smph.SetParamInt(targetmech, targetparam, value);
+        return;
+    }
 }
 
 function SetTargetParamBool(actor target, name targetmech, name targetparam, bool value, optional int priority=0)
@@ -75,6 +128,9 @@ function SetTargetParamBool(actor target, name targetmech, name targetparam, boo
     local LBActor a;
     local LBPawn p;
     local LBDynamicActor d;
+    local LBSkeletalMeshActor s;
+    local LBSKMPhysicsActor skmph;
+    local LBSMPhysicsActor smph;
 
     a=LBActor(target);
     
@@ -99,6 +155,30 @@ function SetTargetParamBool(actor target, name targetmech, name targetparam, boo
         d.SetParamBool(targetmech, targetparam, value);
         return;
     }
+    
+    s=LBSkeletalMeshActor(target);
+    
+    if (s!=none)
+    {   
+        s.SetParamBool(targetmech, targetparam, value);
+        return;
+    }
+    
+    skmph=LBSKMPhysicsActor(target);
+    
+    if (skmph!=none)
+    {   
+        skmph.SetParamBool(targetmech, targetparam, value);
+        return;
+    }
+    
+    smph=LBSMPhysicsActor(target);
+    
+    if (smph!=none)
+    {   
+        smph.SetParamBool(targetmech, targetparam, value);
+        return;
+    }
 }
 
 function SetTargetParam(actor target, name targetmech, name targetparam, object value, optional int priority=0)
@@ -106,6 +186,9 @@ function SetTargetParam(actor target, name targetmech, name targetparam, object 
     local LBActor a;
     local LBPawn p;
     local LBDynamicActor d;
+    local LBSkeletalMeshActor s;
+    local LBSKMPhysicsActor skmph;
+    local LBSMPhysicsActor smph;
 
     a=LBActor(target);
     
@@ -130,6 +213,30 @@ function SetTargetParam(actor target, name targetmech, name targetparam, object 
         d.SetParam(targetmech, targetparam, value);
         return;
     }
+    
+    s=LBSkeletalMeshActor(target);
+    
+    if (s!=none)
+    {   
+        s.SetParam(targetmech, targetparam, value);
+        return;
+    }
+    
+    skmph=LBSKMPhysicsActor(target);
+    
+    if (skmph!=none)
+    {   
+        skmph.SetParam(targetmech, targetparam, value);
+        return;
+    }
+    
+    smph=LBSMPhysicsActor(target);
+    
+    if (smph!=none)
+    {   
+        smph.SetParam(targetmech, targetparam, value);
+        return;
+    }
 }
 
 function SetTargetParams(actor target, name targetmech, name targetparam, array<object> value, optional int priority=0)
@@ -137,6 +244,9 @@ function SetTargetParams(actor target, name targetmech, name targetparam, array<
     local LBActor a;
     local LBPawn p;
     local LBDynamicActor d;
+    local LBSkeletalMeshActor s;
+    local LBSKMPhysicsActor skmph;
+    local LBSMPhysicsActor smph;
 
     a=LBActor(target);
     
@@ -161,6 +271,30 @@ function SetTargetParams(actor target, name targetmech, name targetparam, array<
         d.SetParams(targetmech, targetparam, value);
         return;
     }
+    
+    s=LBSkeletalMeshActor(target);
+    
+    if (s!=none)
+    {   
+        s.SetParams(targetmech, targetparam, value);
+        return;
+    }
+    
+    skmph=LBSKMPhysicsActor(target);
+    
+    if (skmph!=none)
+    {   
+        skmph.SetParams(targetmech, targetparam, value);
+        return;
+    }
+    
+    smph=LBSMPhysicsActor(target);
+    
+    if (smph!=none)
+    {   
+        smph.SetParams(targetmech, targetparam, value);
+        return;
+    }
 }
 
 function SetTargetParamVector(actor target, name targetmech, name targetparam, vector value, optional int priority=0)
@@ -168,6 +302,9 @@ function SetTargetParamVector(actor target, name targetmech, name targetparam, v
     local LBActor a;
     local LBPawn p;
     local LBDynamicActor d;
+    local LBSkeletalMeshActor s;
+    local LBSKMPhysicsActor skmph;
+    local LBSMPhysicsActor smph;
 
     a=LBActor(target);
     
@@ -192,6 +329,30 @@ function SetTargetParamVector(actor target, name targetmech, name targetparam, v
         d.SetParamVector(targetmech, targetparam, value);
         return;
     }
+    
+    s=LBSkeletalMeshActor(target);
+    
+    if (s!=none)
+    {   
+        s.SetParamVector(targetmech, targetparam, value);
+        return;
+    } 
+    
+    skmph=LBSKMPhysicsActor(target);
+    
+    if (skmph!=none)
+    {   
+        skmph.SetParamVector(targetmech, targetparam, value);
+        return;
+    }
+    
+    smph=LBSMPhysicsActor(target);
+    
+    if (smph!=none)
+    {   
+        smph.SetParamVector(targetmech, targetparam, value);
+        return;
+    }
 }
 
 function SetTargetParamRotator(actor target, name targetmech, name targetparam, rotator value, optional int priority=0)
@@ -199,6 +360,9 @@ function SetTargetParamRotator(actor target, name targetmech, name targetparam, 
     local LBActor a;
     local LBPawn p;
     local LBDynamicActor d;
+    local LBSkeletalMeshActor s;
+    local LBSKMPhysicsActor skmph;
+    local LBSMPhysicsActor smph;
 
     a=LBActor(target);
     
@@ -221,6 +385,30 @@ function SetTargetParamRotator(actor target, name targetmech, name targetparam, 
     if (d!=none)
     {
         d.SetParamRotator(targetmech, targetparam, value);
+        return;
+    }
+    
+    s=LBSkeletalMeshActor(target);
+    
+    if (s!=none)
+    {   
+        s.SetParamRotator(targetmech, targetparam, value);
+        return;
+    }
+    
+    skmph=LBSKMPhysicsActor(target);
+    
+    if (skmph!=none)
+    {   
+        skmph.SetParamRotator(targetmech, targetparam, value);
+        return;
+    }
+    
+    smph=LBSMPhysicsActor(target);
+    
+    if (smph!=none)
+    {   
+        smph.SetParamRotator(targetmech, targetparam, value);
         return;
     }
 }
@@ -278,7 +466,10 @@ function float GetTargetParamFloat(actor target, name targetmech, name targetpar
     local LBActor a;
     local LBPawn p;
     local LBDynamicActor d;
+    local LBSkeletalMeshActor s;
     local float value;
+    local LBSKMPhysicsActor skmph;
+    local LBSMPhysicsActor smph;
 
     a=LBActor(target);
     
@@ -303,6 +494,30 @@ function float GetTargetParamFloat(actor target, name targetmech, name targetpar
         value=d.GetParamFloat(targetmech, targetparam);
         return value;
     }
+    
+    s=LBSkeletalMeshActor(target);
+    
+    if (s!=none)
+    {
+        value=s.GetParamFloat(targetmech, targetparam);
+        return value;
+    }
+    
+    skmph=LBSKMPhysicsActor(target);
+    
+    if (skmph!=none)
+    {   
+        value=skmph.GetParamFloat(targetmech, targetparam);
+        return value;
+    }
+    
+    smph=LBSMPhysicsActor(target);
+    
+    if (smph!=none)
+    {   
+        value=smph.GetParamFloat(targetmech, targetparam);
+        return value;
+    }
 }
 
 function int GetTargetParamInt(actor target, name targetmech, name targetparam)
@@ -310,7 +525,10 @@ function int GetTargetParamInt(actor target, name targetmech, name targetparam)
     local LBActor a;
     local LBPawn p;
     local LBDynamicActor d;
+    local LBSkeletalMeshActor s;
     local int value;
+    local LBSKMPhysicsActor skmph;
+    local LBSMPhysicsActor smph;
 
     a=LBActor(target);
     
@@ -335,6 +553,30 @@ function int GetTargetParamInt(actor target, name targetmech, name targetparam)
         value=d.GetParamInt(targetmech, targetparam);
         return value;
     }
+    
+    s=LBSkeletalMeshActor (target);
+    
+    if (s!=none)
+    {
+        value=s.GetParamInt(targetmech, targetparam);
+        return value;
+    }
+    
+    skmph=LBSKMPhysicsActor(target);
+    
+    if (skmph!=none)
+    {   
+        value=skmph.GetParamInt(targetmech, targetparam);
+        return value;
+    }
+    
+    smph=LBSMPhysicsActor(target);
+    
+    if (smph!=none)
+    {   
+        value=smph.GetParamInt(targetmech, targetparam);
+        return value;
+    }
 }
 
 function bool GetTargetParamBool(actor target, name targetmech, name targetparam)
@@ -342,7 +584,10 @@ function bool GetTargetParamBool(actor target, name targetmech, name targetparam
     local LBActor a;
     local LBPawn p;
     local LBDynamicActor d;
+    local LBSkeletalMeshActor s;
     local bool value;
+    local LBSKMPhysicsActor skmph;
+    local LBSMPhysicsActor smph;
 
     a=LBActor(target);
     
@@ -367,6 +612,30 @@ function bool GetTargetParamBool(actor target, name targetmech, name targetparam
         value=d.GetParamBool(targetmech, targetparam);
         return value;
     }
+    
+    s=LBSkeletalMeshActor (target);
+    
+    if (s!=none)
+    {
+        value=s.GetParamBool(targetmech, targetparam);
+        return value;
+    }
+    
+    skmph=LBSKMPhysicsActor(target);
+    
+    if (skmph!=none)
+    {   
+        value=skmph.GetParamBool(targetmech, targetparam);
+        return value;
+    }
+    
+    smph=LBSMPhysicsActor(target);
+    
+    if (smph!=none)
+    {   
+        value=smph.GetParamBool(targetmech, targetparam);
+        return value;
+    }
 }
 
 function object GetTargetParam(actor target, name targetmech, name targetparam)
@@ -374,8 +643,11 @@ function object GetTargetParam(actor target, name targetmech, name targetparam)
     local LBActor a;
     local LBPawn p;
     local LBDynamicActor d;
+    local LBSkeletalMeshActor s;
     local object value;
-
+    local LBSKMPhysicsActor skmph;
+    local LBSMPhysicsActor smph;
+    
     a=LBActor(target);
     
     if (a!=none)
@@ -399,6 +671,31 @@ function object GetTargetParam(actor target, name targetmech, name targetparam)
         value=d.GetParam(targetmech, targetparam);
         return value;
     }
+    
+    s=LBSkeletalMeshActor(target);
+    
+    if (s!=none)
+    {
+        value=s.GetParam(targetmech, targetparam);
+        return value;
+    } 
+    
+    skmph=LBSKMPhysicsActor(target);
+    
+    if (skmph!=none)
+    {   
+        value=skmph.GetParam(targetmech, targetparam);
+        return value;
+    }
+    
+    smph=LBSMPhysicsActor(target);
+    
+    if (smph!=none)
+    {   
+        value=smph.GetParam(targetmech, targetparam);
+        return value;
+    }
+    
 }
 
 function array<object> GetTargetParams(actor target, name targetmech, name targetparam)
@@ -406,7 +703,10 @@ function array<object> GetTargetParams(actor target, name targetmech, name targe
     local LBActor a;
     local LBPawn p;
     local LBDynamicActor d;
+    local LBSkeletalMeshActor s;
     local array<object> value;
+    local LBSKMPhysicsActor skmph;
+    local LBSMPhysicsActor smph;    
 
     a=LBActor(target);
     
@@ -431,6 +731,30 @@ function array<object> GetTargetParams(actor target, name targetmech, name targe
         value=d.GetParams(targetmech, targetparam);
         return value;
     }
+    
+    s=LBSkeletalMeshActor (target);
+    
+    if (s!=none)
+    {
+        value=s.GetParams(targetmech, targetparam);
+        return value;
+    }
+    
+    skmph=LBSKMPhysicsActor(target);
+    
+    if (skmph!=none)
+    {   
+        value=skmph.GetParams(targetmech, targetparam);
+        return value;
+    }
+    
+    smph=LBSMPhysicsActor(target);
+    
+    if (smph!=none)
+    {   
+        value=smph.GetParams(targetmech, targetparam);
+        return value;
+    }    
 }
 
 function vector GetTargetParamVector(actor target, name targetmech, name targetparam)
@@ -438,7 +762,10 @@ function vector GetTargetParamVector(actor target, name targetmech, name targetp
     local LBActor a;
     local LBPawn p;
     local LBDynamicActor d;
+    local LBSkeletalMeshActor s;
     local vector value;
+    local LBSKMPhysicsActor skmph;
+    local LBSMPhysicsActor smph;    
 
     a=LBActor(target);
     
@@ -463,6 +790,30 @@ function vector GetTargetParamVector(actor target, name targetmech, name targetp
         value=d.GetParamVector(targetmech, targetparam);
         return value;
     }
+    
+    s=LBSkeletalMeshActor (target);
+    
+    if (s!=none)
+    {
+        value=s.GetParamVector(targetmech, targetparam);
+        return value;
+    }
+    
+    skmph=LBSKMPhysicsActor(target);
+    
+    if (skmph!=none)
+    {   
+        value=skmph.GetParamVector(targetmech, targetparam);
+        return value;
+    }
+    
+    smph=LBSMPhysicsActor(target);
+    
+    if (smph!=none)
+    {   
+        value=smph.GetParamVector(targetmech, targetparam);
+        return value;
+    }    
 }
 
 function rotator GetTargetParamRotator(actor target, name targetmech, name targetparam)
@@ -470,7 +821,10 @@ function rotator GetTargetParamRotator(actor target, name targetmech, name targe
     local LBActor a;
     local LBPawn p;
     local LBDynamicActor d;
+    local LBSkeletalMeshActor s;
     local rotator value;
+    local LBSKMPhysicsActor skmph;
+    local LBSMPhysicsActor smph;    
 
     a=LBActor(target);
     
@@ -495,6 +849,30 @@ function rotator GetTargetParamRotator(actor target, name targetmech, name targe
         value=d.GetParamRotator(targetmech, targetparam);
         return value;
     }
+    
+    s=LBSkeletalMeshActor (target);
+    
+    if (s!=none)
+    {
+        value=s.GetParamRotator(targetmech, targetparam);
+        return value;
+    }
+    
+    skmph=LBSKMPhysicsActor(target);
+    
+    if (skmph!=none)
+    {   
+        value=skmph.GetParamRotator(targetmech, targetparam);
+        return value;
+    }
+    
+    smph=LBSMPhysicsActor(target);
+    
+    if (smph!=none)
+    {   
+        value=smph.GetParamRotator(targetmech, targetparam);
+        return value;
+    }    
 }
 
 function LBParamContainer GetTargetParamContainer(actor target, name targetmech, name targetparam, ParamTypes paramtype)
@@ -554,6 +932,9 @@ function bool TargetHasMechanism(actor target, name targetmech)
 {
     local LBActor a;
     local LBPawn p;
+    local LBSkeletalMeshActor s;
+    local LBSKMPhysicsActor skmph;
+    local LBSMPhysicsActor smph;    
 
     a=LBActor(target);
     
@@ -571,7 +952,41 @@ function bool TargetHasMechanism(actor target, name targetmech)
             return true;
     }
         
+    s=LBSkeletalMeshActor (target);
+    
+    if (s!=none)
+    {
+        if (s.GetMechanismByName(targetmech)!=none)
+            return true;
+    }    
+        
+    skmph=LBSKMPhysicsActor(target);
+    
+    if (skmph!=none)
+    {   
+        if (skmph.GetMechanismByName(targetmech)!=none)
+            return true;
+    }
+    
+    smph=LBSMPhysicsActor(target);
+    
+    if (smph!=none)
+    {   
+        if (smph.GetMechanismByName(targetmech)!=none)
+            return true;
+    }                
+        
     return false;
+}
+
+/*Returns true if @target is LBActor, LBPawn or other LB... actor*/
+function bool TargetIsLBObject(actor target)
+{
+    if (LBActor(target)!=none || LBPawn(target)!=none || LBSkeletalMeshActor(target)!=none ||
+    LBSKMPhysicsActor(target)!=none || LBSMPhysicsActor(target)!=none)
+        return true;
+    else 
+        return false;    
 }
 
 defaultproperties

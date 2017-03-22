@@ -19,29 +19,7 @@ event OwnerTick(float deltatime)
     
     if (benabled==false)
         return;
-    
-    PerformTick();
 } 
-
-function PerformTick()
-{
-    local LBPawn p;
-    local vector l;
-    local rotator r;
-    
-    if (HeldObject == none)       
-        return;
-        
-    p=LBPawn(parent);
-    
-    //if (p == none)
-    //    return;
-    //    
-    //if (p.Mesh.GetSocketWorldLocationAndRotation(AttachSocket, l, r, 0)==false)
-    //    return;  
-    // 
-    //HeldObject.SetLocation(l); 
-}
 
 function bool AddToIvnentory(actor a)
 {
@@ -69,13 +47,15 @@ function bool AddToIvnentory(actor a)
         return false;   
     }
     
-    if (LBActor(a) == none || LBActor(a).GetMechanismByName(OtherObjectMechanism) == none)
+    //if (LBActor(a) == none || LBActor(a).GetMechanismByName(OtherObjectMechanism) == none)
+    if (!TargetIsLBObject(a) || !TargetHasMechanism(a, OtherObjectMechanism))
     {
         LogError("proc: AddToIvnentory(), other object is not an LBActor:"@LBActor(a)@"or doesn't have a"@OtherObjectMechanism@"mechanism!"); 
         return false;     
     }
     
-    LBActor(a).SetParam(OtherObjectMechanism, 'PickUpBy', parent);
+    SetTargetParam(a, OtherObjectMechanism, 'PickUpBy', parent);
+    //LBActor(a).SetParam(OtherObjectMechanism, 'PickUpBy', parent);
     //LBActor(a).SetParamName(OtherObjectMechanism, 'AttachSocket', AttachSocket);
     
     HeldObject=a;
@@ -91,7 +71,8 @@ function bool ClearInventory()
         return false;
     }
     
-    LBActor(HeldObject).SetParamBool(OtherObjectMechanism, 'PutDown', true);
+    SetTargetParamBool(HeldObject, OtherObjectMechanism, 'PutDown', true);
+    //LBActor(HeldObject).SetParamBool(OtherObjectMechanism, 'PutDown', true);
     
     HeldObject=none;
     
@@ -121,7 +102,8 @@ function bool CanAddToIvnentory()
         return false;   
     }
     
-    if (LBActor(CheckingObject) == none || LBActor(CheckingObject).GetMechanismByName(OtherObjectMechanism) == none)
+    //if (LBActor(CheckingObject) == none || LBActor(CheckingObject).GetMechanismByName(OtherObjectMechanism) == none)
+    if (!TargetIsLBObject(CheckingObject) || !TargetHasMechanism(CheckingObject, OtherObjectMechanism))
     {
         return false;     
     } 

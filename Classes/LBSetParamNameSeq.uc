@@ -21,6 +21,12 @@ event Activated()
     //    LBDynamicActor(targetactor).SetParamName(mechname,paramname,value);
     if(LBPawn(targetactor)!=none)
         LBPawn(targetactor).SetParamName(mechname,paramname,value);
+    if(LBSKMPhysicsActor(targetactor)!=none)
+        LBSKMPhysicsActor(targetactor).SetParamName(mechname,paramname,value); 
+    if(LBSMPhysicsActor(targetactor)!=none)
+        LBSMPhysicsActor(targetactor).SetParamName(mechname,paramname,value);    
+    if(LBSkeletalMeshActor(targetactor)!=none)
+        LBSkeletalMeshActor(targetactor).SetParamName(mechname,paramname,value);
     //if(LBCamera(targetactor)!=none)
     //    LBCamera(targetactor).SetParamName(mechname,paramname,value);
     //`log(">>> ("@targetactor@"|"@targetpawn@")"@mechname@"."@paramname@"="@targetactor.GetParamFloat(mechname, paramname)); 

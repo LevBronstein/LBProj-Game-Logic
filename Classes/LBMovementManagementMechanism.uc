@@ -4,7 +4,7 @@
  *  Creation date: 01.02.2017 00:13
  *  Copyright 2017, Windows7
  */
-class LBMovementManagementMechanism extends LBMechanism;
+class LBMovementManagementMechanism extends LBInteractableMechanism;
 
 var(MovementManager) name DefaultMovementMechanism; //The default movement mechanism, which is used primarily
 var(MovementManager) array<name> MovementMechanisms; //Other movement mechanism, each can be activated by ActivateMovement
@@ -39,19 +39,23 @@ function ActivateMovMech(int id)
     {
         if (i==id)
         {
-            LBActor(parent).SetParamBool(MovementMechanisms[i], 'bEnabled', true);              
+            SetTargetParamBool(parent,MovementMechanisms[i],'bEnabled', true);
+            //LBActor(parent).SetParamBool(MovementMechanisms[i], 'bEnabled', true);              
             b=true;
             LogInfo("Activating movement mechanism:"@MovementMechanisms[i]);
         }
         else
-            LBActor(parent).SetParamBool(MovementMechanisms[i], 'bEnabled', false);              
+            SetTargetParamBool(parent,MovementMechanisms[i],'bEnabled', false);
+        //LBActor(parent).SetParamBool(MovementMechanisms[i], 'bEnabled', false);              
     }
     
     //Также отключаем и механизм по умолчанию, если был активирован другой
     if (b)
-        LBActor(parent).SetParamBool(DefaultMovementMechanism, 'bEnabled', false);
+        SetTargetParamBool(parent, DefaultMovementMechanism, 'bEnabled', false);
+        //LBActor(parent).SetParamBool(DefaultMovementMechanism, 'bEnabled', false);
     else
-        LBActor(parent).SetParamBool(DefaultMovementMechanism, 'bEnabled', true);        
+        SetTargetParamBool(parent, DefaultMovementMechanism, 'bEnabled', true); 
+        //LBActor(parent).SetParamBool(DefaultMovementMechanism, 'bEnabled', true);        
 }
 
 function ActivateDefaultMovMech()
@@ -60,10 +64,12 @@ function ActivateDefaultMovMech()
         
     for (i=0;i<MovementMechanisms.Length;i++)
     {
-        LBActor(parent).SetParamBool(MovementMechanisms[i], 'bEnabled', false);              
+        SetTargetParamBool(parent, MovementMechanisms[i], 'bEnabled', false);
+        //LBActor(parent).SetParamBool(MovementMechanisms[i], 'bEnabled', false);              
     }
     
-    LBActor(parent).SetParamBool(DefaultMovementMechanism, 'bEnabled', true); 
+    SetTargetParamBool(parent, DefaultMovementMechanism, 'bEnabled', true); 
+    //LBActor(parent).SetParamBool(DefaultMovementMechanism, 'bEnabled', true); 
     LogInfo("Activating a default movement mechanism");    
 }
 
@@ -73,10 +79,12 @@ function DeactivateAllMovMechs()
     
     for (i=0;i<MovementMechanisms.Length;i++)
     {
-        LBActor(parent).SetParamBool(MovementMechanisms[i], 'bEnabled', false);         
+        SetTargetParamBool(parent, MovementMechanisms[i], 'bEnabled', false);
+        //LBActor(parent).SetParamBool(MovementMechanisms[i], 'bEnabled', false);         
     }  
   
-    LBActor(parent).SetParamBool(DefaultMovementMechanism, 'bEnabled', false);            
+    SetTargetParamBool(parent, DefaultMovementMechanism, 'bEnabled', false);
+    //LBActor(parent).SetParamBool(DefaultMovementMechanism, 'bEnabled', false);            
     LogInfo("Deactivating all movement mechanisms");
 }
 
@@ -90,5 +98,5 @@ defaultproperties
 {
     mechname="Movement_Manager"
     
-    MechanismParams(0)=(ParamName="ActivateMovementMechanism", ParamInfo="Integer. Write. Activate movement mechanism by given ID.")
+    MechanismParams(0)=(ParamName="ActivateMovementMechanism", ParamType=ParamType_Integer, ParamInfo="Integer. Write. Activate movement mechanism by given ID.")
 }

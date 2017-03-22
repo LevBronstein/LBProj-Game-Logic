@@ -23,6 +23,12 @@ event Activated()
         LBPawn(targetactor).SetParamFloat(mechname,paramname,value);
     if(LBCamera(targetactor)!=none)
         LBCamera(targetactor).SetParamFloat(mechname,paramname,value);
+    if(LBSKMPhysicsActor(targetactor)!=none)
+        LBSKMPhysicsActor(targetactor).SetParamFloat(mechname,paramname,value); 
+    if(LBSMPhysicsActor(targetactor)!=none)
+        LBSMPhysicsActor(targetactor).SetParamFloat(mechname,paramname,value);    
+    if(LBSkeletalMeshActor(targetactor)!=none)
+        LBSkeletalMeshActor(targetactor).SetParamFloat(mechname,paramname,value);
     //`log(">>> ("@targetactor@"|"@targetpawn@")"@mechname@"."@paramname@"="@targetactor.GetParamFloat(mechname, paramname)); 
 }
 

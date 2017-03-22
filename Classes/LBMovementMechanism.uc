@@ -47,12 +47,21 @@ function PerformTick(float dt)
 
 function PerformMovement(float dt)
 {
-    parent.SetLocation(parent.location+ForwardSpeed);
+    if (LBActor(parent)!=none)
+        parent.SetLocation(parent.location+ForwardSpeed);
+    else if (LBPawn(parent)!=none)
+        parent.Velocity=ForwardSpeed;  
+    else if (LBSMPhysicsActor(parent)!=none)
+        LBSMPhysicsActor(parent).CollisionComponent.SetRBPosition(parent.Location+ForwardSpeed);
+    
 }
 
 function PerformRotation(float dt)
 {    
-    parent.SetRotation(parent.Rotation+AngularSpeed);
+    if (LBActor(parent)!=none || LBPawn(parent)!=none)
+        parent.SetRotation(parent.Rotation+AngularSpeed);
+    else if (LBSMPhysicsActor(parent)!=none)
+        LBSMPhysicsActor(parent).CollisionComponent.SetRBRotation(parent.Rotation+AngularSpeed);
 }
 
 function GetParameters()

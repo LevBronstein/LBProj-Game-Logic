@@ -4,22 +4,24 @@
  *  Creation date: 08.01.2017 00:10
  *  Copyright 2017, Windows7
  */
-class LBPathMovementMechanism extends LBMovementMechanism;
+class LBPathMovementMechanism extends LBTransposeMechanism;
 
-var (PathMovement) SplineActor Path; 
+var (PathMovement) float ForwardSpeed; 
+
+var (PathMovementSystem) SplineActor Path;
 
 var float dist;
 
-function FirstTickInit()
-{
-    if (bfirsttick==false)
-        return;
-    
-    if (bfirsttick==true)
-        bfirsttick=false;    
-}
+//function FirstTickInit()
+//{
+//    if (bfirsttick==false)
+//        return;
+//    
+//    if (bfirsttick==true)
+//        bfirsttick=false;    
+//}
 
-function PerformMovement(float dt)
+function PeformActorMovement(float dt)
 {
     local SplineConnection node;
     local float spd;
@@ -31,7 +33,7 @@ function PerformMovement(float dt)
         
     node=Path.Connections[0];
     
-    spd=VSize(ForwardSpeed);
+    spd=ForwardSpeed;
         
     if (spd < node.SplineComponent.GetSplineLength() - dist)
     {
@@ -52,12 +54,15 @@ function PerformMovement(float dt)
         Path=Path.Connections[0].ConnectTo;  
         
         dist=0;  
-    }
-  
+    }   
+   
     parent.SetLocation(v);
 }
+ 
+function PeformPawnMovement(float dt)
+{}
 
-function PerformRotation(float dt)
+function PerformActorRotation(float dt)
 {
     local SplineConnection node;
     local float spd;
@@ -70,10 +75,30 @@ function PerformRotation(float dt)
     node=Path.Connections[0];
         
     r=rotator(node.SplineComponent.GetTangentAtDistanceAlongSpline(dist));
-  
-    parent.SetRotation(r);
+    
+    parent.SetRotation(r);    
+}
+
+function PerformPawnRotation(float dt)
+{}
+
+function PerformMovement(float dt)
+{
+    if (LBActor(parent)!=none)
+        PeformActorMovement(dt);
+    else if (LBPawn(parent)!=none)
+        PeformPawnMovement(dt);
+}
+
+function PerformRotation(float dt)
+{
+    if (LBActor(parent)!=none)
+        PerformActorRotation(dt);
+    else if (LBPawn(parent)!=none)
+        PerformPawnRotation(dt);  
 }
 
 defaultproperties
 {
+    mechname="Path_Movement_Mechanism"
 }

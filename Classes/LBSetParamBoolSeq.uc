@@ -19,8 +19,14 @@ event Activated()
         LBActor(targetactor).SetParamBool(mechname,paramname,value); 
     if(LBDynamicActor(targetactor)!=none)
         LBDynamicActor(targetactor).SetParamBool(mechname,paramname,value); 
+    if(LBSKMPhysicsActor(targetactor)!=none)
+        LBSKMPhysicsActor(targetactor).SetParamBool(mechname,paramname,value);
+    if(LBSMPhysicsActor(targetactor)!=none)
+        LBSMPhysicsActor(targetactor).SetParamBool(mechname,paramname,value);    
     if(LBPawn(targetactor)!=none)
         LBPawn(targetactor).SetParamBool(mechname,paramname,value);
+    if(LBSkeletalMeshActor(targetactor)!=none)
+        LBSkeletalMeshActor(targetactor).SetParamBool(mechname,paramname,value);
     //`log(">>> ("@targetactor@"|"@targetpawn@")"@mechname@"."@paramname@"="@targetactor.GetParamFloat(mechname, paramname)); 
 }
 

@@ -28,6 +28,10 @@ event Activated()
         value=LBActor(targetactor).GetParams(mechname,paramname);
     if(LBDynamicActor(targetactor)!=none)
         value=LBDynamicActor(targetactor).GetParams(mechname,paramname);
+    if(LBSKMPhysicsActor(targetactor)!=none)
+        value=LBSKMPhysicsActor(targetactor).GetParams(mechname,paramname); 
+    if(LBSMPhysicsActor(targetactor)!=none)
+        value=LBSMPhysicsActor(targetactor).GetParams(mechname,paramname);  
     if(LBPawn(targetactor)!=none)
         value=LBPawn(targetactor).GetParams(mechname,paramname);
      

@@ -4,7 +4,7 @@
  *  Creation date: 05.04.2016 22:37
  *  Copyright 2016, Windows7
  */
-class LBBoneRotationMechanism extends LBMechanism;
+class LBBoneRotationMechanism extends LBSkeletalMeshControlMechanism;
 
 var(ParamSource) bool bApplyYaw;
 var(ParamSource) name YawRotationParam; //A name for a float param, that sets the yawrot

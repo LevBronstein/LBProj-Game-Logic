@@ -34,6 +34,18 @@ event Activated()
         v=v+value;
         LBPawn(targetactor).SetParamVector(mechname,paramname,v);
     }
+    if(LBSMPhysicsActor(targetactor)!=none)
+    {
+        v=LBSMPhysicsActor(targetactor).GetParamVector(mechname,paramname);
+        v=v+value;
+        LBSMPhysicsActor(targetactor).SetParamVector(mechname,paramname,v);
+    }
+    if(LBSKMPhysicsActor(targetactor)!=none)
+    {
+        v=LBSKMPhysicsActor(targetactor).GetParamVector(mechname,paramname);
+        v=v+value;
+        LBSKMPhysicsActor(targetactor).SetParamVector(mechname,paramname,v);
+    }
     if(LBCamera(targetactor)!=none)
     {
         v=LBCamera(targetactor).GetParamVector(mechname,paramname);

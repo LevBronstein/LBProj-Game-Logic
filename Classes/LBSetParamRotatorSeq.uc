@@ -26,7 +26,13 @@ event Activated()
     if(LBPawn(targetactor)!=none)
         LBPawn(targetactor).SetParamRotator(mechname,paramname,rvalue);
     if(LBCamera(targetactor)!=none)
-        LBCamera(targetactor).SetParamRotator(mechname,paramname,rvalue);    
+        LBCamera(targetactor).SetParamRotator(mechname,paramname,rvalue);
+    if(LBSKMPhysicsActor(targetactor)!=none)
+        LBSKMPhysicsActor(targetactor).SetParamRotator(mechname,paramname,rvalue); 
+    if(LBSMPhysicsActor(targetactor)!=none)
+        LBSMPhysicsActor(targetactor).SetParamRotator(mechname,paramname,rvalue);    
+    if(LBSkeletalMeshActor(targetactor)!=none)
+        LBSkeletalMeshActor(targetactor).SetParamRotator(mechname,paramname,rvalue);    
 }
 
 
@@ -34,7 +40,7 @@ defaultproperties
 {
     bCallHandler=false
     
-    ObjName="Set Actor Rotator Param"
+    ObjName="Set Actor Vector (Rotator) Param"
     ObjCategory="LevBronstein"
     
     VariableLinks(0)=(ExpectedType=class'SeqVar_Object',LinkDesc="Target Actor",PropertyName=targetactor)

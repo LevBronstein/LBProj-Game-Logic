@@ -21,8 +21,14 @@ event Activated()
         LBDynamicActor(targetactor).SetParam(mechname,paramname,value);
     if(LBPawn(targetactor)!=none)
         LBPawn(targetactor).SetParam(mechname,paramname,value);
+    if(LBSKMPhysicsActor(targetactor)!=none)
+        LBSKMPhysicsActor(targetactor).SetParam(mechname,paramname,value); 
+    if(LBSMPhysicsActor(targetactor)!=none)
+        LBSMPhysicsActor(targetactor).SetParam(mechname,paramname,value);
     if(LBCamera(targetactor)!=none)
-        LBCamera(targetactor).SetParam(mechname,paramname,value);    
+        LBCamera(targetactor).SetParam(mechname,paramname,value); 
+    if(LBSkeletalMeshActor(targetactor)!=none)
+        LBSkeletalMeshActor(targetactor).SetParam(mechname,paramname,value);  
 }
 
 

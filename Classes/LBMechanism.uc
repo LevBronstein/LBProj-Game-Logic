@@ -9,6 +9,8 @@ editinlinenew;
 
 enum ParamTypes
 {
+    ParamType_Undefined,
+    ParamType_Command,
     ParamType_Object,
     ParamType_ObjectArray,
     ParamType_Float,
@@ -26,6 +28,12 @@ enum AnimNotifyTypes
     AnimNotifyTypes_ActionStart,
     AnimNotifyTypes_PerformAction,
     AnimNotifyTypes_ActionEnd,
+};
+
+enum EditModes
+{
+    EditModes_Set,
+    EditMides_Add
 };
 
 struct ObjectValue
@@ -91,6 +99,7 @@ struct LBParamContainer
 struct LBMechanismParamInfo
 {
     var() editconst name ParamName;
+    var() editconst ParamTypes ParamType;
     var() editconst string ParamInfo;
 };
 
@@ -231,6 +240,32 @@ event OwnerAnimNotify(AnimNodeSequence notifynode, AnimNotifyTypes notifytype);
     
 function GetParameters();    
     
+function bool HasParam(name param)
+{
+    local int i;
+    
+    for (i=0;i<MechanismParams.Length;i++)
+    {
+        if (MechanismParams[i].ParamName==param)
+            return true;
+    } 
+    
+    return false;  
+}
+
+function bool HasParamWithType(name param, ParamTypes paramtype)
+{
+    local int i;
+    
+    for (i=0;i<MechanismParams.Length;i++)
+    {
+        if (MechanismParams[i].ParamName==param && MechanismParams[i].ParamType==paramtype)
+            return true;
+    } 
+    
+    return false;  
+}
+
 function LogError(string message)
 {
     if (bLogDebug)
