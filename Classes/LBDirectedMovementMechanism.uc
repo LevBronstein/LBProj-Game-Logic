@@ -12,16 +12,41 @@ var(DirectedMovement) rotator MoveDirection;
 
 function PerformMovement(float dt)
 {   
+    local vector v;
+        
     if (LBActor(parent)!=none)
-        parent.SetLocation(parent.location+ForwardSpeed*kForwardSpeed*Vector(MoveDirection));
+    {
+        v=ForwardSpeed*kForwardSpeed*Vector(MoveDirection);
+        parent.SetLocation(parent.location+v);   
+    }
         
     if (LBPawn(parent)!=none)
-        parent.Velocity=ForwardSpeed*kForwardSpeed*Vector(MoveDirection);    
+    {
+        v=ForwardSpeed*kForwardSpeed*Vector(MoveDirection);
+        parent.Velocity=v;
+    }
+    
+     if (bShowDebugGraphics)
+        DGDisplaySpeedVector(parent, v);      
 }
 
 function PerformRotation(float dt)
 {
     parent.SetRotation(MoveDirection);
+}
+
+function DGDisplaySpeedVector(actor a, vector v)
+{
+    local float r,h;
+    a.GetBoundingCylinder(r,h);
+    parent.DrawDebugLine(a.Location,a.Location+v*h,255,0,0);  
+}
+
+function DGDisplayVector(actor a, vector v, byte red, byte green, byte blue)
+{
+    local float r,h;
+    a.GetBoundingCylinder(r,h);
+    parent.DrawDebugLine(a.Location,a.Location+v*h,red,green,blue);  
 }
 
 function SetParamFloat(name param, float value, optional int priority=0)
@@ -37,13 +62,23 @@ function SetParamFloat(name param, float value, optional int priority=0)
     else if (param=='MoveDirection-Roll' || param== 'MoveDir-Roll')
         MoveDirection.Roll=value*DegToUnrRot;    
 }
+    
+function SetParamVector(name param, vector value, optional int priority=0)
+{
+    super.SetParamVector(param, value, priority);
+    
+    if (param=='MoveDirection' || param== 'MovementDirection')
+    {
+        MoveDirection=Rotator(value);        
+    } 
+}
 
 function SetParamRotator(name param, rotator value, optional int priority=0)
 {
     super.SetParamRotator(param, value, priority);
     
     if (param=='MoveDirection' || param== 'MovementDirection')
-        MoveDirection=value;    
+        MoveDirection=value;  
 }
 
 function rotator GetParamRotator(name param)

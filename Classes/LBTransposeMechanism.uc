@@ -23,6 +23,8 @@ enum CoordinateTypes
 var(MovementClamps) bool bEnableMovement;
 var(MovementClamps) bool bEnableRotation;
 
+var(MechanismDebug) bool bShowDebugGraphics;
+
 event OwnerTick(float deltatime)
 {
     super.OwnerTick(deltatime);

@@ -909,6 +909,28 @@ function LBParamContainer GetTargetParamContainer(actor target, name targetmech,
     return param;
 }
 
+function GetParameters()
+{
+    local int i,j;
+    local LBParamContainer value;
+    
+    for (i=0;i<ParamSource.Length;i++)
+    {
+        if (ParamSource[i].ValueSource.bUseSource)
+        {
+            for (j=0;j<MechanismParams.Length;j++)
+            {
+                if (ParamSource[i].ParamName == MechanismParams[j].ParamName)  
+                {
+                    value=GetTargetParamContainerSrc(ParamSource[i].ValueSource,MechanismParams[j].ParamType);
+                    SetTargetParamContainer(parent,mechname,MechanismParams[j].ParamName,value);
+                }  
+            }
+            
+        }        
+    }
+} 
+
 function LBParamContainer GetTargetParamContainerPtr(LBMechanismParam target, ParamTypes paramtype)
 {
     local LBParamContainer v;

@@ -26,6 +26,8 @@ event Activated()
         r=LBSMPhysicsActor(targetactor).GetParamRotator(mechname,paramname);  
     if(LBPawn(targetactor)!=none)
         r=LBPawn(targetactor).GetParamRotator(mechname,paramname);
+    if(LBCamera(targetactor)!=none)
+        r=LBCamera(targetactor).GetParamRotator(mechname,paramname);
         
     //value.X=r.Yaw * UnrRotToDeg;
     //value.Y=r.Pitch * UnrRotToDeg;

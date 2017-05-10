@@ -148,8 +148,8 @@ var(MechanismDebug) bool bLogDebug;
 var(MechanismDebug) bool bLogFullInfo;
 
 /*A mechanism, from which we get all params via GetParamFloat. Soon will be deprecated!*/ 
-var(ParamSource) name ParameterSource; 
-var(ParamSource) bool bUseParamSource; //Defines whether we should get params (from ParameterSource) 
+var(ParamSource) deprecated name ParameterSource; 
+var(ParamSource) deprecated bool bUseParamSource; //Defines whether we should get params (from ParameterSource) 
 /*An array, which contains a source pointer for each param*/
 var(ParamSource) editfixedsize array<LBParamValueSource> ParamSource;
 
@@ -230,16 +230,15 @@ event OwnerTick(float deltatime)
     if(benabled==false)
         return;
         
-    if (bUseParamSource)
-        GetParameters(); 
+    GetParameters(); 
   
     PerfromTick(deltatime);      
 }
 
 event OwnerAnimNotify(AnimNodeSequence notifynode, AnimNotifyTypes notifytype);
-    
-function GetParameters();    
-    
+        
+function GetParameters();
+
 function bool HasParam(name param)
 {
     local int i;

@@ -64,38 +64,38 @@ function PerformRotation(float dt)
         LBSMPhysicsActor(parent).CollisionComponent.SetRBRotation(parent.Rotation+AngularSpeed);
 }
 
-function GetParameters()
-{
-    if (SpeedXSrc.bUseSource)
-    {
-        ForwardSpeed.X=GetTargetParamFloat(SpeedXSrc.SourceActor, SpeedXSrc.SourceMechanismName, SpeedXSrc.SourceParamName);
-    }
-    
-    if (SpeedYSrc.bUseSource)
-    {
-        ForwardSpeed.Y=GetTargetParamFloat(SpeedYSrc.SourceActor, SpeedYSrc.SourceMechanismName, SpeedYSrc.SourceParamName);
-    }
-    
-    if (SpeedZSrc.bUseSource)
-    {
-        ForwardSpeed.Z=GetTargetParamFloat(SpeedZSrc.SourceActor, SpeedZSrc.SourceMechanismName, SpeedZSrc.SourceParamName);
-    }
-    
-    if (AngSpeedYawSrc.bUseSource)
-    {
-        AngularSpeed.Yaw=GetTargetParamFloat(AngSpeedYawSrc.SourceActor, AngSpeedYawSrc.SourceMechanismName, AngSpeedYawSrc.SourceParamName);
-    }
-    
-    if (AngSpeedPitchSrc.bUseSource)
-    {
-        AngularSpeed.Pitch=GetTargetParamFloat(AngSpeedPitchSrc.SourceActor, AngSpeedPitchSrc.SourceMechanismName, AngSpeedPitchSrc.SourceParamName);
-    }
-    
-    if (AngSpeedRollSrc.bUseSource)
-    {
-        AngularSpeed.Roll=GetTargetParamFloat(AngSpeedRollSrc.SourceActor, AngSpeedRollSrc.SourceMechanismName, AngSpeedRollSrc.SourceParamName);
-    }
-}
+//function GetParameters()
+//{
+//    if (SpeedXSrc.bUseSource)
+//    {
+//        ForwardSpeed.X=GetTargetParamFloat(SpeedXSrc.SourceActor, SpeedXSrc.SourceMechanismName, SpeedXSrc.SourceParamName);
+//    }
+//    
+//    if (SpeedYSrc.bUseSource)
+//    {
+//        ForwardSpeed.Y=GetTargetParamFloat(SpeedYSrc.SourceActor, SpeedYSrc.SourceMechanismName, SpeedYSrc.SourceParamName);
+//    }
+//    
+//    if (SpeedZSrc.bUseSource)
+//    {
+//        ForwardSpeed.Z=GetTargetParamFloat(SpeedZSrc.SourceActor, SpeedZSrc.SourceMechanismName, SpeedZSrc.SourceParamName);
+//    }
+//    
+//    if (AngSpeedYawSrc.bUseSource)
+//    {
+//        AngularSpeed.Yaw=GetTargetParamFloat(AngSpeedYawSrc.SourceActor, AngSpeedYawSrc.SourceMechanismName, AngSpeedYawSrc.SourceParamName);
+//    }
+//    
+//    if (AngSpeedPitchSrc.bUseSource)
+//    {
+//        AngularSpeed.Pitch=GetTargetParamFloat(AngSpeedPitchSrc.SourceActor, AngSpeedPitchSrc.SourceMechanismName, AngSpeedPitchSrc.SourceParamName);
+//    }
+//    
+//    if (AngSpeedRollSrc.bUseSource)
+//    {
+//        AngularSpeed.Roll=GetTargetParamFloat(AngSpeedRollSrc.SourceActor, AngSpeedRollSrc.SourceMechanismName, AngSpeedRollSrc.SourceParamName);
+//    }
+//}
 
 function vector GetParamVector(name param)
 {
@@ -135,8 +135,13 @@ defaultproperties
     
     MechanismParams.Empty
     
-    MechanismParams(0)=(ParamName="Location", ParamInfo="Vector. Read. Gets the location of the parent actor.")
-    MechanismParams(1)=(ParamName="SpeedX", ParamInfo="Float. Read, Write. Sets the speed on X axis.")
-    MechanismParams(2)=(ParamName="SpeedY", ParamInfo="Float. Read, Write. Sets the speed on Y axis.")
-    MechanismParams(3)=(ParamName="SpeedZ", ParamInfo="Float. Read, Write. Sets the speed on Z axis.")
+    MechanismParams(0)=(ParamName="Location", ParamType=ParamType_Vector, ParamInfo="Vector. Read. Gets the location of the parent actor.")
+    MechanismParams(1)=(ParamName="SpeedX", ParamType=ParamType_Float, ParamInfo="Float. Read, Write. Sets the speed on X axis.")
+    MechanismParams(2)=(ParamName="SpeedY", ParamType=ParamType_Float, ParamInfo="Float. Read, Write. Sets the speed on Y axis.")
+    MechanismParams(3)=(ParamName="SpeedZ", ParamType=ParamType_Float, ParamInfo="Float. Read, Write. Sets the speed on Z axis.")
+    
+    ParamSource(0)=(ParamName="Location")
+    ParamSource(1)=(ParamName="SpeedX")
+    ParamSource(2)=(ParamName="SpeedY")
+    ParamSource(3)=(ParamName="SpeedZ")
 }
