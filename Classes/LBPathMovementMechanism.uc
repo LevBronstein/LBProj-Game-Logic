@@ -7,10 +7,17 @@
 class LBPathMovementMechanism extends LBTransposeMechanism;
 
 var (PathMovement) float ForwardSpeed; 
+var (PathMovement) float AngularSpeed;
 
 var (PathMovementSystem) SplineActor Path;
+var (PathMovementSystem) bool bSimulateMovement;
 var (PathMovementSystem) float dError;
 var (PathMovementSystem) float dStepLength; //Should be less then ForwardSpeed
+
+var (PathMovementOutput) vector outLocation; //bSimulateMovement==true; [proc::PeformActorMovement->location]
+var (PathMovementOutput) vector outVelocity; //bSimulateMovement==true; [proc::PeformPawnMovement->velocity]
+var (PathMovementOutput) rotator outRotation; //bSimulateMovement==true; [proc::PerformActorRotation->rotation]
+var (PathMovementOutput) rotator outAngSpeed; //bSimulateMovement==true; [proc::PerformPawnRotation->angspeed] !!!NOT IMPLEMENTED YET!!!
 
 var float dist;
 var float pathstep;
@@ -64,7 +71,14 @@ function PeformActorMovement(float dt)
         dist=0;  
     }   
    
-    parent.SetLocation(v);
+    if (!bSimulateMovement)
+    {
+        parent.SetLocation(v);
+    }
+    else
+    {
+        outLocation=v;    
+    }
 }
  
 function PeformPawnMovement(float dt)
@@ -86,7 +100,14 @@ function PeformPawnMovement(float dt)
     
     if (VSize(v) > dError)
     {
-        parent.Velocity=Normal(v)*ForwardSpeed;
+        if (!bSimulateMovement)
+        {
+            parent.Velocity=Normal(v)*ForwardSpeed;
+        }
+        else
+        {
+            outVelocity=Normal(v)*ForwardSpeed;    
+        }
         
         if (bShowDebugGraphics)
         {
@@ -107,7 +128,14 @@ function PeformPawnMovement(float dt)
                 
                 LogInfo("Going to next path point"@Path);
                 
-                parent.Velocity=Normal(v)*ForwardSpeed;
+                if (!bSimulateMovement)
+                {
+                    parent.Velocity=Normal(v)*ForwardSpeed;
+                }
+                else
+                {
+                    outVelocity=Normal(v)*ForwardSpeed;    
+                }
             } 
             else
             {
@@ -131,7 +159,14 @@ function PerformActorRotation(float dt)
         
     r=rotator(node.SplineComponent.GetTangentAtDistanceAlongSpline(dist));
     
-    parent.SetRotation(r);    
+    if (!bSimulateMovement)
+    {
+        parent.SetRotation(r);
+    }
+    else
+    {
+        outRotation=r;    
+    }
 }
 
 function PerformPawnRotation(float dt)
@@ -147,10 +182,16 @@ function PerformPawnRotation(float dt)
     node=Path.Connections[0];
         
     r=rotator(node.SplineComponent.GetTangentAtDistanceAlongSpline(dist));
-    r.Pitch=0;
-    r.Roll=0;
     
-    parent.SetRotation(r);  
+    if (!bSimulateMovement)
+    {
+        parent.SetRotation(r);
+    }
+    else
+    {
+        outAngSpeed=r-parent.Rotation;
+       //`log("parent.Rotation:"@parent.Rotation*unrrottodeg@"r:"@r*unrrottodeg); 
+    } 
 }
 
 function PerformMovement(float dt)
@@ -192,10 +233,77 @@ function SetParamFloat(name param, float value, optional int priority=0)
     }
 }
 
+function float GetParamFloat(name param)
+{
+    if (param=='outLocationX' || param=='outLocation-X')
+        return outLocation.X;
+    else if (param=='outLocationY' || param=='outLocation-Y')
+        return outLocation.Y;  
+    else if (param=='outLocationZ' || param=='outLocation-Z')
+        return outLocation.Z;  
+    else if (param=='outVelocityX' || param=='outVelocity-X')
+        return outVelocity.X;
+    else if (param=='outVelocityY' || param=='outVelocity-Y')
+        return outVelocity.Y;  
+    else if (param=='outVelocityZ' || param=='outVelocity-Z')
+        return outVelocity.Z; 
+    else if (param=='outRotationYaw' || param=='outRotation-Yaw')
+        return outRotation.Yaw;
+    else if (param=='outRotationPitch' || param=='outRotation-Pitch')
+        return outRotation.Pitch;  
+    else if (param=='outRotationRoll' || param=='outRotation-Roll')
+        return outRotation.Roll;
+    else if (param=='outAngularSpeedYaw' || param=='outAngularSpeed-Yaw')
+        return outAngSpeed.Yaw;
+    else if (param=='outAngularSpeedPitch' || param=='outAngularSpeed-Pitch')
+        return outAngSpeed.Pitch;  
+    else if (param=='outAngularSpeedRoll' || param=='outAngularSpeed-Roll')
+        return outAngSpeed.Roll;    
+}
+    
+
+function vector GetParamVector(name param)
+{
+    if (param=='outLocation')
+        return outLocation;
+    else if (param=='outVelocity' || param=='outVel')
+        return outVelocity;    
+}
+    
+function rotator GetParamRotator(name param)
+{
+    if (param=='outRotation')
+        return outRotation;
+    else if (param=='outAngularSpeed' || param=='outAngSpeed')
+        return outAngSpeed;    
+} 
+
 defaultproperties
 {
     dError=5.0f
     dStepLength=1.0f
     
     mechname="Path_Movement_Mechanism"
+    
+    MechanismParams.Empty
+    
+    MechanismParams(0)=(ParamName="ForwardSpeed", ParamType=ParamType_Float, ParamInfo="Float. Read. Write. Gets or sets the forward speed for path movement. Set to non-zero value to advance along the spline.")
+    MechanismParams(1)=(ParamName="outLocation", ParamType=ParamType_Vector, ParamInfo="Vector. Read. Gets the location for the parent actor in simulated movement.")
+    MechanismParams(2)=(ParamName="outLocationX", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the X component of  @outLocation.")
+    MechanismParams(3)=(ParamName="outLocationY", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Y component of  @outLocation.")
+    MechanismParams(4)=(ParamName="outLocationZ", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Z component of  @outLocation.")
+    MechanismParams(5)=(ParamName="outVelocity", ParamType=ParamType_Vector, ParamInfo="Vector. Read. Gets the velocity for the parent pawn in simulated movement.")
+    MechanismParams(6)=(ParamName="outVelocityX", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the X component of  @outVelocity.")
+    MechanismParams(7)=(ParamName="outVelocityY", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Y component of  @outVelocity.")
+    MechanismParams(8)=(ParamName="outVelocityZ", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Z component of  @outVelocity.")
+    MechanismParams(9)=(ParamName="outRotation", ParamType=ParamType_Rotator, ParamInfo="Rotator. Read. Gets the rotation for the parent actor in simulated movement.")
+    MechanismParams(10)=(ParamName="outRotationYaw", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Yaw component of  @outRotation.")
+    MechanismParams(11)=(ParamName="outRotationPitch", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Pitch component of  @outRotation.")
+    MechanismParams(12)=(ParamName="outRotationRoll", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Roll component of  @outRotation.")
+    MechanismParams(13)=(ParamName="outAngularSpeed", ParamType=ParamType_Rotator, ParamInfo="Rotator. Read. Gets the angular speed for the parent pawn in simulated movement.")
+    MechanismParams(14)=(ParamName="outAngularSpeedYaw", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Yaw component of  @outAngularSpeed.")
+    MechanismParams(15)=(ParamName="outAngularSpeedPitch", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Pitch component of  @outAngularSpeed.")
+    MechanismParams(16)=(ParamName="outAngularSpeedRoll", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Roll component of  @outAngularSpeed.")
+    
+    ParamSource(0)=(ParamName="ForwardSpeed")
 }

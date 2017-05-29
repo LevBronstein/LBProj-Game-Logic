@@ -15,13 +15,6 @@ var(Movement) vector ForwardSpeed;
 //var(Movement) float AngularSpeedRoll;
 var(Movement) rotator AngularSpeed;
 
-var(ParamSource) LBParamSourcePointer SpeedXSrc;
-var(ParamSource) LBParamSourcePointer SpeedYSrc;
-var(ParamSource) LBParamSourcePointer SpeedZSrc;
-var(ParamSource) LBParamSourcePointer AngSpeedYawSrc;
-var(ParamSource) LBParamSourcePointer AngSpeedPitchSrc;
-var(ParamSource) LBParamSourcePointer AngSpeedRollSrc;
-
 var(MechanismDebug) bool bShowDebugLines; //Display debug lines in game
 
 var float currotY, currotP, currotR;
@@ -101,22 +94,46 @@ function vector GetParamVector(name param)
 {
     if (param=='Location')
         return parent.Location;
+    else if (param=='Speed' || param=='ForwardSpeed' || param=='FwdSpeed')
+        return ForwardSpeed;    
 }
+    
+function SetParamVector(name param, vector value, optional int priority=0)
+{
+    if (param=='Speed' || param=='ForwardSpeed' || param=='FwdSpeed')
+        ForwardSpeed=value;    
+}     
 
+function rotator GetParamRotator(name param)
+{
+    if (param=='Rotation')
+        return parent.Rotation;
+    else if (param=='AngSpeed' || param=='AngularSpeed')
+        return AngularSpeed;    
+}    
+   
+function SetParamRotator(name param, rotator value, optional int priority=0)
+{
+    if (param=='AngSpeed' || param=='AngularSpeed')
+        AngularSpeed=value;    
+}  
+    
 function SetParamFloat(name param, float value, optional int priority=0)
 {
-    if (param=='SpeedX')
+    if (param=='SpeedX' || param=='Speed-X')
         ForwardSpeed.X=value;
-    else if (param=='SpeedY')
+    else if (param=='SpeedY' || param=='Speed-Y')
         ForwardSpeed.Y=value;
-    else if (param=='SpeedZ')
+    else if (param=='SpeedZ' || param=='Speed-Z')
         ForwardSpeed.Z=value;
-    else if (param=='AngSpeedYaw')
+    else if (param=='AngularSpeedYaw' || param=='AngSpeedYaw' || param=='AngSpeedYaw-Yaw')
         AngularSpeed.Yaw=value;
-    else if (param=='AngSpeedPitch')
+    else if (param=='AngularSpeedPitch' || param=='AngSpeedPitch' || param=='AngSpeedYaw-Pitch')
         AngularSpeed.Pitch=value;
-    else if (param=='AngSpeedRoll')
-        AngularSpeed.Roll=value;    
+    else if (param=='AngularSpeedRoll' || param=='AngSpeedRoll' || param=='AngSpeedYaw-Roll')
+        AngularSpeed.Roll=value; 
+     
+    //`log(">>>>>>>>>>"@param@"->"@value);   
 }
     
 function SetParamBool(name param, bool value, optional int priority=0) 
@@ -136,12 +153,23 @@ defaultproperties
     MechanismParams.Empty
     
     MechanismParams(0)=(ParamName="Location", ParamType=ParamType_Vector, ParamInfo="Vector. Read. Gets the location of the parent actor.")
-    MechanismParams(1)=(ParamName="SpeedX", ParamType=ParamType_Float, ParamInfo="Float. Read, Write. Sets the speed on X axis.")
-    MechanismParams(2)=(ParamName="SpeedY", ParamType=ParamType_Float, ParamInfo="Float. Read, Write. Sets the speed on Y axis.")
-    MechanismParams(3)=(ParamName="SpeedZ", ParamType=ParamType_Float, ParamInfo="Float. Read, Write. Sets the speed on Z axis.")
+    MechanismParams(1)=(ParamName="Rotation", ParamType=ParamType_Rotator, ParamInfo="Rotator. Read. Gets the rotation of the parent actor.")
+    MechanismParams(2)=(ParamName="Speed", ParamType=ParamType_Vector, ParamInfo="Vector. Read, Write. Gets or sets the speed.")
+    MechanismParams(3)=(ParamName="SpeedX", ParamType=ParamType_Float, ParamInfo="Float. Read, Write. Sets the speed on X axis.")
+    MechanismParams(4)=(ParamName="SpeedY", ParamType=ParamType_Float, ParamInfo="Float. Read, Write. Sets the speed on Y axis.")
+    MechanismParams(5)=(ParamName="SpeedZ", ParamType=ParamType_Float, ParamInfo="Float. Read, Write. Sets the speed on Z axis.")
+    MechanismParams(6)=(ParamName="AngularSpeed", ParamType=ParamType_Rotator, ParamInfo="Rotator. Read, Write. Gets or sets the angular speed.")
+    MechanismParams(7)=(ParamName="AngularSpeedYaw", ParamType=ParamType_Float, ParamInfo="Float. Read, Write. Sets the angular speed on Yaw axis.")
+    MechanismParams(8)=(ParamName="AngularSpeedPitch", ParamType=ParamType_Float, ParamInfo="Float. Read, Write. Sets the angular speed on Pitch axis.")
+    MechanismParams(9)=(ParamName="AngularSpeedRoll", ParamType=ParamType_Float, ParamInfo="Float. Read, Write. Sets the angular speed on Roll axis.")
     
     ParamSource(0)=(ParamName="Location")
-    ParamSource(1)=(ParamName="SpeedX")
-    ParamSource(2)=(ParamName="SpeedY")
-    ParamSource(3)=(ParamName="SpeedZ")
+    ParamSource(1)=(ParamName="Speed")
+    ParamSource(2)=(ParamName="SpeedX")
+    ParamSource(3)=(ParamName="SpeedY")
+    ParamSource(4)=(ParamName="SpeedZ")
+    ParamSource(5)=(ParamName="AngularSpeed")
+    ParamSource(6)=(ParamName="AngularSpeedYaw")
+    ParamSource(7)=(ParamName="AngularSpeedPitch")
+    ParamSource(8)=(ParamName="AngularSpeedRoll")
 }

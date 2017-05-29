@@ -40,6 +40,7 @@ defaultproperties
 {
     bCallScriptEventOnBecomeRelevant = true
    
+    CategoryDesc="LevBronstein"
     
     Children(0)=(Name="PositiveAngularSpeed")
     Children(1)=(Name="ZeroAngularSpeed")

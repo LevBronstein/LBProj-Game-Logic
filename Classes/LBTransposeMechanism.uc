@@ -23,6 +23,8 @@ enum CoordinateTypes
 var(MovementClamps) bool bEnableMovement;
 var(MovementClamps) bool bEnableRotation;
 
+var(MovementTransformOrder) bool bRotateFirst;
+
 var(MechanismDebug) bool bShowDebugGraphics;
 
 event OwnerTick(float deltatime)
@@ -37,11 +39,22 @@ event OwnerTick(float deltatime)
 
 function PerformTick(float dt)
 {
-    if (bEnableMovement) 
-        PerformMovement(dt);
-        
-    if (bEnableRotation) 
-        PerformRotation(dt);    
+    if (bRotateFirst)
+    {
+        if (bEnableRotation) 
+            PerformRotation(dt);
+            
+        if (bEnableMovement) 
+            PerformMovement(dt);       
+    }
+    else   
+    {
+        if (bEnableMovement) 
+            PerformMovement(dt);
+            
+        if (bEnableRotation) 
+            PerformRotation(dt);    
+    }
 }
 
 function PerformMovement(float dt)

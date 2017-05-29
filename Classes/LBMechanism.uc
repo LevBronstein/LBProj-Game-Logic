@@ -159,6 +159,14 @@ function InitMechanism()
 {
     
 }
+
+function EnableMechanism()
+{    
+}
+
+function DisableMechanism()
+{   
+}
  
 function FirstTickInit()
 {
@@ -182,7 +190,23 @@ function SetParamFloat(name param, float value, optional int priority=0)
 {} 
 
 function SetParamBool(name param, bool value, optional int priority=0)
-{}        
+{
+    if (param=='bEnabled')
+    {
+        if (value == true)
+        {
+            if (bEnabled == false)
+                EnableMechanism();
+        }
+        else
+        {
+            if (bEnabled == true)
+                DisableMechanism();        
+        }
+    }
+        
+    bEnabled=value;
+}        
 
 function SetParamVector(name param, vector value, optional int priority=0)
 {} 
@@ -207,7 +231,8 @@ function float GetParamFloat(name param)
 {}      
 
 function bool GetParamBool(name param)
-{}
+{
+}
     
 function vector GetParamVector(name param)
 {} 
