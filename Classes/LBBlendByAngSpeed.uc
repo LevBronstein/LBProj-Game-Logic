@@ -6,7 +6,7 @@
  */
 class LBBlendByAngSpeed extends UDKAnimBlendBase;
 
-var LbPawn p;
+var LbPawn p; //
 var() float Accuracy;
 
 function UpdateAngSpeed(float s)
