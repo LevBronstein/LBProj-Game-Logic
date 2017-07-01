@@ -189,6 +189,14 @@ function bool GetParamBool(name param)
     } 
 }
 
+function float GetParamFloat(name param)
+{
+    if (param=='DistanceToNearestObject' || param=='DistanceToNearest' || param=='DistToNearest')
+    {
+        return GetObjectDistance(GetNearestObject());
+    }   
+}
+
 function array<object> GetParams(name param)
 {
     if (param=='AllObjectsInArea')
@@ -206,7 +214,8 @@ defaultproperties
     
     AreaHighlightColor=(B=32,G=64,R=64)
     
-    MechanismParams(0)=(ParamName="AreaHasObjects", ParamInfo="Boolean. Read. Checks whether defined area has any objects, returns true if there are any.")
-    MechanismParams(1)=(ParamName="NearestObject", ParamInfo="Object (Actor). Read. Gets the nearest to the center of the area object, returns none if there aren't any.")
-    MechanismParams(2)=(ParamName="AllObjectsInArea", ParamInfo="Object Array. Read. Gets a list of objects within the area, returns empty list if there aren't any.")
+    MechanismParams(0)=(ParamName="AreaHasObjects", ParamType=ParamType_Boolean, ParamInfo="Boolean. Read. Checks whether defined area has any objects, returns true if there are any.")
+    MechanismParams(1)=(ParamName="NearestObject", ParamType=ParamType_Object, ParamInfo="Object (Actor). Read. Gets the nearest to the center of the area object, returns none if there aren't any.")
+    MechanismParams(2)=(ParamName="AllObjectsInArea", ParamType=ParamType_ObjectArray, ParamInfo="Object Array. Read. Gets a list of objects within the area, returns empty list if there aren't any.")
+    MechanismParams(3)=(ParamName="DistanceToNearestObject",ParamType=ParamType_Float, ParamInfo="Float. Read. Gets distance to the object, which is the nearest to the center of the area.")
 }

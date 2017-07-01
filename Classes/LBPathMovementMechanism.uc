@@ -14,6 +14,9 @@ var (PathMovementSystem) bool bSimulateMovement;
 var (PathMovementSystem) float dError;
 var (PathMovementSystem) float dStepLength; //Should be less then ForwardSpeed
 
+var (SmoothMovement) bool bUseSmoothMovement;
+var (SmoothMovement) float AccelRate;
+
 var (PathMovementOutput) vector outLocation; //bSimulateMovement==true; [proc::PeformActorMovement->location]
 var (PathMovementOutput) vector outVelocity; //bSimulateMovement==true; [proc::PeformPawnMovement->velocity]
 var (PathMovementOutput) rotator outRotation; //bSimulateMovement==true; [proc::PerformActorRotation->rotation]
@@ -48,7 +51,20 @@ function PeformActorMovement(float dt)
         
     node=Path.Connections[0];
     
-    spd=ForwardSpeed;
+    if (bTickIndependent)
+    {
+        if (bUseSmoothMovement) 
+            spd=LinearInerpFloatValue(spd,ForwardSpeed,TickIndependentFloat(AccelRate, dt, MovementTimeScale),dt);
+        else
+            spd=TickIndependentFloat(ForwardSpeed,dt,MovementTimeScale);    
+    }
+    else
+    {
+        if (bUseSmoothMovement) 
+            spd=LinearInerpFloatValue(spd,ForwardSpeed,AccelRate,dt);
+        else
+            spd=ForwardSpeed;        
+    }
         
     if (spd < node.SplineComponent.GetSplineLength() - dist)
     {
@@ -231,6 +247,10 @@ function SetParamFloat(name param, float value, optional int priority=0)
     {
         ForwardSpeed=value;
     }
+    else if (param=='AccelRate' || param=='AccelerationRate')
+    {
+        AccelRate=value;    
+    }
 }
 
 function float GetParamFloat(name param)
@@ -280,6 +300,8 @@ function rotator GetParamRotator(name param)
 
 defaultproperties
 {
+    AccelRate=1
+    
     dError=5.0f
     dStepLength=1.0f
     
@@ -288,22 +310,24 @@ defaultproperties
     MechanismParams.Empty
     
     MechanismParams(0)=(ParamName="ForwardSpeed", ParamType=ParamType_Float, ParamInfo="Float. Read. Write. Gets or sets the forward speed for path movement. Set to non-zero value to advance along the spline.")
-    MechanismParams(1)=(ParamName="outLocation", ParamType=ParamType_Vector, ParamInfo="Vector. Read. Gets the location for the parent actor in simulated movement.")
-    MechanismParams(2)=(ParamName="outLocationX", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the X component of  @outLocation.")
-    MechanismParams(3)=(ParamName="outLocationY", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Y component of  @outLocation.")
-    MechanismParams(4)=(ParamName="outLocationZ", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Z component of  @outLocation.")
-    MechanismParams(5)=(ParamName="outVelocity", ParamType=ParamType_Vector, ParamInfo="Vector. Read. Gets the velocity for the parent pawn in simulated movement.")
-    MechanismParams(6)=(ParamName="outVelocityX", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the X component of  @outVelocity.")
-    MechanismParams(7)=(ParamName="outVelocityY", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Y component of  @outVelocity.")
-    MechanismParams(8)=(ParamName="outVelocityZ", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Z component of  @outVelocity.")
-    MechanismParams(9)=(ParamName="outRotation", ParamType=ParamType_Rotator, ParamInfo="Rotator. Read. Gets the rotation for the parent actor in simulated movement.")
-    MechanismParams(10)=(ParamName="outRotationYaw", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Yaw component of  @outRotation.")
-    MechanismParams(11)=(ParamName="outRotationPitch", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Pitch component of  @outRotation.")
-    MechanismParams(12)=(ParamName="outRotationRoll", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Roll component of  @outRotation.")
-    MechanismParams(13)=(ParamName="outAngularSpeed", ParamType=ParamType_Rotator, ParamInfo="Rotator. Read. Gets the angular speed for the parent pawn in simulated movement.")
-    MechanismParams(14)=(ParamName="outAngularSpeedYaw", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Yaw component of  @outAngularSpeed.")
-    MechanismParams(15)=(ParamName="outAngularSpeedPitch", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Pitch component of  @outAngularSpeed.")
-    MechanismParams(16)=(ParamName="outAngularSpeedRoll", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Roll component of  @outAngularSpeed.")
+    MechanismParams(1)=(ParamName="AccelerationRate", ParamType=ParamType_Float, ParamInfo="Float. Read. Write. Gets or sets the acceleration rate for smooth movement.")
+    MechanismParams(2)=(ParamName="outLocation", ParamType=ParamType_Vector, ParamInfo="Vector. Read. Gets the location for the parent actor in simulated movement.")
+    MechanismParams(3)=(ParamName="outLocationX", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the X component of  @outLocation.")
+    MechanismParams(4)=(ParamName="outLocationY", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Y component of  @outLocation.")
+    MechanismParams(5)=(ParamName="outLocationZ", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Z component of  @outLocation.")
+    MechanismParams(6)=(ParamName="outVelocity", ParamType=ParamType_Vector, ParamInfo="Vector. Read. Gets the velocity for the parent pawn in simulated movement.")
+    MechanismParams(7)=(ParamName="outVelocityX", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the X component of  @outVelocity.")
+    MechanismParams(8)=(ParamName="outVelocityY", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Y component of  @outVelocity.")
+    MechanismParams(9)=(ParamName="outVelocityZ", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Z component of  @outVelocity.")
+    MechanismParams(10)=(ParamName="outRotation", ParamType=ParamType_Rotator, ParamInfo="Rotator. Read. Gets the rotation for the parent actor in simulated movement.")
+    MechanismParams(11)=(ParamName="outRotationYaw", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Yaw component of  @outRotation.")
+    MechanismParams(12)=(ParamName="outRotationPitch", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Pitch component of  @outRotation.")
+    MechanismParams(13)=(ParamName="outRotationRoll", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Roll component of  @outRotation.")
+    MechanismParams(14)=(ParamName="outAngularSpeed", ParamType=ParamType_Rotator, ParamInfo="Rotator. Read. Gets the angular speed for the parent pawn in simulated movement.")
+    MechanismParams(15)=(ParamName="outAngularSpeedYaw", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Yaw component of  @outAngularSpeed.")
+    MechanismParams(16)=(ParamName="outAngularSpeedPitch", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Pitch component of  @outAngularSpeed.")
+    MechanismParams(17)=(ParamName="outAngularSpeedRoll", ParamType=ParamType_Float, ParamInfo="Float. Read. Gets the Roll component of  @outAngularSpeed.")
     
     ParamSource(0)=(ParamName="ForwardSpeed")
+    ParamSource(1)=(ParamName="AccelerationRate")
 }

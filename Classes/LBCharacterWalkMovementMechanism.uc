@@ -6,21 +6,23 @@
  */
 class LBCharacterWalkMovementMechanism extends LBCharacterMovementMechanism;
 
-var(CharacterWalkMovement) float ForwardSpeed;
-var(CharacterWalkMovement) float kForwardSpeed;
-var(CharacterWalkMovement) float StrafeSpeed;
-var(CharacterWalkMovement) float kStrafeSpeed;
-var(CharacterWalkMovement) float AccelRate;
-var(CharacterWalkMovement) float AngularSpeed;
-var(CharacterWalkMovement) float kAngularSpeed;
-var(CharacterWalkMovement) float JumpSpeed;
-var(CharacterWalkMovement) float kJumpSpeed;
+var(CharacterWalkMovementControls) float ForwardSpeed;
+var(CharacterWalkMovementControls) float kForwardSpeed;
+var(CharacterWalkMovementControls) float StrafeSpeed;
+var(CharacterWalkMovementControls) float kStrafeSpeed;
+var(CharacterWalkMovementControls) float horAccelRate;
+var(CharacterWalkMovementControls) float AngularSpeed;
+var(CharacterWalkMovementControls) float kAngularSpeed;
+var(CharacterWalkMovementControls) float JumpSpeed;
+var(CharacterWalkMovementControls) float kJumpSpeed;
+var(CharacterWalkMovementControls) float vertAccelRate;
 
-var(CharacterWalkMovementInfo) float MaxFwdSpeed;
-var(CharacterWalkMovementInfo) float MaxStrSpeed;
+var(CharacterWalkMovementSpecifications) float MaxFwdSpeed; //Maximum forward direct speed
+var(CharacterWalkMovementSpecifications) float MaxStrSpeed; //Maximum strafe speed
+var(CharacterWalkMovementSpecifications) float JumpHorizontalBoost; //A boost, which is given to pawns horizontal speed when it jumps (proportional to its current horizontal speed)
 //var(CharacterWalkMovementInfo) float MaxJmpVelocity;
 
-var(CharacterWalkMovement) rotator MoveDirection; //only Yaw component is used
+var(CharacterWalkMovementControls) rotator MoveDirection; //only Yaw component is used
 
 var(Animation) float AnimBlendTime;
 var(Animation) float RotationAnimThreshold;
@@ -29,7 +31,9 @@ var array<LBBlendByFwdSpeed> blendbyfwdspd;
 var array<LBBlendByStrSpeed> blendbystrspd;
 var array<LBBlendByAngSpeed> blendbyangspd; 
 
-var float curfwdspeed, curstrspeed, curangspeed;
+var SkelControlSingleBone bonerotcontroll;
+
+var float curfwdspeed, curstrspeed, curangspeed, curjumpspeed;
 
 var float currot;
 
@@ -97,9 +101,9 @@ function InitAnims()
     
     if (i==0)
         LogInfo("None found...");
-    
+        
     LogInfo("Blend by angular speed nodes:");
-    
+
     i=0;
     
     foreach LBPawn(parent).Mesh.AllAnimNodes(class'LBBlendByAngSpeed', angspd)
@@ -113,7 +117,7 @@ function InitAnims()
     }  
   
     if (i==0)
-        LogInfo("None found...");  
+        LogInfo("None found...");      
 }
 
 function PerformTick(float dt)
@@ -123,78 +127,7 @@ function PerformTick(float dt)
     UpdateAnimNodes();
 }
 
-function float LinearInerpFloatValue(float current, float target, float step, float dt)
-{
-    local float value;
-    
-    if (abs(current - target) > abs(step))
-    {
-        if (current < target)
-            value=current+abs(step); 
-        else
-            value=current-abs(step);   
-    }
-    else
-    {
-        if (current < target)
-            value=current+abs(current - target); 
-        else
-            value=current-abs(current - target);      
-    }
-        
-     return value;
-}
-
-function float LinearInterpAngle(float current, float target, float step, float dt)
-{
-    local float value;
-    local float sign;
-    
-    if (current < target)
-    {
-        if (abs(target-current) < 180)
-        {
-            if (abs(current - target) > abs(step))
-                value=current+step;
-            else
-                value=current+abs(current - target);
-        }
-        else
-        {
-            if (abs(current - target) > abs(step))
-                value=current-step;
-            else
-                value=current-abs(current - target);
-            
-            if (value < 0)
-                value=value+360;
-        }    
-    }
-    else
-    {
-        if (abs(target-current) < 180)
-        {
-            if (abs(current - target) > abs(step))
-                value=current-step;
-            else
-                value=current-abs(current - target);
-        }
-        else
-        {
-            if (abs(current - target) > abs(step))
-                value=current+step;
-            else
-                value=current+abs(current - target);
-            
-            if (value > 360)
-                value=value-360;
-        }        
-    }
-    
-    return value;
-}
-
-function vector PerformPawnHorizontalMove(float dt)
+function vector PerformPawnWalk(float dt)
 {
     local vector v;
     local rotator r;
@@ -212,11 +145,17 @@ function vector PerformPawnHorizontalMove(float dt)
     if (bShowDebugGraphics)
         DGDisplayCoordinateSystem(X, Y, Z);
 
-    //curfwdspeed=FInterpTo(curfwdspeed,ForwardSpeed*kForwardSpeed,dt,AccelRate);
-    //curstrspeed=FInterpTo(curstrspeed,StrafeSpeed*kStrafeSpeed,dt,AccelRate);
-
-    curfwdspeed=LinearInerpFloatValue(curfwdspeed,ForwardSpeed*kForwardSpeed,AccelRate,dt);
-    curstrspeed=LinearInerpFloatValue(curstrspeed,StrafeSpeed*kStrafeSpeed,AccelRate,dt);
+    // Когда проседает фпс, приходится уменьшать горизонтальное ускорение
+    if (bTickIndependent)
+    {
+        curfwdspeed=LinearInerpFloatValue(curfwdspeed,ForwardSpeed*kForwardSpeed,TickIndependentFloat(horAccelRate, dt, MovementTimeScale),dt);
+        curstrspeed=LinearInerpFloatValue(curstrspeed,StrafeSpeed*kStrafeSpeed,TickIndependentFloat(horAccelRate, dt, MovementTimeScale),dt); 
+    }
+    else
+    {
+        curfwdspeed=LinearInerpFloatValue(curfwdspeed,ForwardSpeed*kForwardSpeed,horAccelRate,dt);
+        curstrspeed=LinearInerpFloatValue(curstrspeed,StrafeSpeed*kStrafeSpeed,horAccelRate,dt);    
+    }
 
     v=curfwdspeed*X+curstrspeed*Y;
 
@@ -226,7 +165,7 @@ function vector PerformPawnHorizontalMove(float dt)
     return v; 
 }
 
-function vector PerformPawnVerticalMove(float dt)
+function vector PerformPawnJump(float dt)
 {
     local vector v;
     local rotator r;
@@ -239,9 +178,50 @@ function vector PerformPawnVerticalMove(float dt)
     return v;  
 }
     
+function vector PerformPawnFreeFall(float dt)
+{
+    local vector v;
+    local rotator r;
+    local vector X, Y, Z;
+    
+    v=pawn(parent).Velocity; //нахрена?
+    v.Z=0;
+
+    r=parent.Rotation;
+    r.Pitch=0;
+    r.Roll=0;
+
+    GetAxes(r,X,Y,Z);
+
+    if (bShowDebugGraphics)
+        DGDisplayCoordinateSystem(X, Y, Z);
+
+    if (bTickIndependent)
+    {
+        curfwdspeed=Clamp(LinearInerpFloatValue(curfwdspeed*JumpHorizontalBoost,0,TickIndependentFloat(horAccelRate, dt, MovementTimeScale),dt),0,ForwardSpeed*kForwardSpeed);
+        curstrspeed=Clamp(LinearInerpFloatValue(curstrspeed*JumpHorizontalBoost,0,TickIndependentFloat(horAccelRate, dt, MovementTimeScale),dt),0,StrafeSpeed*kStrafeSpeed);
+    }
+    else
+    {
+        curfwdspeed=Clamp(LinearInerpFloatValue(curfwdspeed*JumpHorizontalBoost,0,horAccelRate,dt),0,ForwardSpeed*kForwardSpeed);
+        curstrspeed=Clamp(LinearInerpFloatValue(curstrspeed*JumpHorizontalBoost,0,horAccelRate,dt),0,StrafeSpeed*kStrafeSpeed);    
+    }
+
+    curjumpspeed=LinearInerpFloatValue(curjumpspeed,0,TickIndependentFloat(vertAccelRate, dt, MovementTimeScale),dt); 
+    
+    v=curfwdspeed*X+curstrspeed*Y+curjumpspeed*Z; //может быть тут Z зависит от поверхности?
+    
+    if (bShowDebugGraphics)
+        DGDisplaySpeedVectors(curfwdspeed*X,curstrspeed*Y,vect(0,0,0));
+        DGDisplaySpeedVectors(vect(0,0,0),vect(0,0,0),curjumpspeed*Z);
+       
+    return v;     
+}
+
 function PerformMovement(float dt) 
 {
     local vector vhor,vvert;
+    local vector resvel;
     
     if (LBActor(parent)!=none)
     {
@@ -251,16 +231,27 @@ function PerformMovement(float dt)
     {
         if (parent.base!=none)
         {
-            vhor=PerformPawnHorizontalMove(dt);
+            //handle pawn walk
+            vhor=PerformPawnWalk(dt);
+            //handle pawn jump
+            vvert=PerformPawnJump(dt); 
             
-            vvert=PerformPawnVerticalMove(dt); 
-            
+            //if the pawn has jumped
             if (vsize(vvert)!=0)
-                parent.SetPhysics(PHYS_Falling);
+            {
+                parent.SetPhysics(PHYS_Falling); 
+                curjumpspeed=JumpSpeed*kJumpSpeed;  //set jump meter to max
+                //vhor=vhor*JumpHorizontalBoost;  
+            }
             
-            `log(vvert); 
+            parent.Velocity=vhor+vvert;    
         }
-        parent.Velocity=vhor+vvert;       
+        else
+        {
+            //handle pawn free fall
+            vhor=PerformPawnFreeFall(dt); 
+            parent.Velocity=vhor+vvert; 
+        }     
     }
     else if (LBSMPhysicsActor(parent)!=none)
     {
@@ -279,32 +270,43 @@ function PerformRotation(float dt)
     }
     else if (LBPawn(parent)!=none)
     {
-        tyaw=NormalizeRotAxis(MoveDirection.Yaw)*unrrottodeg;
-        
-        if (tyaw<0)
-            tyaw=tyaw+360;
-        
-        cyaw=currot;
-        
-        if (cyaw<0)
-            cyaw=cyaw+360;
-        
-        yaw=LinearInterpAngle(cyaw,tyaw,AngularSpeed*kAngularSpeed,dt);
-       
-        currot=yaw;
-        curangspeed=cyaw-yaw;
-        
-        //if (abs(curangspeed)<abs(RotationAnimThreshold))
-        //    curangspeed=0;
-        LogInfo("cyaw:"@cyaw@"tyaw:"@tyaw@"curangspeed:"@curangspeed);
+        if (parent.base!=none)
+        {
+            tyaw=NormalizeRotAxis(MoveDirection.Yaw)*unrrottodeg;
+            
+            if (tyaw<0)
+                tyaw=tyaw+360;
+            
+            cyaw=currot;
+            
+            if (cyaw<0)
+                cyaw=cyaw+360;
+            
+            yaw=LinearInterpAngle(cyaw,tyaw,TickIndependentFloat(AngularSpeed*kAngularSpeed,dt,RotationTimeScale),dt);
+            
+            curangspeed=cyaw-yaw;
+            
+            currot=yaw;
+            
+            //if (abs(curangspeed)<abs(RotationAnimThreshold))
+            //    curangspeed=0;
+            //LogInfo("cyaw:"@cyaw@"tyaw:"@tyaw@"curangspeed:"@curangspeed);
 
-        dr=parent.Rotation;
-        dr.Yaw=yaw*degtounrrot;
-        
-        if (bShowDebugGraphics)
-            DGDisplayOrientation(MoveDirection);
-        
-        parent.SetRotation(dr);
+            dr=parent.Rotation;
+            
+            dr.Yaw=yaw*degtounrrot;
+            
+            if (bShowDebugGraphics)
+                DGDisplayOrientation(MoveDirection);
+            
+            parent.SetRotation(dr);    
+        }
+        else
+        {
+            dr=parent.Rotation;
+            dr.Yaw=currot*degtounrrot;   
+            parent.SetRotation(dr); 
+        }
     }
     else if (LBSMPhysicsActor(parent)!=none)
     {
@@ -341,7 +343,7 @@ function SetParamBool(name param, bool value, optional int priority=0)
     else if (param=='bEnableRotation')
         bEnableRotation=value;
 }
-
+    
 function float GetParamFloat(name param)
 {
     if (param=='ForwardSpeed' || param=='FwdSpeed')
@@ -390,7 +392,15 @@ function SetParamRotator(name param, rotator value, optional int priority=0)
 {
     if (param=='MoveDirection' || param=='MoveDir')
         MoveDirection=value;    
-}    
+}
+
+function SetParamVector(name param, vector value, optional int priority=0)
+{    
+    if (param=='MoveDirection' || param=='MoveDir')
+    {
+        MoveDirection=Rotator(value);        
+    } 
+}
   
 function DGDisplayCoordinateSystem(vector X, vector Y, vector Z)
 {
@@ -418,14 +428,21 @@ defaultproperties
    
     MaxFwdSpeed=250.0
     MaxStrSpeed=250.0
+    JumpHorizontalBoost=1.5
+    
     JumpSpeed=250.0
     
+    horAccelRate=15.0
+    vertAccelRate=15.0
+    
     kForwardSpeed=0.0
-    kAngularSpeed=1.0
+    kAngularSpeed=0.0
     kJumpSpeed=0.0
-  
+      
     AnimBlendTime=0.8
     RotationAnimThreshold=2.3
+    RotationSkelControlMin=-35;
+    RotationSkelControlMax=35;
     
     MechanismParams.Empty    
 

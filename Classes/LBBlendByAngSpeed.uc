@@ -4,10 +4,12 @@
  *  Creation date: 05.04.2016 20:54
  *  Copyright 2016, Windows7
  */
-class LBBlendByAngSpeed extends UDKAnimBlendBase;
+class LBBlendByAngSpeed extends AnimNodeBlendList;
 
-var LbPawn p; //
+var LbPawn p; 
 var() float Accuracy;
+
+var(Animation) float BlendTime;
 
 function UpdateAngSpeed(float s)
 {

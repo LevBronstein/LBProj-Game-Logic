@@ -29,20 +29,18 @@ function FirstTickInit()
         bfirsttick=false;
         
     bonecontroller=SkelControlSingleBone(LBPawn(parent).Mesh.FindSkelControl(BoneRotationController));
+    
     if (bonecontroller==none)
     {
-        LogError("bonecontroller <"@BoneRotationController@"> not found!");
+        LogError("bonecontroller <"@BoneRotationController@"> not found!");    
     }
 }
 
-event OwnerTick(float deltatime)
+function PerfromTick(float dt)
 {
-    super.OwnerTick(deltatime);
+    super.PerfromTick(dt);
     
-    if(benabled==false)
-        return;
-        
-    PerformRotation();  
+    PerformRotation(); 
 }
 
 function PerformRotation()
@@ -50,27 +48,47 @@ function PerformRotation()
     if (bonecontroller!=None)
     {
         if (bApplyYaw)
-        bonecontroller.BoneRotation.Yaw=yawrot*DegToUnrRot;
+            bonecontroller.BoneRotation.Yaw=yawrot*DegToUnrRot;
         if (bApplyPitch)
-        bonecontroller.BoneRotation.Pitch=pitchrot*DegToUnrRot;
+            bonecontroller.BoneRotation.Pitch=pitchrot*DegToUnrRot;
         if (bApplyRoll)
-        bonecontroller.BoneRotation.Roll=rollrot*DegToUnrRot; 
+            bonecontroller.BoneRotation.Roll=rollrot*DegToUnrRot; 
     }
 }
 
-function GetParameters()
+function SetParamFloat(name param, float value, optional int priority=0)
+{    
+    if (param=='BoneRotationYaw' || param=='BoneRotation-Yaw')
+        yawrot=value;
+    else if (param=='BoneRotationPitch' || param=='BoneRotation-Pitch')
+        pitchrot=value;
+    else if (param=='BoneRotationRoll' || param=='BoneRotation-Roll')
+       rollrot=value;    
+} 
+
+function float GetParamFloat(name param)
 {
-    if (LBPawn(parent)!=none)
-    {
-        if (bApplyYaw)
-        yawrot=LBPawn(parent).GetParamFloat(ParameterSource,YawRotationParam);
-        if (bApplyPitch)
-        pitchrot=LBPawn(parent).GetParamFloat(ParameterSource,PitchRotationParam);
-        if (bApplyRoll)
-        rollrot=LBPawn(parent).GetParamFloat(ParameterSource,RollRotationParam);
-        return;
-    }
-}
+    if (param=='BoneRotationYaw' || param=='BoneRotation-Yaw')
+        return yawrot;
+    else if (param=='BoneRotationPitch' || param=='BoneRotation-Pitch')
+        return pitchrot;
+    else if (param=='BoneRotationRoll' || param=='BoneRotation-Roll')
+        return rollrot;   
+} 
+   
+//function GetParameters()
+//{
+//    if (LBPawn(parent)!=none)
+//    {
+//        if (bApplyYaw)
+//            yawrot=LBPawn(parent).GetParamFloat(ParameterSource,YawRotationParam);
+//        if (bApplyPitch)
+//            pitchrot=LBPawn(parent).GetParamFloat(ParameterSource,PitchRotationParam);
+//        if (bApplyRoll)
+//            rollrot=LBPawn(parent).GetParamFloat(ParameterSource,RollRotationParam);
+//        return;
+//    }
+//}
 
 
 defaultproperties

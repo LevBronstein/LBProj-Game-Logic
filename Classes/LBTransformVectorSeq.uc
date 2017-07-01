@@ -20,7 +20,7 @@ event Activated()
     r.Roll=coordsys.Z*degtounrrot;
     
     GetAxes(r,X,Y,Z);
-    `log("Coordsys (rotator)"@r*unrrottodeg);
+    //`log("Coordsys (rotator)"@r*unrrottodeg);
     
     result=value.X*X+value.Y*Y+value.Z*Z;
 }

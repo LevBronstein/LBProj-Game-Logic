@@ -4,7 +4,7 @@
  *  Creation date: 08.05.2016 22:41
  *  Copyright 2016, Windows7
  */
-class LBRestrainedMovementMechanism extends LBMechanism;
+class LBRestrainedMovementMechanism extends LBTransposeMechanism;
 
 var(RestrainedMovement) bool bPerformMovement; 
 var(RestrainedMovement) vector PointA; //First point of movement, we are always moving from PointA to PointB with positive speed and vice versa
@@ -25,27 +25,12 @@ var(MechanismDebug) bool bShowDebugLines; //Display debug in game
 
 var float currot;
 
-function FirstTickInit()
+function InitMechanism()
 {
-    super.FirstTickInit();
-    
-    currot=parent.rotation.Yaw*UnrRotToDeg; //!!!
+    currot=parent.rotation.Yaw*UnrRotToDeg;    
 }
 
-event OwnerTick(float deltatime)
-{
-    super.OwnerTick(deltatime);
-    
-    if(benabled==false)
-        return;
-     
-    if (bPerformMovement)  
-        PerformMovement();  
-    if (bPerformRotation)
-        PerformRotation();
-}
-
-function PerformMovement()
+function PerformMovement(float dt)
 {
     local vector v;
       
@@ -61,17 +46,21 @@ function PerformMovement()
         if (vsize(v)>abs(FwdSpeed))
         {
             v=normal(v);
-            parent.MoveSmooth(v*FwdSpeed);  
+            //parent.MoveSmooth(v*FwdSpeed);  
+            parent.SetLocation(parent.Location+v*FwdSpeed);  
         }
         else
         {
-            parent.MoveSmooth(v); 
+            //parent.MoveSmooth(v); 
+            parent.SetLocation(parent.Location+v); 
             if (bReverseOnCompleteMov)
             {
                 FwdSpeed=-FwdSpeed; 
             }
         }
     }  
+    
+    `log(v*FwdSpeed);
     
     if (bShowDebugLines)
     {
@@ -83,7 +72,7 @@ function PerformMovement()
     }
 }
 
-function PerformRotation()
+function PerformRotation(float dt)
 {
     local vector a, b, c;
     local rotator r, ra, rb, rc;

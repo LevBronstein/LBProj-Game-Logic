@@ -25,6 +25,10 @@ var(MovementClamps) bool bEnableRotation;
 
 var(MovementTransformOrder) bool bRotateFirst;
 
+var(MovementSynchronization) bool bTickIndependent;
+var(MovementSynchronization) float MovementTimeScale; //A value, x, which affects 1/x (unit / second) ratio
+var(MovementSynchronization) float RotationTimeScale; //A value, x, which affects 1/x (degree / second) ratio
+
 var(MechanismDebug) bool bShowDebugGraphics;
 
 event OwnerTick(float deltatime)
@@ -62,7 +66,33 @@ function PerformMovement(float dt)
 }
 
 function PerformRotation(float dt)
-{     
+{  
+}
+
+function SetParentLocation(vector v)
+{
+    parent.SetLocation(v);
+}
+
+function SetParentRotation(rotator r)
+{
+    parent.SetRotation(r);
+}
+
+function AddParentLocation(vector v, optional bool bTickIndependent=TRUE, optional float deltatime=1, optional float seconds=1)
+{
+    if (bTickIndependent)
+        parent.SetLocation(parent.Location+TickIndependentVector(v,deltatime,seconds));
+    else
+        parent.SetLocation(parent.Location+v);
+}
+
+function AddParentRotation(rotator r, optional bool bTickIndependent=TRUE, optional float deltatime=1, optional float seconds=1)
+{
+    if (bTickIndependent)
+        parent.SetRotation(parent.Rotation+TickIndependentRotator(r,deltatime,seconds));
+    else
+        parent.SetRotation(parent.Rotation+r);
 }
 
 function vector GetLocalLocation(vector p, vector base)
@@ -80,6 +110,131 @@ function vector GetOrientedLocation(vector p, rotator dir, vector base)
     
     return v; 
 }
+
+/*Interp value-retrievemnt functions
+Supported types of interpolation:
+-- Linear interpolation float (units, degrees)
+*/
+
+function float LinearInerpFloatValue(float current, float target, float step, float dt)
+{
+    local float value;
+    
+    if (abs(current - target) > abs(step))
+    {
+        if (current < target)
+            value=current+abs(step); 
+        else
+            value=current-abs(step);   
+    }
+    else
+    {
+        if (current < target)
+            value=current+abs(current - target); 
+        else
+            value=current-abs(current - target);      
+    }
+        
+     return value;
+}
+
+function float LinearInterpAngle(float current, float target, float step, float dt)
+{
+    local float value;
+    local float sign;
+    
+    if (current < target)
+    {
+        if (abs(target-current) < 180)
+        {
+            if (abs(current - target) > abs(step))
+                value=current+step;
+            else
+                value=current+abs(current - target);
+        }
+        else
+        {
+            if (abs(current - target) > abs(step))
+                value=current-step;
+            else
+                value=current-abs(current - target);
+            
+            if (value < 0)
+                value=value+360;
+        }    
+    }
+    else
+    {
+        if (abs(target-current) < 180)
+        {
+            if (abs(current - target) > abs(step))
+                value=current-step;
+            else
+                value=current-abs(current - target);
+        }
+        else
+        {
+            if (abs(current - target) > abs(step))
+                value=current+step;
+            else
+                value=current+abs(current - target);
+            
+            if (value > 360)
+                value=value-360;
+        }        
+    }
+    
+    return value;
+}
+
+
+/*Tick independent value-retrievemnt functions
+Works like (<DeltaTime>/<Time in seconds>)*<Value>, where <Value> is instant value
+*/
+
+function int TickIndependentInt(int i, float deltatime, float seconds)
+{
+    return int((deltatime/seconds) * i);
+}
+
+function float TickIndependentFloat(float f, float deltatime, float seconds)
+{
+    return (deltatime/seconds) * f;
+}
+
+function vector TickIndependentVector(vector v, float deltatime, float seconds)
+{
+    return (deltatime/seconds) * v;
+}
+
+function rotator TickIndependentRotator(rotator r, float deltatime, float seconds)
+{
+    return (deltatime/seconds) * r;
+}
+
+function vector GetParamVector(name param)
+{
+    if (param=='Location' || param=='Parent-Location')
+    {
+        return parent.Location;
+    }
+    else
+    {
+        return super.GetParamVector(param);    
+    }
+} 
+ 
+function rotator GetParamRotator(name param)
+{
+    if (param=='Rotation' || param=='Parent-Rotation')
+    {
+        return parent.Rotation;
+    }
+    else
+    {
+        return super.GetParamRotator(param);    
+    }
+} 
 
 function SetParamBool(name param, bool value, optional int priority=0)
 {
@@ -99,6 +254,11 @@ function SetParamBool(name param, bool value, optional int priority=0)
 
 defaultproperties
 {
+    bTickIndependent=true
+ 
+    MovementTimeScale=0.01
+    RotationTimeScale=0.01
+    
     bEnableMovement=true
     bEnableRotation=true
 }

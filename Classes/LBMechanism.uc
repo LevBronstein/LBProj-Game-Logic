@@ -244,7 +244,7 @@ function rotator GetParamRotator(name param)
 function name GetParamName(name param)
 {}     
   
-function PerfromTick(float dt)
+function PerfromTick(float dt) //КАК МОЖНО БЫЛО ТАК НАЛАЖАТЬ С НАЗВАНИЕМ??? НУ И ГЕМОР ТЕПЕРЬ...
 {   
 }
     
