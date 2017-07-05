@@ -170,7 +170,7 @@ function SetNewAction(int act)
     {
     }
     
-    blendbyaction.UpdateCurrentAction(act);
+    //blendbyaction.UpdateCurrentAction(act); НЕ РАБОТАЕТ!!!
     //`log(act);
 }
     
