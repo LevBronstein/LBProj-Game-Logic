@@ -22,6 +22,7 @@ enum CoordinateTypes
 
 var(MovementClamps) bool bEnableMovement;
 var(MovementClamps) bool bEnableRotation;
+var(MovementClamps) bool bPreserveRotation; //A pure hack, which allows the pawn not to perform weird rotations, when @PerformRotation is not executed
 
 var(MovementTransformOrder) bool bRotateFirst;
 
@@ -31,22 +32,28 @@ var(MovementSynchronization) float RotationTimeScale; //A value, x, which affect
 
 var(MechanismDebug) bool bShowDebugGraphics;
 
-event OwnerTick(float deltatime)
-{
-    super.OwnerTick(deltatime);
-    
-    if (benabled == false)
-        return;
-        
-    PerformTick(deltatime);
-}
+//event OwnerTick(float deltatime)
+//{
+//    `log(mechname$" before getparams bEnabled:"$benabled);
+//  
+//    GetParameters();
+//    
+//    PerfromTick(deltatime); 
+//
+//    `log(mechname$" after getparams bEnabled:"$benabled);    
+//}
 
-function PerformTick(float dt)
+function PerfromTick(float dt)
 {
     if (bRotateFirst)
     {
         if (bEnableRotation) 
             PerformRotation(dt);
+        else   
+        {
+            if (bPreserveRotation)
+                PreserveRotation(dt);    
+        }
             
         if (bEnableMovement) 
             PerformMovement(dt);       
@@ -57,7 +64,12 @@ function PerformTick(float dt)
             PerformMovement(dt);
             
         if (bEnableRotation) 
-            PerformRotation(dt);    
+            PerformRotation(dt); 
+        else   
+        {
+            if (bPreserveRotation)
+                PreserveRotation(dt);    
+        }
     }
 }
 
@@ -67,6 +79,14 @@ function PerformMovement(float dt)
 
 function PerformRotation(float dt)
 {  
+}
+
+function PreserveRotation(float dt)
+{
+}
+
+function PerformPhysics(float dt)
+{
 }
 
 function SetParentLocation(vector v)
@@ -238,6 +258,8 @@ function rotator GetParamRotator(name param)
 
 function SetParamBool(name param, bool value, optional int priority=0)
 {
+    super.SetParamBool(param, value, priority);
+    
     if (param=='bEnabled')
     {
         bEnabled=value;
@@ -261,4 +283,11 @@ defaultproperties
     
     bEnableMovement=true
     bEnableRotation=true
+    bPreserveRotation=true
+    
+    MechanismParams.Add((ParamName="bEnableMovement", ParamType=ParamType_Boolean, ParamInfo="Boolean. Read, write. Enables or disables movement."))
+    MechanismParams.Add((ParamName="bEnableRotation", ParamType=ParamType_Boolean, ParamInfo="Boolean. Read, write. Enables or disables rotation."))
+    
+    ParamSource.Add((ParamName="bEnableMovement"))
+    ParamSource.Add((ParamName="bEnableRotation"))
 }

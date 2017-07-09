@@ -38,6 +38,16 @@ function TickAllMechanisms(float deltatime)
     }
 }
 
+function AnimNotifyAllMechanisms(AnimNodeSequence notifynode, AnimNotify notify)
+{
+    local int i;
+    
+    for(i=0;i<AllMechanisms.length;i++)
+    {
+        AllMechanisms[i].OwnerAnimNotify(notifynode,notify);
+    }    
+}
+
 function LBMechanism GetMechanismByName(name mechname)
 {
     local int i;

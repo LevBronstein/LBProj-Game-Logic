@@ -299,105 +299,105 @@ function SetParamInt(name param, int value, optional int priority=0)
 } 
     
 //событие для вызова из дерева анимаций
-event OwnerAnimNotify(AnimNodeSequence notifynode, AnimNotifyTypes notifytype)
-{
-    local int i;
-    
-    for (i=0; i<actionseqs.Length; i++)
-    {
-        if (notifynode == actionseqs[i])
-        {
-            //Performing call animation
-            if (notifynode.NodeName == 'Sound_Call') //захардкодено!!!
-            {
-                if (notifytype == AnimNotifyTypes_ActionStart)
-                {
-                     curaction=1; //закрепляем действие, чтобы не было прервано
-                }
-                else if (notifytype == AnimNotifyTypes_PerformAction)
-                {
-                    PerformInteraction(1); //выполняем действие
-                }
-                else if (notifytype == AnimNotifyTypes_ActionEnd)
-                {
-                    blendbyaction.SetActiveChild(0, 0.5); //возвращаем переключатель на исходное состояние
-                    curaction=0; //сообщаем, что действие было завершено
-                }
-            }
-            else if (notifynode.NodeName == 'Emote_Yes')
-            {
-                if (notifytype == AnimNotifyTypes_ActionStart)
-                {
-                    curaction=2; //закрепляем действие, чтобы не было прервано
-                }
-                else if (notifytype == AnimNotifyTypes_ActionEnd)
-                {
-                    blendbyaction.SetActiveChild(0, 0.5); //возвращаем переключатель на исходное состояние
-                    curaction=0; //сообщаем, что действие было завершено
-                }
-            }  
-            else if (notifynode.NodeName == 'Emote_No')
-            {
-                if (notifytype == AnimNotifyTypes_ActionStart)
-                {
-                    curaction=3; //закрепляем действие, чтобы не было прервано
-                }
-                else if (notifytype == AnimNotifyTypes_ActionEnd)
-                {
-                    blendbyaction.SetActiveChild(0, 0.5); //возвращаем переключатель на исходное состояние
-                    curaction=0; //сообщаем, что действие было завершено
-                }
-            }  
-            else if (notifynode.NodeName == 'Emote_Dontknow')
-            {
-                if (notifytype == AnimNotifyTypes_ActionStart)
-                {
-                    curaction=4; //закрепляем действие, чтобы не было прервано
-                }
-                else if (notifytype == AnimNotifyTypes_ActionEnd)
-                {
-                    blendbyaction.SetActiveChild(0, 0.5); //возвращаем переключатель на исходное состояние
-                    curaction=0; //сообщаем, что действие было завершено
-                }
-            } 
-            else if (notifynode.NodeName == 'Interaction_PickUp') //захардкодено!!!
-            {
-                if (notifytype == AnimNotifyTypes_ActionStart)
-                {
-                    curaction=5; //закрепляем действие, чтобы не было прервано
-                }
-                else if (notifytype == AnimNotifyTypes_PerformAction)
-                {
-                    PerformInteraction(2); //выполняем действие
-                }
-                else if (notifytype == AnimNotifyTypes_ActionEnd)
-                {
-                    //AnimNodeSequence(LBPawn(parent).Mesh.FindAnimNode('blendperbone')).SetActiveChild(0, 0.5);
-                    blendbyaction.SetActiveChild(0, 0.5); //возвращаем переключатель на исходное состояние
-                    curaction=0; //сообщаем, что действие было завершено
-                }
-            } 
-            else if (notifynode.NodeName == 'Interaction_DropDown') //захардкодено!!!
-            {
-                if (notifytype == AnimNotifyTypes_ActionStart)
-                {
-                    curaction=6; //закрепляем действие, чтобы не было прервано
-                }
-                else if (notifytype == AnimNotifyTypes_PerformAction)
-                {
-                    PerformInteraction(3); //выполняем действие
-                }
-                else if (notifytype == AnimNotifyTypes_ActionEnd)
-                {
-                    LogInfo("!!!");
-                    //AnimNodeSequence(LBPawn(parent).Mesh.FindAnimNode('blendperbone')).SetActiveChild(0, 0.5);
-                    blendbyaction.SetActiveChild(0, 0.5); //возвращаем переключатель на исходное состояние
-                    curaction=0; //сообщаем, что действие было завершено
-                }
-            }       
-        }
-    }
-}
+//event OwnerAnimNotify(AnimNodeSequence notifynode, AnimNotifyTypes notifytype)
+//{
+//    local int i;
+//    
+//    for (i=0; i<actionseqs.Length; i++)
+//    {
+//        if (notifynode == actionseqs[i])
+//        {
+//            //Performing call animation
+//            if (notifynode.NodeName == 'Sound_Call') //захардкодено!!!
+//            {
+//                if (notifytype == AnimNotifyTypes_ActionStart)
+//                {
+//                     curaction=1; //закрепляем действие, чтобы не было прервано
+//                }
+//                else if (notifytype == AnimNotifyTypes_PerformAction)
+//                {
+//                    PerformInteraction(1); //выполняем действие
+//                }
+//                else if (notifytype == AnimNotifyTypes_ActionEnd)
+//                {
+//                    blendbyaction.SetActiveChild(0, 0.5); //возвращаем переключатель на исходное состояние
+//                    curaction=0; //сообщаем, что действие было завершено
+//                }
+//            }
+//            else if (notifynode.NodeName == 'Emote_Yes')
+//            {
+//                if (notifytype == AnimNotifyTypes_ActionStart)
+//                {
+//                    curaction=2; //закрепляем действие, чтобы не было прервано
+//                }
+//                else if (notifytype == AnimNotifyTypes_ActionEnd)
+//                {
+//                    blendbyaction.SetActiveChild(0, 0.5); //возвращаем переключатель на исходное состояние
+//                    curaction=0; //сообщаем, что действие было завершено
+//                }
+//            }  
+//            else if (notifynode.NodeName == 'Emote_No')
+//            {
+//                if (notifytype == AnimNotifyTypes_ActionStart)
+//                {
+//                    curaction=3; //закрепляем действие, чтобы не было прервано
+//                }
+//                else if (notifytype == AnimNotifyTypes_ActionEnd)
+//                {
+//                    blendbyaction.SetActiveChild(0, 0.5); //возвращаем переключатель на исходное состояние
+//                    curaction=0; //сообщаем, что действие было завершено
+//                }
+//            }  
+//            else if (notifynode.NodeName == 'Emote_Dontknow')
+//            {
+//                if (notifytype == AnimNotifyTypes_ActionStart)
+//                {
+//                    curaction=4; //закрепляем действие, чтобы не было прервано
+//                }
+//                else if (notifytype == AnimNotifyTypes_ActionEnd)
+//                {
+//                    blendbyaction.SetActiveChild(0, 0.5); //возвращаем переключатель на исходное состояние
+//                    curaction=0; //сообщаем, что действие было завершено
+//                }
+//            } 
+//            else if (notifynode.NodeName == 'Interaction_PickUp') //захардкодено!!!
+//            {
+//                if (notifytype == AnimNotifyTypes_ActionStart)
+//                {
+//                    curaction=5; //закрепляем действие, чтобы не было прервано
+//                }
+//                else if (notifytype == AnimNotifyTypes_PerformAction)
+//                {
+//                    PerformInteraction(2); //выполняем действие
+//                }
+//                else if (notifytype == AnimNotifyTypes_ActionEnd)
+//                {
+//                    //AnimNodeSequence(LBPawn(parent).Mesh.FindAnimNode('blendperbone')).SetActiveChild(0, 0.5);
+//                    blendbyaction.SetActiveChild(0, 0.5); //возвращаем переключатель на исходное состояние
+//                    curaction=0; //сообщаем, что действие было завершено
+//                }
+//            } 
+//            else if (notifynode.NodeName == 'Interaction_DropDown') //захардкодено!!!
+//            {
+//                if (notifytype == AnimNotifyTypes_ActionStart)
+//                {
+//                    curaction=6; //закрепляем действие, чтобы не было прервано
+//                }
+//                else if (notifytype == AnimNotifyTypes_PerformAction)
+//                {
+//                    PerformInteraction(3); //выполняем действие
+//                }
+//                else if (notifytype == AnimNotifyTypes_ActionEnd)
+//                {
+//                    LogInfo("!!!");
+//                    //AnimNodeSequence(LBPawn(parent).Mesh.FindAnimNode('blendperbone')).SetActiveChild(0, 0.5);
+//                    blendbyaction.SetActiveChild(0, 0.5); //возвращаем переключатель на исходное состояние
+//                    curaction=0; //сообщаем, что действие было завершено
+//                }
+//            }       
+//        }
+//    }
+//}
 
 defaultproperties
 {

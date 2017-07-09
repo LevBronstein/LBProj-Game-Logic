@@ -128,13 +128,19 @@ function SetParamBool(name param, bool value, optional int priority=0)
 {
     super.SetParamBool(param, value, priority);
     
-    if (param=='bEnabled')
+    if (param == 'Detach' || param == 'PutDown')
     {
-        if (value)
-            Attach();
-        else
-            Detach();
+        AttachActor=none;
+        Detach();
     }
+    
+    //if (param=='bEnabled')
+    //{
+    //    if (value)
+    //        Attach();
+    //    else
+    //        Detach();
+    //}
 }
     
 function SetParamVector(name param, vector value, optional int priority=0)
@@ -162,9 +168,14 @@ function SetParam(name param, object value, optional int priority=0)
 {
     super.SetParam(param, value, priority); 
  
-    if (param=='AttachActor') 
+    if (param == 'AttachActor') 
     {
         AttachActor=Actor(value);    
+    }
+    else if (param == 'AttachToActor')
+    {
+        AttachActor=Actor(value);
+        Attach();   
     }
 }
 

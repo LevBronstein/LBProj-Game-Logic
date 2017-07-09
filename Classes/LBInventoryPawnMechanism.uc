@@ -7,7 +7,11 @@
 class LBInventoryPawnMechanism extends LBInteractableMechanism;
 
 var(InventoryMechanismSystem) name AttachSocket; //a socket in the mesh, where object is attached
-var(InventoryMechanismSystem) name OtherObjectMechanism; //A mechanism, which is used in interacted objects
+
+var(OtherObjectInteraction) bool bCheckOtherObjectMechanism;
+var(OtherObjectInteraction) LBConstNoActorTypedParamPtr bCanBePickedUp;
+var(OtherObjectInteraction) LBConstNoActorTypedParamPtr PickUp;
+var(OtherObjectInteraction) LBConstNoActorTypedParamPtr PutDown;
 
 var actor HeldObject; //currently held object
 
@@ -47,14 +51,30 @@ function bool AddToIvnentory(actor a)
         return false;   
     }
     
-    //if (LBActor(a) == none || LBActor(a).GetMechanismByName(OtherObjectMechanism) == none)
-    if (!TargetIsLBObject(a) || !TargetHasMechanism(a, OtherObjectMechanism))
+    if (!TargetIsLBObject(a))
     {
-        LogError("proc: AddToIvnentory(), other object is not an LBActor:"@LBActor(a)@"or doesn't have a"@OtherObjectMechanism@"mechanism!"); 
+        LogError("proc: AddToIvnentory(), other object is not an LBActor:"@LBActor(a)@"!"); 
         return false;     
     }
     
-    SetTargetParam(a, OtherObjectMechanism, 'PickUpBy', parent);
+    if (!TargetHasMechanism(a,bCanBePickedUp.MechanismName))
+    {
+        if (bCheckOtherObjectMechanism)
+        {
+            LogError("proc: AddToIvnentory(), other object doesn't have a"@bCanBePickedUp.MechanismName@"mechanism!"); 
+            return false; 
+        }    
+    }
+    
+    if (!GetTargetParamBool(a,bCanBePickedUp.MechanismName,bCanBePickedUp.ParamName))
+    {
+        if (bCheckOtherObjectMechanism)
+        { 
+            return false; 
+        }       
+    } 
+    
+    SetTargetParam(a, PickUp.MechanismName, PickUp.ParamName, parent);
     //LBActor(a).SetParam(OtherObjectMechanism, 'PickUpBy', parent);
     //LBActor(a).SetParamName(OtherObjectMechanism, 'AttachSocket', AttachSocket);
     
@@ -71,8 +91,7 @@ function bool ClearInventory()
         return false;
     }
     
-    SetTargetParamBool(HeldObject, OtherObjectMechanism, 'PutDown', true);
-    //LBActor(HeldObject).SetParamBool(OtherObjectMechanism, 'PutDown', true);
+    SetTargetParamBool(HeldObject, PutDown.MechanismName, PutDown.ParamName, true);
     
     HeldObject=none;
     
@@ -102,15 +121,31 @@ function bool CanAddToIvnentory()
         return false;   
     }
     
-    //if (LBActor(CheckingObject) == none || LBActor(CheckingObject).GetMechanismByName(OtherObjectMechanism) == none)
-    if (!TargetIsLBObject(CheckingObject) || !TargetHasMechanism(CheckingObject, OtherObjectMechanism))
-    {
-        return false;     
-    } 
+    ////if (LBActor(CheckingObject) == none || LBActor(CheckingObject).GetMechanismByName(OtherObjectMechanism) == none)
+    //if (!TargetIsLBObject(CheckingObject) || !TargetHasMechanism(CheckingObject, OtherObjectMechanism))
+    //{
+    //    return false;     
+    //} 
     
-    if (!GetTargetParamBool(CheckingObject,OtherObjectMechanism,'bCanBePickedUp'))
+    if (!TargetIsLBObject(CheckingObject))
     {
         return false;     
+    }
+    
+    if (!TargetHasMechanism(CheckingObject, bCanBePickedUp.MechanismName))
+    {
+        if (bCheckOtherObjectMechanism)
+        { 
+            return false; 
+        }    
+    }
+    
+    if (!GetTargetParamBool(CheckingObject,bCanBePickedUp.MechanismName,bCanBePickedUp.ParamName))
+    {
+        if (bCheckOtherObjectMechanism)
+        { 
+            return false; 
+        }       
     } 
     
     return true;
@@ -126,6 +161,8 @@ function bool CanRemoveFromIvnentory()
 
 function SetParam(name param, object value, optional int priority=0)
 {
+    super.SetParam(param,value,priority);
+    
     if (param=='AddObject')
         AddToIvnentory(actor(value));
     else if (param=='CheckingObject')
@@ -134,8 +171,12 @@ function SetParam(name param, object value, optional int priority=0)
     
 function SetParamBool(name param, bool value, optional int priority=0)
 {
+    super.SetParamBool(param,value,priority);
+    
     if (param=='RemoveAllObjects' || param=='RemoveObject')
         ClearInventory();
+    else if (param=='AddCheckingObject')
+        AddToIvnentory(CheckingObject);        
 }
     
 function object GetParam(name param)
@@ -144,6 +185,8 @@ function object GetParam(name param)
     {
         return HeldObject;
     }   
+    else
+        return super.GetParam(param);
 }
 
 function bool GetParamBool(name param)
@@ -156,6 +199,8 @@ function bool GetParamBool(name param)
     {
         return CanRemoveFromIvnentory();
     }  
+    else
+        return super.GetParamBool(param);
 }
 
 defaultproperties
@@ -166,13 +211,22 @@ defaultproperties
     
     AttachSocket="InventorySocket"
     
-    bLogFullInfo=true
+    PickUp=(ParamType=ParamType_Object,MechanismName="Attached_Movement_Mechanism",ParamName="AttachToActor")
+    PutDown=(ParamType=ParamType_Boolean,MechanismName="Attached_Movement_Mechanism",ParamName="Detach")
+    bCanBePickedUp=(ParamType=ParamType_Boolean,MechanismName="Attached_Movement_Mechanism",ParamName="bIsAvailable")
         
-    MechanismParams(0)=(ParamName="AddObject", ParamInfo="Object. Write. Add corresponding object to the inventory. Only one object can be held.")
-    MechanismParams(1)=(ParamName="RemoveObject", ParamInfo="Bool. Write. Remove held object from the inventory.")
-    MechanismParams(2)=(ParamName="RemoveAllObjects", ParamInfo="Bool. Write. Same as [RemoveAllObjects].")
-    MechanismParams(3)=(ParamName="HeldObject", ParamInfo="Object. Read. Get held object, that is currently held.")
-    MechanismParams(4)=(ParamName="CheckingObject", ParamInfo="Object. Write. Set to an object which is check, whether it can be added to invetory.")
-    MechanismParams(5)=(ParamName="CanAddToIvnentory", ParamInfo="Bool. Read. Returns true if [CheckingObject] can be added to inventory, otherwise - false.")
-    MechanismParams(6)=(ParamName="CanRemoveFromIvnentory", ParamInfo="Bool. Read. Returns true if there is any object in inventory and it can be dropped down.")
+    MechanismParams.Add((ParamName="AddObject", ParamType=ParamType_Object, ParamInfo="Object. Write. Add corresponding object to the inventory. Only one object can be held."))
+    MechanismParams.Add((ParamName="RemoveObject", ParamType=ParamType_Boolean, ParamInfo="Bool. Write. Remove held object from the inventory."))
+    MechanismParams.Add((ParamName="RemoveAllObjects", ParamType=ParamType_Boolean, ParamInfo="Bool. Write. Same as [RemoveAllObjects]."))
+    MechanismParams.Add((ParamName="HeldObject", ParamType=ParamType_Object, ParamInfo="Object. Read. Get held object, that is currently held."))
+    MechanismParams.Add((ParamName="CheckingObject", ParamType=ParamType_Object, ParamInfo="Object. Write. Set to an object which is check, whether it can be added to invetory."))
+    MechanismParams.Add((ParamName="CanAddToIvnentory", ParamType=ParamType_Boolean, ParamInfo="Bool. Read. Returns true if [CheckingObject] can be added to inventory, otherwise - false."))
+    MechanismParams.Add((ParamName="CanRemoveFromIvnentory", ParamType=ParamType_Boolean, ParamInfo="Bool. Read. Returns true if there is any object in inventory and it can be dropped down."))
+    MechanismParams.Add((ParamName="AddCheckingObject", ParamType=ParamType_Boolean, ParamInfo="Bool. Wrie. Add @CheckingObject to the inventory. The @CheckingObject should be set."))
+    
+    ParamSource.Add((ParamName="AddObject"))
+    ParamSource.Add((ParamName="RemoveObject"))
+    ParamSource.Add((ParamName="RemoveAllObjects"))
+    ParamSource.Add((ParamName="CheckingObject"))
+    ParamSource.Add((ParamName="AddCheckingObject"))
 }

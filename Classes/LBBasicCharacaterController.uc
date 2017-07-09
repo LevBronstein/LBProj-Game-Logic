@@ -22,6 +22,13 @@ enum InterruptTypes
     //InterruptTypes_SwitchInterrupt, //Action can be interrupted or switched to an action from list @AllowedToSwitchActions
 };
 
+enum ActionNotifyTypes
+{
+    ActionNotifyTypes_ActionPerform,
+    ActionNotifyTypes_ActionStart,
+    ActionNotifyTypes_ActionEnd,
+};
+
 struct LBCharActionInfo
 {
     var() int ActionCode; //The code of this action, used in script
@@ -49,7 +56,7 @@ struct LBCharActionInfo
     }
 };
 
-var(ActionAnimations) array<LBCharActionInfo> CharacterActionList;
+var(ActionList) array<LBCharActionInfo> CharacterActionList;
 
 var array<LBBlendByAction> blendbyactionnodes; 
 var array<AnimNodeSequence> actionseqs;
@@ -62,10 +69,7 @@ var AnimNode curanim; //текущая анимация
 
 function InitMechanism()
 {    
-    curaction=-1;
-    
-    defaultaction.ActionCode=-1;
-    defaultaction.ActionName='Default';    
+    ResetToDefaultAction();
     
     InitAnimation();    
 }
@@ -99,13 +103,13 @@ function InitAnimation()
     
 function PerfromTick(float dt)
 {
+    //`log("Tick!");
     if (curaction<0) //если нету действия -- не наше дело
         return;
-    
-    
+        
     if (AnimNodeSequence(curanim)!=none)
     {
-       //`log(curanim@"is playing:"@AnimNodeSequence(curanim).bPlaying);
+        //`log(curanim.name@"is playing:"@AnimNodeSequence(curanim).bPlaying);
         
         if (!AnimNodeSequence(curanim).bPlaying) //Если вдруг прекратилось проигрывание
         {
@@ -142,11 +146,8 @@ function LBCharActionInfo FindCharActionInfoByCode(int actioncode)
             return CharacterActionList[i];    
         }
     }
-        
-    info.ActionCode=-1;
-    info.Actionname='';
     
-    return info;    
+    return defaultaction;    
 }
 
 function int FindCharActionInfoIndexByCode(int actioncode)
@@ -164,6 +165,7 @@ function int FindCharActionInfoIndexByCode(int actioncode)
     return -1;
 }
 
+//проверка, может ли newaction прервать curaction
 function bool IsAllowedInterruptor(LBCharActionInfo curaction, LBCharActionInfo newaction)
 {
     local int i;
@@ -180,6 +182,24 @@ function bool IsAllowedInterruptor(LBCharActionInfo curaction, LBCharActionInfo 
         return true; 
         
     return false;
+}
+
+//может ли владелец (паун) позволит прервать
+function bool IsAllowedByParent(LBCharActionInfo action)
+{
+    if (!action.bAllowMovement)
+    {
+        if (Vsize(parent.Velocity)!=0)
+            return false;
+    }
+        
+    return true;
+}
+
+//специальное условие для производных классов
+function bool IsCustomConditionMet(int actionid)
+{
+    return true;
 }
 
 function UpdateAnimationNodes(LBCharActionInfo actioninfo)
@@ -254,28 +274,37 @@ function BeginAction(int actionid)
     }
     
     //пробиваем по списку доступных прерывателей
-    if (IsAllowedInterruptor(curactioninfo,actioninfo))
+    if (!IsAllowedInterruptor(curactioninfo,actioninfo))
     {
-        if (curaction>-1)
-            OnActionInterrupt(actionid, curaction);
+        LogError("proc:: BeginAction(); cannot start action "$actioninfo.ActionName$", because it is not a valid interruptor for action "$curactioninfo.ActionName$".");
+        return;      
+    }
+    
+    //проверяем, может ли владелец позволить данное действие
+    if (!IsAllowedByParent(actioninfo))
+    {
+        LogError("proc:: BeginAction(); cannot start action "$actioninfo.ActionName$", because parent "$parent$" does not allow at the moment.");
+        return;     
+    }
+    
+    if (!IsCustomConditionMet(actionid))
+        return;
+    
+    if (curaction>-1)
+        OnActionInterrupt(actionid, curaction);
         
-        LogInfo("proc:: BeginAction(), current action is "$actioninfo.ActionName$".");
-            
-        curaction=actionid;
-        UpdateAnimationNodes(actioninfo);
-        OnActionStart(actionid);    
-    }
-    else
-    {
-        LogError("proc:: BeginAction(); cannot start action "$actioninfo.ActionName$", because it is not a valid interruptor for action "$curactioninfo.ActionName$".");    
-    }
+    LogInfo("proc:: BeginAction(), current action is "$actioninfo.ActionName$".");
+        
+    curaction=actionid;
+    UpdateAnimationNodes(actioninfo);
+    OnActionStart(actionid);  
 }
 
 function SwitchAction(int actionid)
 {
     local LBCharActionInfo actioninfo;
     
-    if (CharacterActionList.Length>0 && actionid>0 && actionid<CharacterActionList.Length)
+    if (CharacterActionList.Length>0 && actionid>-1 && actionid<CharacterActionList.Length)
         curaction=actionid; 
     else
         curaction=-1;   
@@ -295,7 +324,8 @@ function StopAction(int action)
                
 }
 
-function HandleActionStart()
+//Для производных классов
+function HandleActionStart(int startedaction)
 {
 }
 
@@ -306,21 +336,29 @@ event OnActionStart(int startedaction)
     
     actioninfo=CharActionInfoByIndex(startedaction);
     
-    HandleActionStart();    
+    HandleActionStart(startedaction);    
     
     LogInfo("event:: OnActionStart(); action "@actioninfo.ActionName$" has started.");
 }
 
-function HandleAnimNotify()
+function HandleAnimNotify(int actioncode, int actiondata, ActionNotifyTypes notifytype)
 {
 }
     
-event OwnerAnimNotify(AnimNodeSequence notifynode, AnimNotifyTypes notifytype)
+event OwnerAnimNotify(AnimNodeSequence notifynode, AnimNotify notify)
 {
-    HandleAnimNotify();
+    local LBAnimNotify_Action actionnotify;
+    
+    actionnotify=LBAnimNotify_Action(notify);
+    
+    if(actionnotify==none) 
+        return;
+           
+    HandleAnimNotify(actionnotify.ActionCode,actionnotify.ActionData,actionnotify.ActionNotifyType);
 }
 
-function HandleActionStop()
+//Для производных классов
+function HandleActionStop(int stoppedaction)
 {
 }
 
@@ -333,13 +371,13 @@ event OnActionStop(int stoppedaction)
     
     actioninfo=CharActionInfoByIndex(stoppedaction);
     
-    HandleActionStop();
-
+    
     if (actioninfo.SwitchToAction<0)
     {
         ResetToDefaultAction(); 
         curactioninfo=CharActionInfoByIndex(curaction);
-        LogInfo("event:: OnActionStop(); action "@actioninfo.ActionName$" has stopped, current action is "$curactioninfo.ActionName$".");      
+        LogInfo("event:: OnActionStop(); action "@actioninfo.ActionName$" has stopped, current action is "$curactioninfo.ActionName$"."); 
+        OnActionStart(-1);     
     }
     else 
     {
@@ -349,10 +387,10 @@ event OnActionStop(int stoppedaction)
             
         curactioninfo=CharActionInfoByIndex(curaction);
         LogInfo("event:: OnActionStop(); action "@actioninfo.ActionName$" has stopped, current action is "$curactioninfo.ActionName$"."); 
+        OnActionStart(newactionid);
     }
     
-    
-    
+    HandleActionStop(stoppedaction); 
 }
 
 //Called when an action was interrupted
@@ -365,6 +403,27 @@ event OnActionInterrupt(int interrupted, int interrupter)
     curactioninfo=CharActionInfoByIndex(interrupter);
     
     LogInfo("event:: OnActionInterrupt(); action "@actioninfo.ActionName$" has interrupted action "$curactioninfo.ActionName$".");    
+}
+
+function bool GetParamBool(name param)
+{
+    if (param == 'bAllowMovement')
+    {
+        //`log(param@"="@CharActionInfoByIndex(curaction).bAllowMovement);
+        return CharActionInfoByIndex(curaction).bAllowMovement;
+    } 
+    else
+        return super.GetParamBool(param);
+}
+
+function int GetParamInt(name param)
+{
+    if (param == 'CurrentAction' || param == 'CurAction')
+    {
+        return curaction;
+    }  
+    else
+        return super.GetParamInt(param);  
 }
 
 function SetParamInt(name param, int value, optional int priority=0)
@@ -380,4 +439,10 @@ function SetParamInt(name param, int value, optional int priority=0)
 defaultproperties
 {
     mechname="Basic_Character_Controller"    
+    
+    defaultaction=(ActionCode=-1, ActionName="Default", bAllowMovement=TRUE)
+    
+    MechanismParams.Add((ParamName="CurAction", ParamType=ParamType_Integer, ParamInfo="Integer. Read. Gets currently performed action."))
+    MechanismParams.Add((ParamName="BeginAction", ParamType=ParamType_Integer, ParamInfo="Integer. Write. Sets the number of an action from action list, wich should be executed.")) 
+    MechanismParams.Add((ParamName="bAllowMovement", ParamType=ParamType_Boolean, ParamInfo="Boolean. Read. Returns TRUE if current action allows movement, otherwise -- FALSE.")) 
 }

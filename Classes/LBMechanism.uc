@@ -136,6 +136,21 @@ struct LBTypedParamPtr
     var() ParamTypes ParamType;
 };
 
+struct LBConstTypedParamPtr
+{
+    var() editconst ParamTypes ParamType;
+    var() actor ParentActor;
+    var() name MechanismName;
+    var() name ParamName;
+};
+
+struct LBConstNoActorTypedParamPtr
+{
+    var() editconst ParamTypes ParamType;
+    var() name MechanismName;
+    var() name ParamName;
+};
+
 
 var(MechanismBase) actor parent; //parent actor
 var(MechanismBase) class<Actor> parentclass;
@@ -193,6 +208,7 @@ function SetParamBool(name param, bool value, optional int priority=0)
 {
     if (param=='bEnabled')
     {
+        //`log(mechname@"sets bEnabled to"@value);
         if (value == true)
         {
             if (bEnabled == false)
@@ -203,9 +219,9 @@ function SetParamBool(name param, bool value, optional int priority=0)
             if (bEnabled == true)
                 DisableMechanism();        
         }
-    }
         
-    bEnabled=value;
+        bEnabled=value;
+    }
 }        
 
 function SetParamVector(name param, vector value, optional int priority=0)
@@ -219,50 +235,78 @@ function SetParamName(name param, name value, optional int priority=0)
 {}     
     
 function object GetParam(name param)
-{}
+{
+    return none;
+}
     
 function array<object> GetParams(name param)
-{}
+{
+    local array<object> arr;
+    return arr;    
+}
     
 function int GetParamInt(name param)
-{}    
+{
+    return 0;
+}    
 
 function float GetParamFloat(name param)
-{}      
+{
+    return 0;
+}      
 
 function bool GetParamBool(name param)
 {
+    return false;
 }
     
 function vector GetParamVector(name param)
-{} 
+{
+    return vect(0,0,0);
+} 
  
 function rotator GetParamRotator(name param)
-{}  
+{
+    return rot(0,0,0);    
+}  
 
 //not fully supported for now    
 function name GetParamName(name param)
-{}     
+{
+    return '';
+}     
   
+//Отключается выполнение, если вызвать SetParam... с несуществующим парамтером, баги короче
 function PerfromTick(float dt) //КАК МОЖНО БЫЛО ТАК НАЛАЖАТЬ С НАЗВАНИЕМ??? НУ И ГЕМОР ТЕПЕРЬ...
 {   
+    
 }
     
 event OwnerTick(float deltatime)
 {
     FirstTickInit();
     
+    GetbEnabled();
+    
     if(benabled==false)
         return;
         
-    GetParameters(); 
-  
+    GetParameters();
+        
     PerfromTick(deltatime);      
 }
 
-event OwnerAnimNotify(AnimNodeSequence notifynode, AnimNotifyTypes notifytype);
-        
-function GetParameters();
+event OwnerAnimNotify(AnimNodeSequence notifynode, AnimNotify notify)
+{
+}
+ 
+function GetbEnabled()
+{
+}
+       
+function GetParameters()
+{
+}
 
 function bool HasParam(name param)
 {

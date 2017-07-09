@@ -896,7 +896,7 @@ function LBParamContainer GetTargetParamContainer(actor target, name targetmech,
             param.IntegerParam.value=GetTargetParamInt(target, targetmech, targetparam);
         break;
         case ParamType_Boolean:
-            param.BooleanParam.value=GetTargetParamBool(target, targetmech, targetparam);;
+            param.BooleanParam.value=GetTargetParamBool(target, targetmech, targetparam);
         break;
         case ParamType_Vector:
             param.VectorParam.value=GetTargetParamVector(target, targetmech, targetparam);
@@ -907,6 +907,21 @@ function LBParamContainer GetTargetParamContainer(actor target, name targetmech,
     } 
     
     return param;
+}
+
+function GetbEnabled()
+{
+    local int i;
+    local bool value;
+    
+    for (i=0;i<ParamSource.Length;i++)
+    {
+        if (ParamSource[i].ParamName == 'bEnabled' && ParamSource[i].ValueSource.bUseSource)  
+        {     
+            value=GetTargetParamBool(ParamSource[i].ValueSource.SourceActor,ParamSource[i].ValueSource.SourceMechanismName,ParamSource[i].ValueSource.SourceParamName);
+            SetTargetParamBool(parent,mechname,'bEnabled',value); 
+        }
+    }    
 }
 
 function GetParameters()
@@ -1013,4 +1028,7 @@ function bool TargetIsLBObject(actor target)
 
 defaultproperties
 {
+    MechanismParams.Add((ParamName="bEnabled", ParamType=ParamType_Boolean, ParamInfo="Boolean. Read, write. Enables or disables this mechanism."))
+    
+    ParamSource.Add((ParamName="bEnabled"))
 }

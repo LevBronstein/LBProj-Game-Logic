@@ -120,9 +120,9 @@ function InitAnims()
         LogInfo("None found...");      
 }
 
-function PerformTick(float dt)
+function PerfromTick(float dt)
 {
-    super.PerformTick(dt);
+    super.PerfromTick(dt);
     
     UpdateAnimNodes();
 }
@@ -314,6 +314,18 @@ function PerformRotation(float dt)
     }    
 }
 
+function PreserveRotation(float dt)
+{
+    local rotator dr;
+
+    dr=parent.Rotation;
+            
+    dr.Yaw=currot*degtounrrot; 
+ 
+    parent.SetRotation(dr);   
+}
+
+
 function UpdateAnimNodes()
 {
     local int i;
@@ -336,6 +348,7 @@ function UpdateAnimNodes()
 
 function SetParamBool(name param, bool value, optional int priority=0) 
 {
+    //`log(mechname$":"$param$"<-"$value);
     super.SetParamBool(param,value,priority);
     
     if (param=='bEnableMovement')
@@ -360,11 +373,15 @@ function float GetParamFloat(name param)
         return MoveDirection.Pitch;
     else if (param=='MoveDirectionRoll' || param=='MoveDirection-Roll' || param=='MoveDir-Roll')
         return MoveDirection.Roll;  
+    else
+        return super.GetParamFloat(param);
 }    
     
 function SetParamFloat(name param, float value, optional int priority=0)
 {
     //`log(param@"->"@value);
+    
+    super.SetParamFloat(param, value, priority);
     
     if (param=='ForwardSpeed' || param=='FwdSpeed')
         ForwardSpeed=value;
@@ -390,18 +407,22 @@ function SetParamFloat(name param, float value, optional int priority=0)
  
 function SetParamRotator(name param, rotator value, optional int priority=0)
 {
+    super.SetParamRotator(param, value, priority);
+    
     if (param=='MoveDirection' || param=='MoveDir')
         MoveDirection=value;    
 }
 
 function SetParamVector(name param, vector value, optional int priority=0)
 {    
+    super.SetParamVector(param, value, priority);
+    
     if (param=='MoveDirection' || param=='MoveDir')
     {
         MoveDirection=Rotator(value);        
     } 
 }
-  
+
 function DGDisplayCoordinateSystem(vector X, vector Y, vector Z)
 {
     parent.DrawDebugLine(parent.Location+vect(0,0,32),parent.Location+(X*100)+vect(0,0,32),100,0,0);
@@ -442,29 +463,27 @@ defaultproperties
     AnimBlendTime=0.8
     RotationAnimThreshold=2.3
     RotationSkelControlMin=-35;
-    RotationSkelControlMax=35;
-    
-    MechanismParams.Empty    
+    RotationSkelControlMax=35;   
 
-    MechanismParams(0)=(ParamName="ForwardSpeed", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the forward speed.")
-    MechanismParams(1)=(ParamName="kForwardSpeed", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the @kforward speed.") 
-    MechanismParams(2)=(ParamName="StrafeSpeed", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the @StrafeSpeed speed.")
-    MechanismParams(3)=(ParamName="kStrafeSpeed", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the @kStrafeSpeed speed.") 
-    MechanismParams(4)=(ParamName="JumpSpeed", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the @JumpSpeed speed.")
-    MechanismParams(5)=(ParamName="kJumpSpeed", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the @kSJumpSpeed speed.")
-    MechanismParams(6)=(ParamName="MoveDirection", ParamType=ParamType_Rotator, ParamInfo="Rotator. Read, write. Sets the @MoveDirection value.")
-    MechanismParams(7)=(ParamName="MoveDirectionYaw", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the @MoveDirection Yaw component.")
-    MechanismParams(8)=(ParamName="MoveDirectionPitch", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the @MoveDirection Pitch component.") 
-    MechanismParams(9)=(ParamName="MoveDirectionRoll", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the @MoveDirection Roll component.") 
+    MechanismParams.Add((ParamName="ForwardSpeed", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the forward speed."))
+    MechanismParams.Add((ParamName="kForwardSpeed", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the @kforward speed."))
+    MechanismParams.Add((ParamName="StrafeSpeed", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the @StrafeSpeed speed."))
+    MechanismParams.Add((ParamName="kStrafeSpeed", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the @kStrafeSpeed speed."))
+    MechanismParams.Add((ParamName="JumpSpeed", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the @JumpSpeed speed."))
+    MechanismParams.Add((ParamName="kJumpSpeed", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the @kSJumpSpeed speed."))
+    MechanismParams.Add((ParamName="MoveDirection", ParamType=ParamType_Rotator, ParamInfo="Rotator. Read, write. Sets the @MoveDirection value."))
+    MechanismParams.Add((ParamName="MoveDirectionYaw", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the @MoveDirection Yaw component."))
+    MechanismParams.Add((ParamName="MoveDirectionPitch", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the @MoveDirection Pitch component.")) 
+    MechanismParams.Add((ParamName="MoveDirectionRoll", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the @MoveDirection Roll component.")) 
     
-    ParamSource(0)=(ParamName="ForwardSpeed")
-    ParamSource(1)=(ParamName="kForwardSpeed")
-    ParamSource(2)=(ParamName="StrafeSpeed")
-    ParamSource(3)=(ParamName="kStrafeSpeed")
-    ParamSource(4)=(ParamName="JumpSpeed")
-    ParamSource(5)=(ParamName="kJumpSpeed")
-    ParamSource(6)=(ParamName="MoveDirection")
-    ParamSource(7)=(ParamName="MoveDirectionYaw")
-    ParamSource(8)=(ParamName="MoveDirectionPitch")
-    ParamSource(9)=(ParamName="MoveDirectionRoll")
+    ParamSource.Add((ParamName="ForwardSpeed"))
+    ParamSource.Add((ParamName="kForwardSpeed"))
+    ParamSource.Add((ParamName="StrafeSpeed"))
+    ParamSource.Add((ParamName="kStrafeSpeed"))
+    ParamSource.Add((ParamName="JumpSpeed"))
+    ParamSource.Add((ParamName="kJumpSpeed"))
+    ParamSource.Add((ParamName="MoveDirection"))
+    ParamSource.Add((ParamName="MoveDirectionYaw"))
+    ParamSource.Add((ParamName="MoveDirectionPitch"))
+    ParamSource.Add((ParamName="MoveDirectionRoll"))
 }

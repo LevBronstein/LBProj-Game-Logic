@@ -53,6 +53,16 @@ function LBMechanism GetMechanismByName(name mechname)
     return none;
 }
 
+function AnimNotifyAllMechanisms(AnimNodeSequence notifynode, AnimNotify notify)
+{
+    local int i;
+    
+    for(i=0;i<AllMechanisms.length;i++)
+    {
+        AllMechanisms[i].OwnerAnimNotify(notifynode,notify);
+    }    
+}
+
 /********************** SET PARAM OVERLOADS **********************/
 
 function SetParam(name mechanism, name param, object value)
