@@ -80,15 +80,19 @@ function PerformRotation(float dt)
     if (AttachActor == none)
         return;
     
-    if (pawn(AttachActor).Mesh.GetSocketWorldLocationAndRotation(AttachSocket, l, r, 0)==true)
+    //If parent is attached to a pawn, we can use sockets
+    if (pawn(AttachActor)!=none)
     {
+        if (pawn(AttachActor).Mesh.GetSocketWorldLocationAndRotation(AttachSocket, l, r, 0)==true)
+        {
+            if (CoordSystem==CoordinateType_LocalOriented)
+                parent.SetRotation(r+RotOffset);  
+        }
+        else
+        {    
         if (CoordSystem==CoordinateType_LocalOriented)
-            parent.SetRotation(r+RotOffset);  
-    }
-    else
-    {    
-    if (CoordSystem==CoordinateType_LocalOriented)
-        parent.SetRotation(AttachActor.Rotation+RotOffset);
+            parent.SetRotation(AttachActor.Rotation+RotOffset);
+        }
     }
 }
 

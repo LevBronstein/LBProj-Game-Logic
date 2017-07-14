@@ -14,6 +14,7 @@ function SetTargetParamFloat(actor target, name targetmech, name targetparam, fl
     local LBDynamicActor d;
     local LBSKMPhysicsActor skmph;
     local LBSMPhysicsActor smph;
+    local LBCamera cam;
 
     a=LBActor(target);
     
@@ -62,6 +63,14 @@ function SetTargetParamFloat(actor target, name targetmech, name targetparam, fl
         smph.SetParamFloat(targetmech, targetparam, value);
         return;
     }
+    
+    cam=LBCamera(target);
+    
+    if(cam!=none)
+    {
+        cam.SetParamFloat(targetmech, targetparam, value);
+        return;    
+    }
 }
 
 function SetTargetParamInt(actor target, name targetmech, name targetparam, int value, optional int priority=0)
@@ -72,6 +81,7 @@ function SetTargetParamInt(actor target, name targetmech, name targetparam, int 
     local LBSkeletalMeshActor s;
     local LBSKMPhysicsActor skmph;
     local LBSMPhysicsActor smph;
+    local LBCamera cam;
 
     a=LBActor(target);
     
@@ -121,6 +131,14 @@ function SetTargetParamInt(actor target, name targetmech, name targetparam, int 
         smph.SetParamInt(targetmech, targetparam, value);
         return;
     }
+    
+    cam=LBCamera(target);
+    
+    if(cam!=none)
+    {
+        cam.SetParamInt(targetmech, targetparam, value);
+        return;    
+    }
 }
 
 function SetTargetParamBool(actor target, name targetmech, name targetparam, bool value, optional int priority=0)
@@ -131,6 +149,7 @@ function SetTargetParamBool(actor target, name targetmech, name targetparam, boo
     local LBSkeletalMeshActor s;
     local LBSKMPhysicsActor skmph;
     local LBSMPhysicsActor smph;
+    local LBCamera cam;
 
     a=LBActor(target);
     
@@ -179,6 +198,14 @@ function SetTargetParamBool(actor target, name targetmech, name targetparam, boo
         smph.SetParamBool(targetmech, targetparam, value);
         return;
     }
+    
+    cam=LBCamera(target);
+    
+    if(cam!=none)
+    {
+        cam.SetParamBool(targetmech, targetparam, value);
+        return;    
+    }
 }
 
 function SetTargetParam(actor target, name targetmech, name targetparam, object value, optional int priority=0)
@@ -189,6 +216,7 @@ function SetTargetParam(actor target, name targetmech, name targetparam, object 
     local LBSkeletalMeshActor s;
     local LBSKMPhysicsActor skmph;
     local LBSMPhysicsActor smph;
+    local LBCamera cam;
 
     a=LBActor(target);
     
@@ -237,6 +265,14 @@ function SetTargetParam(actor target, name targetmech, name targetparam, object 
         smph.SetParam(targetmech, targetparam, value);
         return;
     }
+    
+    cam=LBCamera(target);
+    
+    if(cam!=none)
+    {
+        cam.SetParam(targetmech, targetparam, value);
+        return;    
+    }
 }
 
 function SetTargetParams(actor target, name targetmech, name targetparam, array<object> value, optional int priority=0)
@@ -247,6 +283,7 @@ function SetTargetParams(actor target, name targetmech, name targetparam, array<
     local LBSkeletalMeshActor s;
     local LBSKMPhysicsActor skmph;
     local LBSMPhysicsActor smph;
+    local LBCamera cam;
 
     a=LBActor(target);
     
@@ -295,6 +332,14 @@ function SetTargetParams(actor target, name targetmech, name targetparam, array<
         smph.SetParams(targetmech, targetparam, value);
         return;
     }
+    
+    cam=LBCamera(target);
+    
+    if(cam!=none)
+    {
+        cam.SetParams(targetmech, targetparam, value);
+        return;    
+    }
 }
 
 function SetTargetParamVector(actor target, name targetmech, name targetparam, vector value, optional int priority=0)
@@ -305,6 +350,7 @@ function SetTargetParamVector(actor target, name targetmech, name targetparam, v
     local LBSkeletalMeshActor s;
     local LBSKMPhysicsActor skmph;
     local LBSMPhysicsActor smph;
+    local LBCamera cam;
 
     a=LBActor(target);
     
@@ -353,6 +399,14 @@ function SetTargetParamVector(actor target, name targetmech, name targetparam, v
         smph.SetParamVector(targetmech, targetparam, value);
         return;
     }
+    
+    cam=LBCamera(target);
+    
+    if(cam!=none)
+    {
+        cam.SetParamVector(targetmech, targetparam, value);
+        return;    
+    }
 }
 
 function SetTargetParamRotator(actor target, name targetmech, name targetparam, rotator value, optional int priority=0)
@@ -363,6 +417,7 @@ function SetTargetParamRotator(actor target, name targetmech, name targetparam, 
     local LBSkeletalMeshActor s;
     local LBSKMPhysicsActor skmph;
     local LBSMPhysicsActor smph;
+    local LBCamera cam;
 
     a=LBActor(target);
     
@@ -410,6 +465,14 @@ function SetTargetParamRotator(actor target, name targetmech, name targetparam, 
     {   
         smph.SetParamRotator(targetmech, targetparam, value);
         return;
+    }
+    
+    cam=LBCamera(target);
+    
+    if(cam!=none)
+    {
+        cam.SetParamRotator(targetmech, targetparam, value);
+        return;    
     }
 }
 
@@ -470,6 +533,7 @@ function float GetTargetParamFloat(actor target, name targetmech, name targetpar
     local float value;
     local LBSKMPhysicsActor skmph;
     local LBSMPhysicsActor smph;
+    local LBCamera cam;
 
     a=LBActor(target);
     
@@ -518,6 +582,14 @@ function float GetTargetParamFloat(actor target, name targetmech, name targetpar
         value=smph.GetParamFloat(targetmech, targetparam);
         return value;
     }
+    
+    cam=LBCamera(target);
+    
+    if (cam!=none)
+    {   
+        value=a.GetParamFloat(targetmech, targetparam);
+        return value;
+    }
 }
 
 function int GetTargetParamInt(actor target, name targetmech, name targetparam)
@@ -529,6 +601,7 @@ function int GetTargetParamInt(actor target, name targetmech, name targetparam)
     local int value;
     local LBSKMPhysicsActor skmph;
     local LBSMPhysicsActor smph;
+    local LBCamera cam;
 
     a=LBActor(target);
     
@@ -577,6 +650,14 @@ function int GetTargetParamInt(actor target, name targetmech, name targetparam)
         value=smph.GetParamInt(targetmech, targetparam);
         return value;
     }
+    
+    cam=LBCamera(target);
+    
+    if (cam!=none)
+    {   
+        value=a.GetParamInt(targetmech, targetparam);
+        return value;
+    }
 }
 
 function bool GetTargetParamBool(actor target, name targetmech, name targetparam)
@@ -588,6 +669,7 @@ function bool GetTargetParamBool(actor target, name targetmech, name targetparam
     local bool value;
     local LBSKMPhysicsActor skmph;
     local LBSMPhysicsActor smph;
+    local LBCamera cam;
 
     a=LBActor(target);
     
@@ -636,6 +718,14 @@ function bool GetTargetParamBool(actor target, name targetmech, name targetparam
         value=smph.GetParamBool(targetmech, targetparam);
         return value;
     }
+    
+    cam=LBCamera(target);
+    
+    if (cam!=none)
+    {   
+        value=a.GetParamBool(targetmech, targetparam);
+        return value;
+    }
 }
 
 function object GetTargetParam(actor target, name targetmech, name targetparam)
@@ -647,6 +737,7 @@ function object GetTargetParam(actor target, name targetmech, name targetparam)
     local object value;
     local LBSKMPhysicsActor skmph;
     local LBSMPhysicsActor smph;
+    local LBCamera cam;
     
     a=LBActor(target);
     
@@ -696,6 +787,13 @@ function object GetTargetParam(actor target, name targetmech, name targetparam)
         return value;
     }
     
+    cam=LBCamera(target);
+    
+    if (cam!=none)
+    {   
+        value=a.GetParam(targetmech, targetparam);
+        return value;
+    }
 }
 
 function array<object> GetTargetParams(actor target, name targetmech, name targetparam)
@@ -706,7 +804,8 @@ function array<object> GetTargetParams(actor target, name targetmech, name targe
     local LBSkeletalMeshActor s;
     local array<object> value;
     local LBSKMPhysicsActor skmph;
-    local LBSMPhysicsActor smph;    
+    local LBSMPhysicsActor smph;
+    local LBCamera cam;    
 
     a=LBActor(target);
     
@@ -754,7 +853,15 @@ function array<object> GetTargetParams(actor target, name targetmech, name targe
     {   
         value=smph.GetParams(targetmech, targetparam);
         return value;
-    }    
+    }   
+   
+    cam=LBCamera(target);
+    
+    if (cam!=none)
+    {   
+        value=a.GetParams(targetmech, targetparam);
+        return value;
+    } 
 }
 
 function vector GetTargetParamVector(actor target, name targetmech, name targetparam)
@@ -766,6 +873,7 @@ function vector GetTargetParamVector(actor target, name targetmech, name targetp
     local vector value;
     local LBSKMPhysicsActor skmph;
     local LBSMPhysicsActor smph;    
+    local LBCamera cam;
 
     a=LBActor(target);
     
@@ -813,7 +921,15 @@ function vector GetTargetParamVector(actor target, name targetmech, name targetp
     {   
         value=smph.GetParamVector(targetmech, targetparam);
         return value;
-    }    
+    }  
+  
+    cam=LBCamera(target);
+    
+    if (cam!=none)
+    {   
+        value=a.GetParamVector(targetmech, targetparam);
+        return value;
+    }  
 }
 
 function rotator GetTargetParamRotator(actor target, name targetmech, name targetparam)
@@ -824,7 +940,8 @@ function rotator GetTargetParamRotator(actor target, name targetmech, name targe
     local LBSkeletalMeshActor s;
     local rotator value;
     local LBSKMPhysicsActor skmph;
-    local LBSMPhysicsActor smph;    
+    local LBSMPhysicsActor smph;
+    local LBCamera cam;    
 
     a=LBActor(target);
     
@@ -872,7 +989,15 @@ function rotator GetTargetParamRotator(actor target, name targetmech, name targe
     {   
         value=smph.GetParamRotator(targetmech, targetparam);
         return value;
-    }    
+    }
+
+    cam=LBCamera(target);
+    
+    if (cam!=none)
+    {   
+        value=a.GetParamRotator(targetmech, targetparam);
+        return value;
+    }     
 }
 
 function LBParamContainer GetTargetParamContainer(actor target, name targetmech, name targetparam, ParamTypes paramtype)

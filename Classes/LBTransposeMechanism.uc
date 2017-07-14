@@ -207,6 +207,25 @@ function float LinearInterpAngle(float current, float target, float step, float 
     return value;
 }
 
+function vector LinearInerpVectorValue(vector current, vector target, float step, float dt)
+{
+    local vector value;
+    local vector v;
+    
+    v=Normal(target-current);
+    
+    if (VSize(current - target) > VSize(v*step))
+    {
+        value=current+v*step; 
+    }
+    else
+    {
+        value=current+(current - target);   
+    }
+        
+     return value;
+}
+
 
 /*Tick independent value-retrievemnt functions
 Works like (<DeltaTime>/<Time in seconds>)*<Value>, where <Value> is instant value

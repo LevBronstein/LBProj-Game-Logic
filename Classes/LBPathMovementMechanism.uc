@@ -72,7 +72,7 @@ function PeformActorMovement(float dt)
         
         v=node.SplineComponent.GetLocationAtDistanceAlongSpline(dist);
 
-        `log("Cur point: "@v@","@dist@"/"@node.SplineComponent.GetSplineLength()@path);
+        //`log("Cur point: "@v@","@dist@"/"@node.SplineComponent.GetSplineLength()@path);
         //r=rotator(node.SplineComponent.GetTangentAtDistanceAlongSpline(dist));
     }
     else
