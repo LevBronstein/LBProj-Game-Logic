@@ -4,22 +4,7 @@
  *  Creation date: 10.02.2017 19:41
  *  Copyright 2017, Windows7
  */
-class LBVolumeCheckingMechanism extends LBActorCheckingMechanism;
-
-enum CoordinateTypes
-{
-    /*The default coordinate type, when the point location is calculated
-    in global coordinates*/
-    CoordinateType_World,
-    /*Local coordinates, it means that the base actor's location is
-    added to the point location*/
-    CoordinateType_Local,
-    /*Local oriented coordinates, it means that the point location
-    is projected into base actor's local coordinate system with
-    certain orientation (GetAxes is used)*/
-    CoordinateType_LocalOriented,
-};
-
+class LBVolumeCheckingMechanism extends LBGeomActorCheckingMechanism;
 
 /*A center of the checking area*/
 var(VolumeCheckingMechanism) vector CheckingAreaCenter;
@@ -61,7 +46,7 @@ function GetCheckingActors()
    
 function bool CustomActorCheck(actor a)
 {
-    if (VSize(a.Location-TransformCoords(CheckingAreaCenter)) <= dError)
+    if (VSize(a.Location-TransformCoords(CheckingAreaCenter,CheckingAreaCoords)) <= dError)
         return true;
     else
         return false;
@@ -136,42 +121,21 @@ function float GetObjectDistance(actor a)
     local vector X, Y, Z;
     local float l;
 
-    v=TransformCoords(CheckingAreaCenter);
+    v=TransformCoords(CheckingAreaCenter,CheckingAreaCoords);
     
     l=VSize(a.Location-v);
 
     return l;    
 }
-        
+
 function DGHighlightArea()
 {
     local vector v;
     
     if (bShowDebugGraphics)
     {
-        v=TransformCoords(CheckingAreaCenter);
+        v=TransformCoords(CheckingAreaCenter,CheckingAreaCoords);
         parent.DrawDebugBox(v,vect(32,32,32),AreaHighlightColor.R,AreaHighlightColor.G,AreaHighlightColor.B);  
-    }
-}
-
-function vector TransformCoords(vector p)
-{
-    local vector v;
-    local vector X, Y, Z;
-    
-    if (CheckingAreaCoords==CoordinateType_World) 
-    {
-        return p;
-    }   
-    else if (CheckingAreaCoords==CoordinateType_Local)
-    {
-        return p+parent.Location;
-    }
-    else if (CheckingAreaCoords==CoordinateType_LocalOriented)
-    {
-        GetAxes(parent.Rotation,X,Y,Z);
-        v=parent.Location+X*p.X+Y*p.Y+Z*p.Z;
-        return v;        
     }
 }
 

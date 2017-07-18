@@ -58,10 +58,13 @@ struct LBCharActionInfo
 
 var(ActionList) array<LBCharActionInfo> CharacterActionList;
 
+/* Possible modification: ActionAnimBlendTime
+ * Modify anything else at your own risk!
+*/
+var(ActionList) LBCharActionInfo DefaultAction;
+
 var array<LBBlendByAction> blendbyactionnodes; 
 var array<AnimNodeSequence> actionseqs;
-
-var LBCharActionInfo defaultaction;
 
 var int curaction; //текущее действие (индекс в массиве CharacterActionList)
 var bool bcaninterrupt; //можно ли прервать в данный момент текущее действие

@@ -19,7 +19,7 @@ var(VolumeCheckingMechanism) float CheckingAreaRadius;
     
 function bool CustomActorCheck(actor a)
 {
-    if (VSize(a.Location-TransformCoords(CheckingAreaCenter)) <= CheckingAreaRadius)
+    if (VSize(a.Location-TransformCoords(CheckingAreaCenter,CheckingAreaCoords)) <= CheckingAreaRadius)
         return true;
     else
         return false;
@@ -31,7 +31,7 @@ function DGHighlightArea()
     
     if (bShowDebugGraphics)
     {
-        v=TransformCoords(CheckingAreaCenter);
+        v=TransformCoords(CheckingAreaCenter,CheckingAreaCoords);
         parent.DrawDebugSphere(v,CheckingAreaRadius,12,AreaHighlightColor.R,AreaHighlightColor.G,AreaHighlightColor.B);  
     }
 }

@@ -36,7 +36,9 @@ var(EventActivation) bool bActivateOnHasNoActorsMatchingTrue;
 var(EventActivation) name OnHasNoActorsMatchingTrueEvent;
 
 var(MechanismDebug) bool bShowDebugGraphics;
+var(MechanismDebug) bool bMarkPositiveActors;
 var(MechanismDebug) Color PositiveActorsHighlightColor;
+var(MechanismDebug) bool bMarkNegativeActors;
 var(MechanismDebug) Color NegativeActorsHighlightColor;
 
 function PerfromTick(float dt)
@@ -234,13 +236,19 @@ function DGHighlightActor(actor a, bool b)
     { 
         if (b)
         {
-            a.GetBoundingCylinder(r,h);
-            a.DrawDebugSphere(a.Location,h+h/4,12,PositiveActorsHighlightColor.R,PositiveActorsHighlightColor.G,PositiveActorsHighlightColor.B);  
+            if (bMarkPositiveActors)
+            {
+                a.GetBoundingCylinder(r,h);
+                a.DrawDebugSphere(a.Location,h+h/4,12,PositiveActorsHighlightColor.R,PositiveActorsHighlightColor.G,PositiveActorsHighlightColor.B); 
+            } 
         }
         else
         {
-            a.GetBoundingCylinder(r,h);
-            a.DrawDebugSphere(a.Location,h+h/4,12,NegativeActorsHighlightColor.R,NegativeActorsHighlightColor.G,NegativeActorsHighlightColor.B);  
+            if (bMarkNegativeActors)
+            {
+                a.GetBoundingCylinder(r,h);
+                a.DrawDebugSphere(a.Location,h+h/4,12,NegativeActorsHighlightColor.R,NegativeActorsHighlightColor.G,NegativeActorsHighlightColor.B);
+            }  
         }
     }        
 }
@@ -267,4 +275,7 @@ defaultproperties
     
     PositiveActorsHighlightColor=(B=0,G=0,R=200)
     NegativeActorsHighlightColor=(B=200,G=0,R=0)
+    
+    bMarkPositiveActors=true
+    bMarkNegativeActors=false
 }

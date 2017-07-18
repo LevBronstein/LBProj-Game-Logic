@@ -573,12 +573,5 @@ event Tick(float deltatime)
 
 defaultproperties
 {
-    bSmooth=true  
-  
-    VInterpSpeed=2
-    RInterpSpeed=200
-   
     Physics=PHYS_Flying 
-    
-    DistanceToTarget=128
 }
