@@ -447,5 +447,6 @@ defaultproperties
     
     MechanismParams.Add((ParamName="CurAction", ParamType=ParamType_Integer, ParamInfo="Integer. Read. Gets currently performed action."))
     MechanismParams.Add((ParamName="BeginAction", ParamType=ParamType_Integer, ParamInfo="Integer. Write. Sets the number of an action from action list, wich should be executed.")) 
-    MechanismParams.Add((ParamName="bAllowMovement", ParamType=ParamType_Boolean, ParamInfo="Boolean. Read. Returns TRUE if current action allows movement, otherwise -- FALSE.")) 
+    MechanismParams.Add((ParamName="bAllowMovement", ParamType=ParamType_Boolean, ParamInfo="Boolean. Read. Returns TRUE if current action allows movement, otherwise -- FALSE."))
+    //Добавить что-то вроде GetNotifyStats, который будет true только когда приходит соответствующий нотифай 
 }

@@ -21,6 +21,13 @@ enum CoordinateTypes
     CoordinateType_LocalOriented,
 };
 
+enum AreaTypes
+{
+    AreaTypes_Sphere,
+    AreaTypes_Box,    
+};
+
+
 function vector TransformCoords(vector p, CoordinateTypes coords)
 {
     local vector v;

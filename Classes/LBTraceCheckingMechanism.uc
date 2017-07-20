@@ -53,7 +53,7 @@ function TraceInfo TraceRay(vector origin, vector target)
         else 
             parent.DrawDebugLine(origin, target, 0, 0, 255);     
     }
-    
+
     return hit;
 }
 
@@ -128,9 +128,22 @@ function array<actor> GetActorsMatchingTrue()
     
     if (hit.hitactor!=none)
         arr.AddItem(hit.hitactor);
-    
+        
     //А если в себя попадёт?
     return arr;
+}
+
+function object GetFirstTracedObject()
+{
+    local array<actor> arr;
+    local actor a;
+
+    arr=GetActorsMatchingTrue();  
+    
+    if (arr.Length>0)
+        a=arr[0];
+        
+    return a;  
 }
 
 function array<actor> GetActorsMatchingFalse()
@@ -140,10 +153,22 @@ function array<actor> GetActorsMatchingFalse()
     return arr;
 }
 
+function object GetParam(name param)
+{
+    if (param=='FirstTracedObject' || param=='FirstTracedObj' || param=='GetFirstTracedObject')
+    {
+        return GetFirstTracedObject();
+    }  
+    else
+    return super.GetParam(param); 
+}
+
 defaultproperties
 {
     mechname="Trace_Checking_Mechanism"
     
     RayTraceOriginSocket="TraceOriginSocket"
     MaxTraceLength=1024
+    
+    MechanismParams.Add((ParamName="FirstTracedObject", ParamType=ParamType_Object, ParamInfo="Object (Actor). Read. Gets the first object hit by the tracing ray."))
 }

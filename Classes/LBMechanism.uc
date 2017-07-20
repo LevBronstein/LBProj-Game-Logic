@@ -136,6 +136,15 @@ struct LBTypedParamPtr
     var() ParamTypes ParamType;
 };
 
+struct LBTargetValueContainer
+{
+    var() LBMechanismParam Target;
+    var() bool bOverrideParentActor; 
+    var() bool bOverrideMechanismName;
+    var() bool bOverrideParamName;
+    var() LBParamContainer Value;   
+};
+
 struct LBConstTypedParamPtr
 {
     var() editconst ParamTypes ParamType;
