@@ -54,6 +54,12 @@ function bool CanInteract()
         return false;    
     }
     
+    if (Interactions[CurInteraction].Values.Length==0)
+    {
+        LogError("proc: CanInteract(), current interaction"@CurInteraction@"has no values to set");
+        return false;    
+    }
+    
     for (i=0;i<Interactions[CurInteraction].Values.Length;i++)
     {
         if (Interactions[CurInteraction].Values[i].bOverrideParentActor)
@@ -77,7 +83,7 @@ function bool CanInteract()
                 LogError("proc: CanInteract(), @ParentActor in value"@i@"of interaction"@CurInteraction@"is not a pawn or none:"@Interactions[CurInteraction].Values[i].Target.ParentActor);
                 return false;
             }  
-         
+
             if (!TargetHasMechanism(Interactions[CurInteraction].Values[i].Target.ParentActor, Interactions[CurInteraction].Values[i].Target.MechanismName))
             {
                 LogError("proc: CanInteract(), mechanism"@Interactions[CurInteraction].Values[i].Target.MechanismName@" in value"@i@"of interaction"@CurInteraction@"was not found in @TargetObject:"@Interactions[CurInteraction].Values[i].Target.ParentActor);
@@ -85,7 +91,7 @@ function bool CanInteract()
             }    
         }
     }
-        
+   
     return true;
 }
 
