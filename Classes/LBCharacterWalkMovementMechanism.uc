@@ -355,6 +355,11 @@ function SetParamBool(name param, bool value, optional int priority=0)
         bEnableMovement=value;
     else if (param=='bEnableRotation')
         bEnableRotation=value;
+    else if (param=='ResetMoveDirection')
+    {
+        if (value)
+            MoveDirection=parent.Rotation;    
+    }
 }
     
 function float GetParamFloat(name param)
@@ -475,6 +480,7 @@ defaultproperties
     MechanismParams.Add((ParamName="MoveDirectionYaw", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the @MoveDirection Yaw component."))
     MechanismParams.Add((ParamName="MoveDirectionPitch", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the @MoveDirection Pitch component.")) 
     MechanismParams.Add((ParamName="MoveDirectionRoll", ParamType=ParamType_Float, ParamInfo="Float. Read, write. Sets the @MoveDirection Roll component.")) 
+    MechanismParams.Add((ParamName="ResetMoveDirection", ParamType=ParamType_Boolean, ParamInfo="Boolean. Write. Set TRUE to reset @MoveDirection to @Rotation of parent."))
     
     ParamSource.Add((ParamName="ForwardSpeed"))
     ParamSource.Add((ParamName="kForwardSpeed"))

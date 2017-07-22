@@ -28,16 +28,10 @@ var(CharacterInteraction) LBConstTypedParamPtr SetPerformInteraction;
 //Id of the interaction TOUCH in interaction mechanism
 var(CharacterInteraction) int TouchInteractionID;
 
-//Get any potentally pickable object by this pointer from any source, i.e. @AreaCheckingMechanism.NearestObject
-var(CharacterInventory) LBConstTypedParamPtr GetPotentallyPickableActor;
-//Set @GetPotentallyPickableActor to an inventory mechanism by this pointer to check for pickup
-var(CharacterInventory) LBConstTypedParamPtr SetPickCheckingActor;
 //Set actor be added to inventory by inventory mechanism by this pointer
 var(CharacterInventory) LBConstTypedParamPtr SetAddObjectToInventory; 
 //Set boolean value by this pointer to an inventory mechanism to remove object from inventory
 var(CharacterInventory) LBConstTypedParamPtr SetRemoveObjectFromInventory; 
-//Get any held object from an inventory mechanism
-var(CharacterInventory) LBConstTypedParamPtr GetHeldObject;
 //Get boolean value from thish source, indicating abilty to pick up 
 var(CharacterInventory) LBConstTypedParamPtr GetbCanPickUp;
 //Get boolean value from thish source, indicating abilty to put down 
@@ -69,16 +63,13 @@ function PerformInteraction(int interaction)
 function bool CheckPickUp()
 {
     local bool bpickup;
-    local actor pickup;
-    
-    pickup=Actor(GetTargetParam(GetPotentallyPickableActor.ParentActor,GetPotentallyPickableActor.MechanismName,GetPotentallyPickableActor.ParamName)); 
-    SetTargetParam(SetPickCheckingActor.ParentActor,SetPickCheckingActor.MechanismName,SetPickCheckingActor.ParamName,pickup);
+
     bpickup=GetTargetParamBool(GetbCanPickUp.ParentActor,GetbCanPickUp.MechanismName,GetbCanPickUp.ParamName);  
     
     if (bpickup)   
-        LogInfo("We can pick up object"@pickup);
+        LogInfo("We can pick up object");
     else
-        LogInfo("We can not pick up object"@pickup);
+        LogInfo("We can not pick up object");
         
     return bpickup;
 }
@@ -90,22 +81,18 @@ function bool CheckPutDown()
     bputdown=GetTargetParamBool(GetbCanPutDown.ParentActor,GetbCanPutDown.MechanismName,GetbCanPutDown.ParamName);  
     
     if (bputdown)   
-        LogInfo("We can put down up object"@bputdown);
+        LogInfo("We can put down up object");
     else
-        LogInfo("We can not put down object"@bputdown);
+        LogInfo("We can not put down object");
         
     return bputdown;   
 }
 
 function PickUpObject()
 {
-    local bool bpickup;
-    local actor pickup;   
-   
-    pickup=Actor(GetTargetParam(GetPotentallyPickableActor.ParentActor,GetPotentallyPickableActor.MechanismName,GetPotentallyPickableActor.ParamName));
-    SetTargetParam(SetAddObjectToInventory.ParentActor,SetAddObjectToInventory.MechanismName,SetAddObjectToInventory.ParamName,pickup);
+    SetTargetParamBool(SetAddObjectToInventory.ParentActor,SetAddObjectToInventory.MechanismName,SetAddObjectToInventory.ParamName,true);
     
-    LogInfo("We have picked up object"@pickup);
+    LogInfo("We have picked up object");
 }
 
 function PutDown()
@@ -124,7 +111,7 @@ function bool IsCustomConditionMet(int actionid)
     //Проверка возомжности выполнения действия (анимации) взаимодействия с объектом -- прикосновения
     if (actioncode ==  401)
     {
-        return CheckInteract(1);    
+        return CheckInteract(TouchInteractionID);    
     } 
     //Проверка возомжности выполнения действия (анимации) поднятия объекта
     else if (actioncode ==  501)
@@ -145,7 +132,7 @@ function HandleAnimNotify(int actioncode, int actiondata, ActionNotifyTypes noti
     //Взаимодейсивме -- прикосновение
     if (actioncode ==  401)
     {
-        if (CheckInteract(1))
+        if (CheckInteract(TouchInteractionID))
         {
             PerformInteraction(TouchInteractionID);    
         } 
@@ -171,15 +158,14 @@ function HandleAnimNotify(int actioncode, int actiondata, ActionNotifyTypes noti
     
 defaultproperties
 {
-    GetPotentallyPickableActor=(ParamType=ParamType_Object)
-    SetPickCheckingActor=(ParamType=ParamType_Object, ParamName="CheckingObject")
-    SetAddObjectToInventory=(ParamType=ParamType_Object, ParamName="AddObject")
-    GetbCanPickUp=(ParamType=ParamType_Boolean)
-    GetbCanPutDown=(ParamType=ParamType_Boolean)
+    SetAddObjectToInventory=(ParamType=ParamType_Boolean, MechanismName="Inventory_Mechanism", ParamName="AddCheckingObject")
+    SetRemoveObjectFromInventory=(ParamType=ParamType_Boolean, MechanismName="Inventory_Mechanism", ParamName="RemoveAllObjects")
+    GetbCanPickUp=(ParamType=ParamType_Boolean, MechanismName="Inventory_Mechanism", ParamName="bCanAddToIvnentory")
+    GetbCanPutDown=(ParamType=ParamType_Boolean, MechanismName="Inventory_Mechanism", ParamName="bCanRemoveFromIvnentory")
     
-    GetbCanInteract=(ParamType=ParamType_Boolean, ParamName="bCanInteract")
-    SetInteractionID=(ParamType=ParamType_Integer, ParamName="CurentInteraction")
-    SetPerformInteraction=(ParamType=ParamType_Boolean, ParamName="Interact")
+    GetbCanInteract=(ParamType=ParamType_Boolean, MechanismName="Simple_Interaction_Mechanism", ParamName="bCanInteract")
+    SetInteractionID=(ParamType=ParamType_Integer, MechanismName="Simple_Interaction_Mechanism", ParamName="CurentInteraction")
+    SetPerformInteraction=(ParamType=ParamType_Boolean, MechanismName="Simple_Interaction_Mechanism", ParamName="Interact")
     
     TouchInteractionID=1
 }

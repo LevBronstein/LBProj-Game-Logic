@@ -32,7 +32,7 @@ function bool AddToIvnentory(actor a)
     local rotator r;
     
     p=LBPawn(parent);
-    
+
     if (p == none)
     {
         LogError("proc: AddToIvnentory(), parent is not a pawn or none:"@p);  
@@ -70,6 +70,7 @@ function bool AddToIvnentory(actor a)
     {
         if (bCheckOtherObjectMechanism)
         { 
+            LogError("proc: AddToIvnentory(), other object has param"@bCanBePickedUp.ParamName@"false");
             return false; 
         }       
     } 
@@ -80,6 +81,7 @@ function bool AddToIvnentory(actor a)
     
     HeldObject=a;
     
+    LogInfo("The object"@HeldObject@"has been added to inventory");
     return true;
 }
 
@@ -95,6 +97,7 @@ function bool ClearInventory()
     
     HeldObject=none;
     
+    LogInfo("proc: ClearInventory(), the inventory has been cleared");
     return true;
 }
 
@@ -108,16 +111,19 @@ function bool CanAddToIvnentory()
     
     if (p == none)
     {
+        LogError("proc: CanAddToIvnentory(), parent is not an LBPawn or none"@parent);
         return false;
     }
     
     if (HeldObject != none)
     {
+        LogError("proc: CanAddToIvnentory(), there is already an object in the inventory"@HeldObject);
         return false;
     }
     
     if (p.Mesh.GetSocketWorldLocationAndRotation(AttachSocket, l, r, 0)==false)
     {
+        LogError("proc: CanAddToIvnentory(), the mesh"@p.Mesh@"does not have a socket"@AttachSocket);
         return false;   
     }
     
@@ -129,6 +135,7 @@ function bool CanAddToIvnentory()
     
     if (!TargetIsLBObject(CheckingObject))
     {
+        LogError("proc: CanAddToIvnentory(), the CheckingObject is not an LBObject"@CheckingObject);
         return false;     
     }
     
@@ -136,6 +143,7 @@ function bool CanAddToIvnentory()
     {
         if (bCheckOtherObjectMechanism)
         { 
+            LogError("proc: CanAddToIvnentory(), the CheckingObject"@CheckingObject@"does not have a mechanism"@bCanBePickedUp.MechanismName);
             return false; 
         }    
     }
@@ -144,6 +152,7 @@ function bool CanAddToIvnentory()
     {
         if (bCheckOtherObjectMechanism)
         { 
+            LogError("proc: CanAddToIvnentory(), the parameter"@bCanBePickedUp.ParamName@"is false");
             return false; 
         }       
     } 
@@ -154,7 +163,10 @@ function bool CanAddToIvnentory()
 function bool CanRemoveFromIvnentory()
 {
     if (HeldObject == none)
+    {
+        LogError("proc: CanRemoveFromIvnentory(), there is no object in the inventory");
         return false;
+    }
     else
         return true;
 }
@@ -175,7 +187,7 @@ function SetParamBool(name param, bool value, optional int priority=0)
     
     if (param=='RemoveAllObjects' || param=='RemoveObject')
         ClearInventory();
-    else if (param=='AddCheckingObject')
+    else if (param=='AddCheckingObject' || param=='FastAddObject')
         AddToIvnentory(CheckingObject);        
 }
     
@@ -191,11 +203,11 @@ function object GetParam(name param)
 
 function bool GetParamBool(name param)
 {
-    if (param=='CanAddToIvnentory')
+    if (param=='bCanAddToIvnentory' || param=='CanAddToIvnentory') 
     {
         return CanAddToIvnentory();
     } 
-    else if (param=='CanRemoveFromIvnentory')
+    else if (param=='bCanRemoveFromIvnentory' || param=='CanRemoveFromIvnentory')
     {
         return CanRemoveFromIvnentory();
     }  
@@ -220,8 +232,8 @@ defaultproperties
     MechanismParams.Add((ParamName="RemoveAllObjects", ParamType=ParamType_Boolean, ParamInfo="Bool. Write. Same as [RemoveAllObjects]."))
     MechanismParams.Add((ParamName="HeldObject", ParamType=ParamType_Object, ParamInfo="Object. Read. Get held object, that is currently held."))
     MechanismParams.Add((ParamName="CheckingObject", ParamType=ParamType_Object, ParamInfo="Object. Write. Set to an object which is check, whether it can be added to invetory."))
-    MechanismParams.Add((ParamName="CanAddToIvnentory", ParamType=ParamType_Boolean, ParamInfo="Bool. Read. Returns true if [CheckingObject] can be added to inventory, otherwise - false."))
-    MechanismParams.Add((ParamName="CanRemoveFromIvnentory", ParamType=ParamType_Boolean, ParamInfo="Bool. Read. Returns true if there is any object in inventory and it can be dropped down."))
+    MechanismParams.Add((ParamName="bCanAddToIvnentory", ParamType=ParamType_Boolean, ParamInfo="Bool. Read. Returns true if [CheckingObject] can be added to inventory, otherwise - false."))
+    MechanismParams.Add((ParamName="bCanRemoveFromIvnentory", ParamType=ParamType_Boolean, ParamInfo="Bool. Read. Returns true if there is any object in inventory and it can be dropped down."))
     MechanismParams.Add((ParamName="AddCheckingObject", ParamType=ParamType_Boolean, ParamInfo="Bool. Wrie. Add @CheckingObject to the inventory. The @CheckingObject should be set."))
     
     ParamSource.Add((ParamName="AddObject"))

@@ -37,7 +37,6 @@ function bool CheckBoxArea(actor a)
         a.Location.Y >= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).Y-CheckingBoxExtent.Y && a.Location.Y <= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).Y+CheckingBoxExtent.Y && 
         a.Location.Z >= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).Z-CheckingBoxExtent.Z && a.Location.Z <= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).Z+CheckingBoxExtent.Z)
     {
-        `log(GetObjectOffset(a));
         return true;
     }
     else
