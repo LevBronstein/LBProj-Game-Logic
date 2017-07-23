@@ -21,6 +21,8 @@ of the given array of actors @CheckingActors. Default is TRUE.
 WARNING: may be extremely slow!!!*/
 var(CheckingActors) bool bCheckAllActors; 
 
+var(CheckingActors) bool bCheckOnlyLBActors; 
+
 var(MechanismTick) bool bCheckEveryTick;
 
 /*A set of conditions, which should be correct for checking actor (ALL of them)
@@ -68,7 +70,7 @@ function PerfromTick(float dt)
 
 function bool CheckActorValidity(actor a)
 {
-    if (!TargetIsLBObject(a))
+    if (bCheckOnlyLBActors && !TargetIsLBObject(a))
     {
         LogError("proc: CheckActorValidity(), actor"@a@"is not valid LB-Object");
         return false;

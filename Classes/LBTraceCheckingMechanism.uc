@@ -25,9 +25,8 @@ enum TraceOriginModes
 
 var(TraceCheckingMechanismSystem) TraceOriginModes TraceOriginMode;
 var(TraceCheckingMechanismSystem) name RayTraceOriginSocket; //A socket in skeletal mesh of the owner, which should be used as a start of ray traces
+var(TraceCheckingMechanismSystem) float TraceStartOffset;
 var(TraceCheckingMechanismSystem) float MaxTraceLength;
-var(TraceCheckingMechanismSystem) bool bTraceExtent;
-var(TraceCheckingMechanismSystem) vector RayTraceExtent;
 
 var(PredefinedOrigin) vector PredefLoc;
 var(PredefinedOrigin) rotator PredefRot;
@@ -41,52 +40,74 @@ function bool CheckActor(actor a)
 function TraceInfo TraceRay(vector origin, vector target)
 {
     local TraceInfo hit;
+    local actor a;
+    local vector hitloc;
+    local vector hitnormal;
+    local vector dist;
     
-    hit.hitactor=parent.Trace(hit.hitloc, hit.hitnormal, target, origin);
-
+    local float mindist;
+    
+    mindist=MaxTraceLength;
+    hit.hitloc=target;
+    
+    foreach parent.TraceActors(class'Actor',a,hitloc,hitnormal,target,origin)
+    {
+        dist=hitloc-origin;
+        
+        if (CheckActorValidity(a))
+        {
+            if (VSize(dist)<=mindist)
+            {
+                if (a!=parent || (a==parent && bIncludeParent))
+                {
+                    mindist=VSize(dist);
+                    hit.hitactor=a;
+                    hit.hitloc=hitloc;
+                    hit.hitnormal=hitnormal;
+                }
+            }
+        }
+    }
+    
+    a=parent.Trace(hitloc, hitnormal, target, origin);
+    
     if (bShowDebugGraphics)
     {
         if (TargetIsLBObject(hit.hitactor))
             parent.DrawDebugLine(origin, hit.hitloc, 255, 0, 0);
-        else if (hit.hitactor!=none)
-            parent.DrawDebugLine(origin, hit.hitloc, 0, 255, 0);   
+        else if (hit.hitactor!=none || a!=none)
+            parent.DrawDebugLine(origin, hitloc, 0, 255, 0);   
         else 
             parent.DrawDebugLine(origin, target, 0, 0, 255);     
-    }
+    } 
 
     return hit;
 }
 
-function TraceInfo TraceRayExtent(vector origin, vector target, vector extent)
-{
-    local TraceInfo hit;
-    
-    hit.hitactor=parent.Trace(hit.hitloc, hit.hitnormal, target, origin, ,extent);
-
-    if (bShowDebugGraphics)
-    {
-        if (TargetIsLBObject(hit.hitactor))
-        {
-            parent.DrawDebugLine(origin, hit.hitloc, 255, 0, 0);
-            parent.DrawDebugLine(origin+extent, hit.hitloc+extent, 255, 0, 0);
-            parent.DrawDebugLine(origin-extent, hit.hitloc-extent, 255, 0, 0);
-        }
-        else if (hit.hitactor!=none)
-        {
-            parent.DrawDebugLine(origin, hit.hitloc, 0, 255, 0);  
-            parent.DrawDebugLine(origin+extent, hit.hitloc+extent, 0, 255, 0);  
-            parent.DrawDebugLine(origin-extent, hit.hitloc-extent, 0, 255, 0);
-        }
-        else 
-        {
-            parent.DrawDebugLine(origin, target, 0, 0, 255);  
-            parent.DrawDebugLine(origin+extent, target+extent, 0, 0, 255);
-            parent.DrawDebugLine(origin-extent, target-extent, 0, 0, 255);
-        }
-    }
-    
-    return hit;
-}
+//function TraceInfo TraceRaySimple(vector origin, vector target)
+//{
+//    local TraceInfo hit;
+//    
+//    hit.hitactor=parent.Trace(hit.hitloc, hit.hitnormal, target, origin);   
+//    
+//    if (!CheckActorValidity(hit.hitactor) || (hit.hitactor==parent && !bIncludeParent))
+//    {
+//        hit.hitactor=none;
+//        hit.hitloc=target;       
+//    }
+//    
+//    if (bShowDebugGraphics)
+//    {
+//        if (TargetIsLBObject(hit.hitactor))
+//            parent.DrawDebugLine(origin, hit.hitloc, 255, 0, 0);
+//        else if (hit.hitactor!=none)
+//            parent.DrawDebugLine(origin, hit.hitloc, 0, 255, 0);   
+//        else 
+//            parent.DrawDebugLine(origin, target, 0, 0, 255);     
+//    } 
+//
+//    return hit;
+//}
 
 function array<actor> GetActorsMatchingTrue()
 {
@@ -111,25 +132,21 @@ function array<actor> GetActorsMatchingTrue()
     {
         l=TransformCoords(PredefLoc,PredefLocCoords);
         r=PredefRot;
-        d=vect(0,0,1)>>r;
+        d=vect(1,0,0)>>parent.rotation+r;
         d=Normal(d);     
     }
     else
     {
         l=parent.Location;
-        d=vect(0,0,1)>>parent.Rotation;
+        d=vect(1,0,0)>>parent.Rotation;
         d=Normal(d);      
     }
 
-    if (bTraceExtent)
-        hit=TraceRayExtent(l, l+d*MaxTraceLength,RayTraceExtent);
-    else    
-        hit=TraceRay(l, l+d*MaxTraceLength);
+    hit=TraceRay(l+d*TraceStartOffset, l+d*MaxTraceLength);
     
     if (hit.hitactor!=none)
         arr.AddItem(hit.hitactor);
-        
-    //А если в себя попадёт?
+
     return arr;
 }
 
