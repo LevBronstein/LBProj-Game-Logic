@@ -6,6 +6,12 @@
  */
 class LBTraceCheckingMechanism extends LBGeomActorCheckingMechanism;
 
+struct TraceOrigin
+{
+    var vector origloc;
+    var vector origdir;
+};
+
 struct TraceInfo
 {
     var Actor hitactor;
@@ -109,40 +115,78 @@ function TraceInfo TraceRay(vector origin, vector target)
 //    return hit;
 //}
 
+function TraceOrigin GetTraceOrigin(TraceOriginModes originmode, optional vector pLoc, optional rotator pRot, optional CoordinateTypes pCoord)
+{
+    local TraceOrigin origin;
+    local LBPawn p;
+    local vector l, d; 
+    local rotator r;
+    
+    p=LBPawn(parent);
+    
+    if (p!=none && originmode==TraceOriginModes_PawnSocket)
+    {
+        if (p.Mesh.GetSocketWorldLocationAndRotation(RayTraceOriginSocket, l, r, 0)!=false)
+        {
+            //origin.origdir=vect(0,0,1)>>r;
+            origin.origloc=l;
+            origin.origdir=Vector(r);
+            //d=Normal(d);    
+        }    
+    }
+    else if (originmode==TraceOriginModes_PredefinedOrigin)
+    {
+        origin.origloc=TransformCoords(pLoc,pCoord);
+        origin.origdir=Vector(parent.rotation+pRot);
+        //d=Normal(d);     
+    }
+    else
+    {
+        origin.origloc=parent.Location;
+        origin.origdir=vector(parent.Rotation);   
+    }
+    
+    return origin;
+}
+
 function array<actor> GetActorsMatchingTrue()
 {
     local array<actor> arr;
+    
+    local TraceOrigin origin;
     
     local LBPawn p;
     local vector l, d; 
     local rotator r;
     local TraceInfo hit;
 
-    p=LBPawn(parent);
-    
-    if (p!=none && TraceOriginMode==TraceOriginModes_PawnSocket)
-    {
-        if (p.Mesh.GetSocketWorldLocationAndRotation(RayTraceOriginSocket, l, r, 0)!=false)
-        {
-            d=vect(0,0,1)>>r;
-            d=Normal(d);    
-        }    
-    }
-    else if (TraceOriginMode==TraceOriginModes_PredefinedOrigin)
-    {
-        l=TransformCoords(PredefLoc,PredefLocCoords);
-        r=PredefRot;
-        d=vect(1,0,0)>>parent.rotation+r;
-        d=Normal(d);     
-    }
-    else
-    {
-        l=parent.Location;
-        d=vect(1,0,0)>>parent.Rotation;
-        d=Normal(d);      
-    }
+    //p=LBPawn(parent);
+    //
+    //if (p!=none && TraceOriginMode==TraceOriginModes_PawnSocket)
+    //{
+    //    if (p.Mesh.GetSocketWorldLocationAndRotation(RayTraceOriginSocket, l, r, 0)!=false)
+    //    {
+    //        d=vect(0,0,1)>>r;
+    //        d=Normal(d);    
+    //    }    
+    //}
+    //else if (TraceOriginMode==TraceOriginModes_PredefinedOrigin)
+    //{
+    //    l=TransformCoords(PredefLoc,PredefLocCoords);
+    //    r=PredefRot;
+    //    d=vect(1,0,0)>>parent.rotation+r;
+    //    d=Normal(d);     
+    //}
+    //else
+    //{
+    //    l=parent.Location;
+    //    d=vect(1,0,0)>>parent.Rotation;
+    //    d=Normal(d);      
+    //}
 
-    hit=TraceRay(l+d*TraceStartOffset, l+d*MaxTraceLength);
+    origin=GetTraceOrigin(TraceOriginMode,PredefLoc,PredefRot,PredefLocCoords);
+
+    hit=TraceRay(origin.origloc+origin.origdir*TraceStartOffset, origin.origloc+origin.origdir*MaxTraceLength);
     
     if (hit.hitactor!=none)
         arr.AddItem(hit.hitactor);

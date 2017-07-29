@@ -54,7 +54,7 @@ function PeformActorMovement(float dt)
     if (bTickIndependent)
     {
         if (bUseSmoothMovement) 
-            spd=LinearInerpFloatValue(spd,ForwardSpeed,TickIndependentFloat(AccelRate, dt, MovementTimeScale),dt);
+            spd=LinearInerpFloatValue(spd,TickIndependentFloat(ForwardSpeed, dt, MovementTimeScale),TickIndependentFloat(AccelRate, dt, MovementTimeScale),dt);
         else
             spd=TickIndependentFloat(ForwardSpeed,dt,MovementTimeScale);    
     }

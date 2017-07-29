@@ -25,7 +25,7 @@ var(BoxArea) vector CheckingBoxExtent;
     
 function bool CheckSphereArea(actor a)
 {
-    if (VSize(a.Location-TransformCoords(CheckingAreaCenter,CheckingAreaCoords)) <= CheckingSphereRadius)
+    if (a!=none && VSize(a.Location-TransformCoords(CheckingAreaCenter,CheckingAreaCoords)) <= CheckingSphereRadius)
         return true;
     else
         return false;    
@@ -33,7 +33,8 @@ function bool CheckSphereArea(actor a)
 
 function bool CheckBoxArea(actor a)
 {
-    if (a.Location.X >= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).X-CheckingBoxExtent.X && a.Location.X <= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).X+CheckingBoxExtent.X && 
+    if (a!=none && 
+        a.Location.X >= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).X-CheckingBoxExtent.X && a.Location.X <= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).X+CheckingBoxExtent.X && 
         a.Location.Y >= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).Y-CheckingBoxExtent.Y && a.Location.Y <= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).Y+CheckingBoxExtent.Y && 
         a.Location.Z >= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).Z-CheckingBoxExtent.Z && a.Location.Z <= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).Z+CheckingBoxExtent.Z)
     {

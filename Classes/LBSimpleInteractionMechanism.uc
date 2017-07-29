@@ -19,6 +19,9 @@ struct LBSimpleReaction
 };
 
 var(InteractionList) array<LBSimpleInteraction> Interactions;
+var(InteractionRestraint) bool bCheckOtherObject;
+var(InteractionRestraint) LBConstTypedParamPtr OtherObjectCanInteract;
+var(InteractionRestraint) bool bOverrideParentActorInCanInteract;
 var(ReactionList) array<LBSimpleInteraction> Reactions;
 
 var actor TargetObject;
@@ -64,6 +67,39 @@ function bool CanInteract()
     {
         LogError("proc: CanInteract(), current interaction"@CurInteraction@"has no values to set");
         return false;    
+    }
+    
+    if (bCheckOtherObject)
+    {
+        if (bOverrideParentActorInCanInteract)
+        {
+            if (!TargetIsLBObject(TargetObject) || !TargetHasMechanism(TargetObject,OtherObjectCanInteract.MechanismName))
+            {
+                LogError("proc: CanInteract(), @TargetObject seems not capable of interaction: not an LBObject or does not have"@OtherObjectCanInteract.MechanismName@"mechanism");
+                return false;    
+            } 
+        
+            if (!GetTargetParamBool(TargetObject,OtherObjectCanInteract.MechanismName,OtherObjectCanInteract.ParamName)) 
+            {
+                LogError("proc: CanInteract(),the object"@OtherObjectCanInteract.ParentActor@"mechanism"@OtherObjectCanInteract.MechanismName@"param"@OtherObjectCanInteract.ParamName@"returns false");
+                return false;    
+            }   
+        }
+        else
+        {
+            if (!TargetIsLBObject(OtherObjectCanInteract.ParentActor) || !TargetHasMechanism(OtherObjectCanInteract.ParentActor,OtherObjectCanInteract.MechanismName))
+            {
+                LogError("proc: CanInteract(), @TargetObject seems not capable of interaction");
+                return false;    
+            } 
+            
+            if (!GetTargetParamBool(OtherObjectCanInteract.ParentActor,OtherObjectCanInteract.MechanismName,OtherObjectCanInteract.ParamName)) 
+            {
+                LogError("proc: CanInteract(),the object"@OtherObjectCanInteract.ParentActor@"mechanism"@OtherObjectCanInteract.MechanismName@"param"@OtherObjectCanInteract.ParamName@"returns false");
+                return false;    
+            } 
+        }
+       
     }
     
     for (i=0;i<Interactions[CurInteraction].Values.Length;i++)
@@ -260,6 +296,8 @@ defaultproperties
     
     MechanismParams.Add((ParamName="TargetObject", ParamType=ParamType_Object, ParamInfo="Object (Actor). Read, write. Gets or set @TargetObject, which is the counterpart of any interaction."))
     MechanismParams.Add((ParamName="CurentInteraction", ParamType=ParamType_Integer, ParamInfo="Integer. Read. Gets or sets @CurInteraction, which holds the id in interaction list."))
+    
+    OtherObjectCanInteract=(ParamType=ParamType_Boolean, MechanismName="Object_Info", ParamName="bCanInteract")
     
     ParamSource.Add((ParamName="TargetObject"))
     ParamSource.Add((ParamName="CurentInteraction"))

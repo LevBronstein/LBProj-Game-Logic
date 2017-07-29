@@ -476,6 +476,13 @@ function SetTargetParamRotator(actor target, name targetmech, name targetparam, 
     }
 }
 
+//Для установки нескольких парамтеров за раз
+//Аналогично SetParam..(..); SetParam..(..); SetParam..(..); только соблюдается атомарность транзакции
+function SetTargetMultiParam(actor target, name targetmech, name targetparam, rotator value, optional int priority=0)
+{
+    
+}
+
 function SetTargetParamContainer(actor target, name targetmech, name targetparam, LBParamContainer value, optional int priority=0)
 {
     switch (value.ParamType)

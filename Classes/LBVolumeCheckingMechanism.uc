@@ -46,7 +46,7 @@ function GetCheckingActors()
    
 function bool CustomActorCheck(actor a)
 {
-    if (VSize(a.Location-TransformCoords(CheckingAreaCenter,CheckingAreaCoords)) <= dError)
+    if (a!=none && VSize(a.Location-TransformCoords(CheckingAreaCenter,CheckingAreaCoords)) <= dError)
         return true;
     else
         return false;

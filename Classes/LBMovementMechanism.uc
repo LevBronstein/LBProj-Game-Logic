@@ -40,21 +40,42 @@ function PerformTick(float dt)
 
 function PerformMovement(float dt)
 {
-    if (LBActor(parent)!=none)
-        parent.SetLocation(parent.location+ForwardSpeed);
-    else if (LBPawn(parent)!=none)
-        parent.Velocity=ForwardSpeed;  
-    else if (LBSMPhysicsActor(parent)!=none)
-        LBSMPhysicsActor(parent).CollisionComponent.SetRBPosition(parent.Location+ForwardSpeed);
-    
+    if (bTickIndependent)
+    {
+        if (LBActor(parent)!=none)
+            parent.SetLocation(parent.location+TickIndependentVector(ForwardSpeed,dt,MovementTimeScale));
+        else if (LBPawn(parent)!=none)
+            parent.Velocity=TickIndependentVector(ForwardSpeed,dt,MovementTimeScale);  
+        else if (LBSMPhysicsActor(parent)!=none)
+            LBSMPhysicsActor(parent).CollisionComponent.SetRBPosition(parent.Location+TickIndependentVector(ForwardSpeed,dt,MovementTimeScale));
+    }
+    else
+    {
+        if (LBActor(parent)!=none)
+            parent.SetLocation(parent.location+ForwardSpeed);
+        else if (LBPawn(parent)!=none)
+            parent.Velocity=ForwardSpeed;  
+        else if (LBSMPhysicsActor(parent)!=none)
+            LBSMPhysicsActor(parent).CollisionComponent.SetRBPosition(parent.Location+ForwardSpeed);        
+    }
 }
 
 function PerformRotation(float dt)
 {    
-    if (LBActor(parent)!=none || LBPawn(parent)!=none)
-        parent.SetRotation(parent.Rotation+AngularSpeed);
-    else if (LBSMPhysicsActor(parent)!=none)
-        LBSMPhysicsActor(parent).CollisionComponent.SetRBRotation(parent.Rotation+AngularSpeed);
+    if (bTickIndependent)
+    {
+        if (LBActor(parent)!=none || LBPawn(parent)!=none)
+            parent.SetRotation(parent.Rotation+TickIndependentRotator(AngularSpeed,dt,RotationTimeScale));
+        else if (LBSMPhysicsActor(parent)!=none)
+            LBSMPhysicsActor(parent).CollisionComponent.SetRBRotation(parent.Rotation+TickIndependentRotator(AngularSpeed,dt,RotationTimeScale));
+    }
+    else
+    {
+        if (LBActor(parent)!=none || LBPawn(parent)!=none)
+            parent.SetRotation(parent.Rotation+AngularSpeed);
+        else if (LBSMPhysicsActor(parent)!=none)
+            LBSMPhysicsActor(parent).CollisionComponent.SetRBRotation(parent.Rotation+AngularSpeed);
+    }
 }
 
 //function GetParameters()
