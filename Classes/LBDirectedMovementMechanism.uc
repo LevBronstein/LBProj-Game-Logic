@@ -55,6 +55,8 @@ function SetParamFloat(name param, float value, optional int priority=0)
     
     if (param=='ForwardSpeed' || param== 'FwdSpeed')
         ForwardSpeed=value; 
+    else if (param=='kForwardSpeed' || param== 'kFwdSpeed')
+        kForwardSpeed=value; 
     else if (param=='MoveDirection-Yaw' || param== 'MoveDir-Yaw')
         MoveDirection.Yaw=value*DegToUnrRot;
     else if (param=='MoveDirection-Pitch' || param== 'MoveDir-Pitch')

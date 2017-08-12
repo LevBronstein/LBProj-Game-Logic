@@ -11,7 +11,7 @@ enum ActionTypes
     ActionTypes_SartStopWithAnim, //Action starts when animation starts, ends when animation ends, returns to default action
     ActionTypes_LoopWithAnim, //Action starts when animation starts, stops when interrupted or deactivated (for looped or continious)
     ActionTypes_SartStopByNotify,  //Action starts when animnotify_start is reached, stops, when animnotify_stop is reached
-    ActionTypes_ContiniousOrNoAnim, //Action is performed after activation undefined time or has no or default animation
+    ActionTypes_ContiniousOrNoAnim, //Action is performed after activation undefined time or has default animation
 };
 
 enum InterruptTypes
@@ -210,6 +210,9 @@ function UpdateAnimationNodes(LBCharActionInfo actioninfo)
     local int i,j;
     local AnimNode anim;
      
+    //if (actioninfo.ActionType==ActionTypes_ContiniousOrNoAnim)
+    //    return;
+    
     for (i=0;i<blendbyactionnodes.Length;i++)
     {
         for (j=0;j<blendbyactionnodes[i].Children.Length;j++)
@@ -222,10 +225,11 @@ function UpdateAnimationNodes(LBCharActionInfo actioninfo)
                 //AnimNodeSequence(anim).PlayAnim(actioninfo.bLoopActionAnim,actioninfo.ActionAnimPlayRate,actioninfo.ActionAnimPlayPos); 
                 curanim=anim;
                 //по умолчанию не трогаем -- там всё само регулируеются   
-                if (actioninfo.ActionName != 'Default')
-                {
+                //if (actioninfo.ActionName != 'Default')
+                //{
+                if (actioninfo.ActionType!=ActionTypes_ContiniousOrNoAnim)
                     anim.PlayAnim(actioninfo.bLoopActionAnim,actioninfo.ActionAnimPlayRate,actioninfo.ActionAnimPlayPos); //не нужно сразу проигрывать! просто перемотать время на 0.0, установить скорость а может и нет  
-                }
+                //}
                 //anim.PlayAnim();
             }
         }  
@@ -443,7 +447,7 @@ defaultproperties
 {
     mechname="Basic_Character_Controller"    
     
-    defaultaction=(ActionCode=-1, ActionName="Default", bAllowMovement=TRUE)
+    defaultaction=(ActionCode=-1, ActionName="Default", ActionType=ActionTypes_ContiniousOrNoAnim, bAllowMovement=TRUE)
     
     MechanismParams.Add((ParamName="CurAction", ParamType=ParamType_Integer, ParamInfo="Integer. Read. Gets currently performed action."))
     MechanismParams.Add((ParamName="BeginAction", ParamType=ParamType_Integer, ParamInfo="Integer. Write. Sets the number of an action from action list, wich should be executed.")) 

@@ -7,7 +7,17 @@
 class LBDirectedPhysImpulseMechanism extends LBDirectedMovementMechanism;
 
 var (PhysicalMovement) bool bIgnorantMovement;
-//var (PhysicalMovementDirection) 
+var (PhysicalMovement) bool bKeepLocationWhenNotMoving;
+
+var bool bwasmovinglasttick;
+var vector lastloc;
+
+function InitMechanism()
+{
+    super.InitMechanism();
+ 
+    lastloc=parent.location;
+}
 
 function PerformMovement(float dt)
 {    
@@ -16,14 +26,14 @@ function PerformMovement(float dt)
     
     if (bIgnorantMovement)
     {
+        v=ForwardSpeed*kForwardSpeed*Vector(MoveDirection);
+        
         if (LBSMPhysicsActor(parent)!=none)
-        {
-            v=ForwardSpeed*kForwardSpeed*Vector(MoveDirection);
+        { 
             LBSMPhysicsActor(parent).CollisionComponent.SetRBPosition(parent.location+v);
         }
         if (LBSKMPhysicsActor(parent)!=none)
         {
-            v=ForwardSpeed*kForwardSpeed*Vector(MoveDirection);
             LBSKMPhysicsActor(parent).CollisionComponent.SetRBPosition(parent.location+v);    
         }
             
@@ -32,18 +42,19 @@ function PerformMovement(float dt)
     }
     else
     {
+        v=ForwardSpeed*kForwardSpeed*Vector(MoveDirection);  
+        
         if (LBSMPhysicsActor(parent)!=none)
         {
-            v=ForwardSpeed*kForwardSpeed*Vector(MoveDirection);
             c=LBSMPhysicsActor(parent).CollisionComponent;
-            c.AddImpulse(v);
         }
+        
         if (LBSKMPhysicsActor(parent)!=none)
         {
-            v=ForwardSpeed*kForwardSpeed*Vector(MoveDirection);
-            c=LBSKMPhysicsActor(parent).CollisionComponent;
-            c.AddImpulse(v);     
+            c=LBSKMPhysicsActor(parent).CollisionComponent;     
         }
+        
+        c.AddImpulse(v);
         
         if (bShowDebugGraphics)
             DGDisplayComponentSpeedVector(c, v);
@@ -55,6 +66,7 @@ function PerformMovement(float dt)
 
 function PerformRotation(float dt)
 {
+    //Super.PerformRotation(dt);
     //parent.CollisionComponent.AddTorque(vector(MoveDirection));    
 }
 

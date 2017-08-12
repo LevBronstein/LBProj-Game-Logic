@@ -9,23 +9,6 @@ class LBFloatingMovementMechanism extends LBTransposeMechanism;
 var(FloatingMovement) float FloatAttidtudeZ; //A desired height
 var(FloatingMovement) float LinearSpeed;
 var(FloatingMovement) float kLinearSpeed;
-var(FloatingMovement) rotator FloatRotation;
-var(FloatingMovement) float kFloatRotation;
-
-var(MechanismDebug) bool bShowDebugLines;
-
-//event OwnerTick(float deltatime)
-//{
-//    super.OwnerTick(deltatime);
-//    
-//    if(benabled==false)
-//        return;
-//    
-//    if (bUseParamSource)
-//        GetParameters();
-//          
-//    PerformMovement(deltatime);  
-//}
 
 function PerformMovement(float dt)
 {
@@ -46,31 +29,18 @@ function PerformMovement(float dt)
         //paertn.Velocity=normal(v)*ForwardSpeed*kForwardSpeed; 
     }  
     
-    if (bShowDebugLines)
+    if (bShowDebugGraphics)
     {
         parent.DrawDebugSphere(targetloc, 64, 16, 255, 0, 0);
         parent.DrawDebugLine(parent.location + vect(0,0,32), targetloc, 255, 0, 0);
     }
 }
 
-function PerformRotation(float dt)
-{
-    parent.SetRotation(parent.Rotation+FloatRotation*kFloatRotation);    
-}
-
-function SetParamBool(name param, bool value, optional int priority=0)
-{
-    if (param=='bEnabled')
-        bEnabled=value;
-}
     
 
 defaultproperties
 {
     FloatAttidtudeZ=0
-    LinearSpeed=0.15
-    kLinearSpeed=1.0
-    kFloatRotation=1
     
     mechname="Floating_Movement"
 }

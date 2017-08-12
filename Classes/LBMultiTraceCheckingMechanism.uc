@@ -36,7 +36,6 @@ function array<actor> GetActorsMatchingTrue()
     
     if (maintrace.Length!=0)
     {
-        `log("no aux traces"@maintrace.Length@maintrace[0]);
         return maintrace; 
     }
     
@@ -70,7 +69,6 @@ function array<actor> GetActorsMatchingTrue()
     
     maintrace.AddItem(hit.hitactor);
     
-    `log("aux traces"@maintrace.Length@maintrace[0]);
     return maintrace;
 }
 
