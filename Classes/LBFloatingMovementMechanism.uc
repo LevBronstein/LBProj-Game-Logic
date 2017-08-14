@@ -4,43 +4,51 @@
  *  Creation date: 22.12.2016 21:01
  *  Copyright 2016, Windows7
  */
-class LBFloatingMovementMechanism extends LBTransposeMechanism;
+class LBFloatingMovementMechanism extends LBDirectedMovementMechanism;
 
-var(FloatingMovement) float FloatAttidtudeZ; //A desired height
-var(FloatingMovement) float LinearSpeed;
-var(FloatingMovement) float kLinearSpeed;
+var(FloatingMovement) float AttitudeZ;
+var(FloatingMovement) float MaxSpeedZ;
 
-function PerformMovement(float dt)
+function PerformMovement(float dt) 
 {
     local vector v;
-    local vector targetloc;
-      
-    v=vect(0,0,0); 
-    targetloc=parent.Location;
-    targetloc.Z=FloatAttidtudeZ;
-
-    v=targetloc-parent.location;
-    
-    if (vsize(v)>=kLinearSpeed*LinearSpeed) //дистаниця нулевая - не работает (дергается)!!!
+    `log(AttitudeZ);
+    if (LBSMPhysicsActor(parent)!=none || LBSKMPhysicsActor(parent)!=none)
     {
-        v=normal(v);
+        v=ForwardSpeed*kForwardSpeed*Vector(MoveDirection);
         
-        parent.MoveSmooth(normal(v)*LinearSpeed*kLinearSpeed);
-        //paertn.Velocity=normal(v)*ForwardSpeed*kForwardSpeed; 
-    }  
-    
-    if (bShowDebugGraphics)
+        if (parent.Location.z < AttitudeZ || parent.Location.z > AttitudeZ)
+        {
+            v.z=Fclamp(AttitudeZ-parent.Location.z,-MaxSpeedZ,MaxSpeedZ);
+        }
+        `log(v);    
+        parent.CollisionComponent.SetRBLinearVelocity(v); 
+    }
+    else
     {
-        parent.DrawDebugSphere(targetloc, 64, 16, 255, 0, 0);
-        parent.DrawDebugLine(parent.location + vect(0,0,32), targetloc, 255, 0, 0);
+        super.PerformMovement(dt);
     }
 }
 
+function SetParamFloat(name param, float value, optional int priority=0)
+{
+    super.SetParamFloat(param, value, priority);
     
+    if (param=='AttitudeZ' || param== 'Attitude-Z')
+        AttitudeZ=value;  
+}
+    
+function float GetParamFloat(name param)
+{
+    if (param=='AttitudeZ' || param== 'Attitude-Z')
+    {
+        return AttitudeZ;
+    }
+    else
+        return super.GetParamFloat(param);    
+}  
 
 defaultproperties
 {
-    FloatAttidtudeZ=0
-    
-    mechname="Floating_Movement"
+    MaxSpeedZ=100;
 }

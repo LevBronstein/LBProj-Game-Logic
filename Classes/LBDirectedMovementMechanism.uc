@@ -26,7 +26,19 @@ function PerformMovement(float dt)
         parent.Velocity=v;
     }
     
-     if (bShowDebugGraphics)
+    if (LBSMPhysicsActor(parent)!=none)
+    { 
+        v=ForwardSpeed*kForwardSpeed*Vector(MoveDirection);
+        parent.CollisionComponent.SetRBLinearVelocity(v);
+    }
+    
+    if (LBSKMPhysicsActor(parent)!=none)
+    {
+        v=ForwardSpeed*kForwardSpeed*Vector(MoveDirection);
+        parent.CollisionComponent.SetRBLinearVelocity(v);    
+    }
+    
+    if (bShowDebugGraphics)
         DGDisplaySpeedVector(parent, v);      
 }
 
