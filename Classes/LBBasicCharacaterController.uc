@@ -43,7 +43,9 @@ struct LBCharActionInfo
     var(Animation) float ActionAnimPlayRate;
     var(Animation) float ActionAnimPlayPos;
     var(Animation) float ActionAnimBlendTime;
-        
+    
+    // var(ActionConditions) CustomConditionMet
+    
     structdefaultproperties
     {
         SwitchToAction=-1

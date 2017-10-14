@@ -4,40 +4,14 @@
  *  Creation date: 14.07.2017 14:09
  *  Copyright 2017, Win10
  */
-class LBTargetedCameraModifier extends LBTransposeMechanism;
-
-enum LBTargetCameraModes
-{
-    LBTargetCameraModes_TargetPoint,
-    LBTargetCameraModes_TargetActor,
-};
-
-var (LBTargetedCamera) LBTargetCameraModes CameraTargetMode;
-var (LBTargetedCamera) Actor TargetActor;
-var (LBTargetedCamera) vector TargetPoint;
+class LBThirdPersonCameraModifier extends LBTargetCameraModifier;
 
 var (LBTargetedCameraOffset) vector LocationOffset;
-var (LBTargetedCameraOffset) vector TargetOffset;
 var (LBTargetedCameraOffset) rotator RotationOffset;
 
 var (LBTargetedCameraMovement) vector TruckSpeed;
 var (LBTargetedCameraMovement) rotator OrbitSpeed;
 
-function vector CalcTargetLocation()
-{
-    local vector p;
-    
-    if (CameraTargetMode == LBTargetCameraModes_TargetPoint)
-    {
-        p=TargetPoint+TargetOffset;
-    }
-    else
-    {
-        p = TargetActor.Location+TargetOffset;
-    }   
-    
-    return p;    
-}
 
 function vector CalcCameraLocation(vector target)
 {
@@ -46,17 +20,6 @@ function vector CalcCameraLocation(vector target)
     l=GetOrientedLocation(LocationOffset,RotationOffset,target);
 
     return l;
-}
-
-function rotator CaclCameraRotation(vector target)
-{
-    local vector v;
-    local rotator r;    
- 
-    v=(target-parent.Location);
-    r=rotator(v);
-    
-    return r;   
 }
 
 function UpdateOffset(float dt)
@@ -78,7 +41,7 @@ function PerfromTick(float dt)
     
     super.PerfromTick(dt); 
 }
-
+    
 function PerformMovement(float dt)
 {
     local vector t;
@@ -90,60 +53,13 @@ function PerformMovement(float dt)
     parent.SetLocation(l);
 }
 
-function PerformRotation(float dt)
-{
-    local vector t;
-    local rotator r; 
- 
-    t=CalcTargetLocation();
-    r=CaclCameraRotation(t);
-    
-    parent.SetRotation(r);
-}
-
 function ChangeTargetActor(actor a)
 {
 }
 
-function SetParam(name param, object value, optional int priority=0)
-{
-    if (param == 'TargetActor')
-    {
-        TargetActor = Actor(value);
-    }
-}
-
 function float GetParamFloat(name param)
 {
-    if (param == 'DistanceToTarget')
-    {
-        return 0;
-    }
-    else if (param == 'Location-X')
-    {
-        return parent.Location.X;
-    }
-    else if (param == 'Location-Y')
-    {
-        return parent.Location.Y;
-    }
-    else if (param == 'Location-Z')
-    {
-        return parent.Location.Z;
-    }
-    else if (param == 'Rotation-X')
-    {
-        return parent.Rotation.Yaw * UnrRotToDeg;
-    }
-    else if (param == 'Rotation-Y')
-    {
-        return parent.Rotation.Pitch * UnrRotToDeg;
-    }
-    else if (param == 'Rotation-Z')
-    {
-        return parent.Rotation.Roll * UnrRotToDeg;
-    }
-    else if (param == 'RotationOffset-X')
+    if (param == 'RotationOffset-X')
     {
         return RotationOffset.Yaw * UnrRotToDeg;
     }
@@ -191,6 +107,10 @@ function float GetParamFloat(name param)
     {
         return OrbitSpeed.Roll * UnrRotToDeg; 
     }
+    else
+    {
+        return super.GetParamFloat(param);    
+    }
 }
 
 function SetParamFloat(name param, float value, optional int priority=0)
@@ -198,47 +118,7 @@ function SetParamFloat(name param, float value, optional int priority=0)
     local vector v;
     local rotator r;
         
-    if (param == 'DistanceToTarget')
-    {
-        //what?!
-    }
-    else if (param == 'Location-X')
-    {
-        v = parent.Location;
-        v.X = value;
-        parent.SetLocation(v);
-    }
-    else if (param == 'Location-Y')
-    {
-        v = parent.Location;
-        v.Y = value;
-        parent.SetLocation(v);
-    }
-    else if (param == 'Location-Z')
-    {
-        v = parent.Location;
-        v.Z = value;
-        parent.SetLocation(v);
-    }
-    else if (param == 'Rotation-X')
-    {
-        r = parent.Rotation;
-        r.Yaw = value * DegToUnrRot;
-        parent.SetRotation(r);
-    }
-    else if (param == 'Rotation-Y')
-    {
-        r = parent.Rotation;
-        r.Pitch = value * DegToUnrRot;
-        parent.SetRotation(r);
-    }
-    else if (param == 'Rotation-Z')
-    {
-        r = parent.Rotation;
-        r.Roll = value * DegToUnrRot;
-        parent.SetRotation(r);
-    }
-    else if (param == 'RotationOffset-X')
+    if (param == 'RotationOffset-X')
     {
         RotationOffset.Yaw = value * DegToUnrRot;
     }
@@ -286,22 +166,10 @@ function SetParamFloat(name param, float value, optional int priority=0)
     {
         OrbitSpeed.Roll = value * DegToUnrRot; 
     }
-}
-
-function SetParamVector(name param, vector value, optional int priority=0)
-{
-    if (param == 'TargetPoint')
+    else 
     {
-        TargetPoint = value;
+        super.SetParamFloat(param, value, priority);
     }
-    else if (param == 'LocationOffset')
-    {
-        LocationOffset = value;
-    }
-    //else if (param == 'Location')
-    //{
-    //    SetLocation(value);
-    //}
 }
 
 function SetParamRotator(name param, rotator value, optional int priority=0)
@@ -314,17 +182,17 @@ function SetParamRotator(name param, rotator value, optional int priority=0)
 
 function vector GetParamVector(name param)
 {
-    if (param == 'TargetPoint')
-    {
-        return TargetPoint;
-    }
-    else if (param == 'LocationOffset')
+    if (param == 'LocationOffset')
     {
         return LocationOffset;
     }
     else if (param == 'Location')
     {
         return parent.Location;
+    }
+    else
+    {
+        return super.GetParamVector(param); 
     }
 }
 
@@ -338,9 +206,13 @@ function rotator GetParamRotator(name param)
     {
         return parent.Rotation;    
     }
+    else
+    {
+        return super.GetParamRotator(param); 
+    }
 }
 
 defaultproperties
 {
-    mechname="Targeted_Camera_Modifier"
+    mechname="ThirdPerson_Camera_Modifier"
 }
