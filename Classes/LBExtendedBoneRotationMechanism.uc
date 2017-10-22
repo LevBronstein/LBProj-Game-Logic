@@ -71,31 +71,52 @@ function Rotator GetTargetRotation()
             if (0<=f2*unrrottodeg && f2*unrrottodeg<=180)
             {
                 //`log("r="@r.Yaw*unrrottodeg@"f1="@f1*unrrottodeg@"f2="@f2*unrrottodeg@"res="@fclamp(r.Yaw,min(f1,f2),max(f1,f2))*unrrottodeg);
-                `log("case 1");
-                r.Yaw=fclamp(r.Yaw,min(f1,f2),max(f1,f2));    
+                //`log("case 1");
+                if (0<r.Yaw && r.Yaw<=f1)
+                {
+                    r.Yaw=f1;     
+                }
+                    
+                if (f2<=r.Yaw && r.Yaw<180*degtounrrot)
+                {
+                    r.Yaw=f2;    
+                }  
+               
+                if (-180*degtounrrot<=r.Yaw && r.Yaw<=0)
+                {
+                    if ((-r.Yaw)+f1 <= (r.Yaw-(-180)*degtounrrot)+(180*degtounrrot-f2))    
+                        r.Yaw=f1; 
+                    else 
+                        r.Yaw=f2;    
+                }
             }
             else
             {
-               // `log("case 2");
-                 //`log("r="@r.Yaw*unrrottodeg@"f1="@f1*unrrottodeg@"f2="@f2*unrrottodeg);
-                if (!((f1<=r.Yaw && r.Yaw<=180*degtounrrot) || (-180*degtounrrot<=r.Yaw && r.Yaw<=f2)))
+                //`log("case 2");
+                if (f2<=r.Yaw && r.Yaw<0)
                 {
-                    if (abs(r.Yaw-f1) < abs(r.Yaw-f2))
-                        r.Yaw=f1;
-                    else
-                        r.Yaw=f2;
-                }        
-                //`log("res="@r.Yaw*unrrottodeg);    
-                //r.Yaw=fclamp(r.Yaw,f1,f2+360*degtounrrot);       
+                    if ((-r.Yaw)+f1 <= r.Yaw-f2)    
+                        r.Yaw=f1; 
+                    else 
+                        r.Yaw=f2;       
+                }
+                    
+                if (0<=r.Yaw && r.Yaw<=f1)
+                {
+                    if (f1-r.Yaw < r.Yaw+(-f2))    
+                        r.Yaw=f1; 
+                    else 
+                        r.Yaw=f2;    
+                }  
             }
         }
         else
         {
-            //`log("case 3");
-            //`log("r="@r.Yaw*unrrottodeg@"f1="@f1*unrrottodeg@"f2="@f2*unrrottodeg);
             if (0<=f2*unrrottodeg && f2*unrrottodeg<=180) 
             {
-                if (f2<r.Yaw && r.Yaw<=180*degtounrrot)
+                //`log("case 3");
+                //`log("r="@r.Yaw*unrrottodeg@"f1="@f1*unrrottodeg@"f2="@f2*unrrottodeg);
+                if (f2<=r.Yaw && r.Yaw<=180*degtounrrot)
                 {
                     if ((180*degtounrrot-r.Yaw)+(f1-(-180)*degtounrrot) < r.Yaw-f2)    
                         r.Yaw=f1; 
@@ -103,21 +124,38 @@ function Rotator GetTargetRotation()
                         r.Yaw=f2;       
                 }
                     
-                if (-180*degtounrrot<=r.Yaw && r.Yaw<f1)
+                if (-180*degtounrrot<r.Yaw && r.Yaw<=f1)
                 {
                     if (r.Yaw-f1 < (r.Yaw-(-180)*degtounrrot)+(180*degtounrrot-f2))    
                         r.Yaw=f1; 
                     else 
                         r.Yaw=f2;    
                 }
-                    `log("res="@r.Yaw*unrrottodeg);
+                    //`log("res="@r.Yaw*unrrottodeg);
             }
             else
             {
-                `log("case 4");
-                r.Yaw=fclamp(r.Yaw,min(f1,f2),max(f1,f2));
-            }
-            //r.Yaw=parent.rotation.Yaw;     
+                //`log("case 4");
+                //`log("r="@r.Yaw*unrrottodeg@"f1="@f1*unrrottodeg@"f2="@f2*unrrottodeg@"res="@fclamp(r.Yaw,min(f1,f2),max(f1,f2))*unrrottodeg);
+                if (f2<r.Yaw && r.Yaw<=0)
+                {
+                    r.Yaw=f2;     
+                }
+                    
+                if ((-180)*degtounrrot<=r.Yaw && r.Yaw<f1) 
+                {
+                    r.Yaw=f1;    
+                }  
+               
+                if (0<r.Yaw && r.Yaw<=180*degtounrrot)
+                {
+                    if ((f1-(-180)*degtounrrot)+(180*degtounrrot-r.Yaw) < r.Yaw+(-f2))    
+                        r.Yaw=f1; 
+                    else 
+                        r.Yaw=f2;    
+                }
+                //`log("res="@r.Yaw*unrrottodeg);
+            }   
         }
         
         //r.Yaw=fclamp(r.Yaw,min(f1,f2),max(f1,f2));
