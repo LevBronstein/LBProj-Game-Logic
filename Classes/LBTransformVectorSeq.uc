@@ -10,17 +10,28 @@ var vector coordsys;
 var vector value;
 var vector result;
 
+var() bool bInputInDegs;
+
 event Activated()
 {
     local vector X, Y, Z;
     local rotator r;
     
-    r.Yaw=coordsys.X*degtounrrot;
-    r.Pitch=coordsys.Y*degtounrrot;
-    r.Roll=coordsys.Z*degtounrrot;
+    if (bInputInDegs)
+    {
+        r.Yaw=coordsys.X*degtounrrot;
+        r.Pitch=coordsys.Y*degtounrrot;
+        r.Roll=coordsys.Z*degtounrrot;
+    }
+    else
+    {
+        r.Yaw=coordsys.X;
+        r.Pitch=coordsys.Y;
+        r.Roll=coordsys.Z;
+    }
     
     GetAxes(r,X,Y,Z);
-    //`log("Coordsys (rotator)"@r*unrrottodeg);
+    //`log("Coordsys (rotator)"@coordsys*unrrottodeg);
     
     result=value.X*X+value.Y*Y+value.Z*Z;
 }
@@ -28,6 +39,8 @@ event Activated()
 defaultproperties
 {
     bCallHandler=false
+    
+    bInputInDegs=true
     
     ObjName="Transform Vector"
     ObjCategory="LevBronstein Utils"

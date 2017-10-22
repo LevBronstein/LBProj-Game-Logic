@@ -11,6 +11,11 @@ function PerfromTick(float dt)
     super.PerfromTick(dt);
 }
 
+function SetSkelcontrolRotation()
+{
+    
+}
+
 defaultproperties
 {
 }

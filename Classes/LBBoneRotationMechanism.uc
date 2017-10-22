@@ -6,18 +6,29 @@
  */
 class LBBoneRotationMechanism extends LBSkeletalMeshControlMechanism;
 
-var(BoneRotationMechanism) bool bApplyYaw;
-var(BoneRotationMechanism) bool bApplyPitch;
-var(BoneRotationMechanism) bool bApplyRoll;
+struct LBCoordBasis
+{
+    var() vector X;
+    var() vector Y;
+    var() vector Z;    
+};
+
+var(BoneRotation) bool bApplyYaw;
+var(BoneRotation) bool bApplyPitch;
+var(BoneRotation) bool bApplyRoll;
 
 var(BoneRotationMechanismSystem) Name BoneRotationController; //Which controller to use for the rotation
 var(BoneRotationMechanismSystem) bool bTranslateFromDegToUnrrot; //Set to true when all input data is given in degrees
+
+var(BoneRotationCoords) LBCoordBasis LocalCoords;
 
 var(MovementSynchronization) bool bTickIndependent;
 var(MovementSynchronization) float MovementTimeScale; //A value, x, which affects 1/x (unit / second) ratio
 var(MovementSynchronization) float RotationTimeScale;
 
-var(BoneRotation) float AngularSpeed;
+var(BoneRotationSpeed) bool bSmoothRotation;
+var(BoneRotationSpeed) float AngularSpeed;
+
 var(BoneRotation) rotator TargetRotation;
 
 var SkelControlSingleBone bonecontroller;
@@ -43,22 +54,28 @@ function PerfromTick(float dt)
     super.PerfromTick(dt);
 
     PerformRotation(dt); 
+    DGDisplayBoneRotation();
+}
+
+function rotator GetTargetRotation()
+{
+    //`log(TargetRotation*unrrottodeg);
+    return TargetRotation;
 }
 
 function float RotateYaw(float dt)
 {
     local float crot,trot,rrot;
     
-    if (bTranslateFromDegToUnrrot)
-        trot=TargetRotation.Yaw;
+    trot=GetTargetRotation().Yaw;
+
+    crot=currot.Yaw;    
+
+    if (bSmoothRotation)
+        rrot=LinearInterpAngle(crot,trot,TickIndependentFloat(AngularSpeed,dt,RotationTimeScale),dt);
     else
-        trot=TargetRotation.Yaw * UnrRotToDeg;
-     
-    trot=NormalizeDegAngle(trot);
-
-    crot=currot.Yaw*unrrottodeg;    
-
-    rrot=LinearInterpAngle(crot,trot,TickIndependentFloat(AngularSpeed,dt,RotationTimeScale),dt);
+        rrot=trot;
+        
     return rrot;   
 }
 
@@ -66,33 +83,31 @@ function float RotatePitch(float dt)
 {
     local float crot,trot,rrot;
     
-    if (bTranslateFromDegToUnrrot)
-        trot=TargetRotation.Pitch;
-     else
-        trot=TargetRotation.Pitch * UnrRotToDeg;
-                        
-    trot=NormalizeDegAngle(trot);
+    trot=GetTargetRotation().Pitch;
 
-    crot=currot.Pitch*unrrottodeg;    
+    crot=currot.Pitch;    
 
-    rrot=LinearInterpAngle(crot,trot,TickIndependentFloat(AngularSpeed,dt,RotationTimeScale),dt);
+    if (bSmoothRotation)
+        rrot=LinearInterpAngle(crot,trot,TickIndependentFloat(AngularSpeed,dt,RotationTimeScale),dt);
+    else
+        rrot=trot;
+    
     return rrot;   
 }
 
 function float RotateRoll(float dt)
 {
     local float crot,trot,rrot;
-    
-    if (bTranslateFromDegToUnrrot)
-        trot=TargetRotation.Roll;
-     else
-        trot=TargetRotation.Roll * UnrRotToDeg;
                         
-    trot=NormalizeDegAngle(trot);
+    trot=GetTargetRotation().Roll;
 
-    crot=currot.Roll*unrrottodeg;    
+    crot=currot.Roll;    
 
-    rrot=LinearInterpAngle(crot,trot,TickIndependentFloat(AngularSpeed,dt,RotationTimeScale),dt);
+    if (bSmoothRotation)
+        rrot=LinearInterpAngle(crot,trot,TickIndependentFloat(AngularSpeed,dt,RotationTimeScale),dt);
+    else 
+        rrot=trot;
+    
     return rrot;   
 }
 
@@ -102,19 +117,28 @@ function PerformRotation(float dt)
     {
         if (bApplyYaw)
         {
-            currot.Yaw=RotateYaw(dt)*degtounrrot;
+            currot.Yaw=RotateYaw(dt);
         }
         if (bApplyPitch)
         {
-            currot.Pitch=RotatePitch(dt)*degtounrrot;
+            currot.Pitch=RotatePitch(dt);
         }    
         if (bApplyRoll)
         {
-            currot.Roll=RotateRoll(dt)*degtounrrot;
+            currot.Roll=RotateRoll(dt);
         }   
          
         bonecontroller.BoneRotation=currot;    
     }
+}
+
+function DGDisplayBoneRotation()
+{
+
+    
+    //r=OrthoRotation(X,Y,Z);
+    
+    //parent.DrawDebugLine(parent.Location+vect(0,0,96),parent.Location+vector(r)*128+vect(0,0,96),128,128,128); 
 }
 
 function SetParamFloat(name param, float value, optional int priority=0)
@@ -164,6 +188,21 @@ function float NormalizeDegAngle(float ang)
         v=v+360;    
         
     return v;
+}
+
+function float NormalizeDegAngleByValue(int degangle, int value)
+{ 
+    return ((degangle * unrrottodeg) % value + value)*degtounrrot;
+}
+
+function float UnfoldDegAngle(float ang)
+{
+    local float a;
+
+    a=ang;
+    
+    //if (a<-180)
+    //a=NormalizeRotAxis(ang)*unrrottodeg; //[-180,180]    
 }
 
 function float LinearInterpAngle(float current, float target, float step, float dt)
@@ -230,6 +269,8 @@ defaultproperties
     bApplyYaw=true
     bApplyPitch=true
     bApplyRoll=true
+    
+    LocalCoords=(X=(X=1,Y=0,Z=0),Y=(X=0,Y=1,Z=0),Z=(X=0,Y=0,Z=1))
     
     bTranslateFromDegToUnrrot=true
     
