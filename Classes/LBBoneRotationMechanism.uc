@@ -6,21 +6,25 @@
  */
 class LBBoneRotationMechanism extends LBSkeletalMeshControlMechanism;
 
-struct LBCoordBasis
+struct RotationRestraint
 {
-    var() vector X;
-    var() vector Y;
-    var() vector Z;    
+    var() bool bUseRestraint;
+    var() float MinValueDeg <editcondition=bUseRestraint>;
+    var() float MaxValueDeg <editcondition=bUseRestraint>;    
 };
 
 var(BoneRotation) bool bApplyYaw;
 var(BoneRotation) bool bApplyPitch;
 var(BoneRotation) bool bApplyRoll;
 
+var(BoneRotationCoords) RotatorResolver BoneRotationResolver;
+
+var(BoneRotationRestraint) RotationRestraint YawRestraint; 
+var(BoneRotationRestraint) RotationRestraint PitchRestraint; 
+var(BoneRotationRestraint) RotationRestraint RollRestraint; 
+
 var(BoneRotationMechanismSystem) Name BoneRotationController; //Which controller to use for the rotation
 var(BoneRotationMechanismSystem) bool bTranslateFromDegToUnrrot; //Set to true when all input data is given in degrees
-
-var(BoneRotationCoords) LBCoordBasis LocalCoords;
 
 var(MovementSynchronization) bool bTickIndependent;
 var(MovementSynchronization) float MovementTimeScale; //A value, x, which affects 1/x (unit / second) ratio
@@ -254,6 +258,118 @@ function float LinearInterpAngle(float current, float target, float step, float 
     return value;
 }
 
+function int ClampRotatorAxis(int axisvalue, int min, int max)
+{
+    local int r,f1,f2;
+    
+    f1=NormalizeRotAxis(min);
+    f2=NormalizeRotAxis(max);
+    
+    r=NormalizeRotAxis(axisvalue);
+    
+    if (0<=f1*unrrottodeg && f1*unrrottodeg<=180)
+    {
+        if (0<=f2*unrrottodeg && f2*unrrottodeg<=180)
+        {
+            if (0<r && r<=f1)
+            {
+                r=f1;     
+            }
+                
+            if (f2<=r && r<180*degtounrrot)
+            {
+                r=f2;    
+            }  
+           
+            if (-180*degtounrrot<=r && r<=0)
+            {
+                if ((-r)+f1 <= (r-(-180)*degtounrrot)+(180*degtounrrot-f2))    
+                    r=f1; 
+                else 
+                    r=f2;    
+            }
+        }
+        else
+        {
+            if (f2<=r && r<0)
+            {
+                if ((-r)+f1 <= r-f2)    
+                    r=f1; 
+                else 
+                    r=f2;       
+            }
+                
+            if (0<=r && r<=f1)
+            {
+                if (f1-r < r+(-f2))    
+                    r=f1; 
+                else 
+                    r=f2;    
+            }  
+        }
+    }
+    else
+    {
+        if (0<=f2*unrrottodeg && f2*unrrottodeg<=180) 
+        {
+            if (f2<=r && r<=180*degtounrrot)
+            {
+                if ((180*degtounrrot-r)+(f1-(-180)*degtounrrot) < r-f2)    
+                    r=f1; 
+                else 
+                    r=f2;       
+            }
+                
+            if (-180*degtounrrot<r && r<=f1)
+            {
+                if (r-f1 < (r-(-180)*degtounrrot)+(180*degtounrrot-f2))    
+                    r=f1; 
+                else 
+                    r=f2;    
+            }
+        }
+        else
+        {
+            if (f2<r && r<=0)
+            {
+                r=f2;     
+            }
+                
+            if ((-180)*degtounrrot<=r && r<f1) 
+            {
+                r=f1;    
+            }  
+           
+            if (0<r && r<=180*degtounrrot)
+            {
+                if ((f1-(-180)*degtounrrot)+(180*degtounrrot-r) < r+(-f2))    
+                    r=f1; 
+                else 
+                    r=f2;    
+            }
+        }   
+    }   
+    
+    return r;  
+}
+
+function rotator ClampRotator(rotator r, optional bool bClampYaw=false, optional int Yawf1=0, optional int Yawf2=0, optional bool bClampPitch=false, optional int Pitchf1=0, optional int Pitchf2=0,
+optional bool bClampRoll=false, optional int Rollf1=0, optional int Rollf2=0)
+{   
+    local rotator res;
+    
+    if (bClampYaw)
+        res.Yaw=ClampRotatorAxis(r.Yaw,Yawf1,Yawf2);
+        
+    if (bClampPitch)
+        res.Pitch=ClampRotatorAxis(r.Pitch,Pitchf1,Pitchf2); 
+     
+    if (bClampRoll)
+        res.Roll=ClampRotatorAxis(r.Roll,Rollf1,Rollf2);  
+
+    return res;    
+}
+    
 
 defaultproperties
 {

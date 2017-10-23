@@ -36,8 +36,10 @@ function ChangeBehaviorMode(int newmode)
 function Rotator GetTargetRotation()
 {
     local vector v, X,Y,Z;
-    local rotator r,rp,rd;
+    local rotator r,rp,res;
     local float f1,f2;
+    
+    //local int yaw, pitch, roll;
     
     //GetAxes(ResolveRotator(currot,RotatorResolver(RotationAxes_Pitch,RotationAxes_Roll,RotationAxes_Yaw,,,true))+parent.Rotation,X,Y,Z);
     //    parent.drawDebugLine(parent.Location+vect(0,0,128),parent.Location+vect(0,0,128)+X*64,255,0,0);
@@ -60,157 +62,16 @@ function Rotator GetTargetRotation()
     {
         v=LookAtActor.Location-parent.location;
         r=rotator(v);
-        r.Yaw=NormalizeRotAxis(r.Yaw);
-        //`log(NormalizeRotAxis(r.Yaw)*unrrottodeg@"|"@NormalizeRotAxis(parent.rotation.Yaw)*unrrottodeg);
-        f1=NormalizeRotAxis(parent.rotation.Yaw-75*degtounrrot);
-        f2=NormalizeRotAxis(parent.rotation.Yaw+75*degtounrrot);
-        //`log(NormalizeRotAxis(parent.rotation.Yaw)*unrrottodeg@"|"@f1*unrrottodeg@"<"@r.Yaw*unrrottodeg@"<"@f2*unrrottodeg@"="@fclamp(r.Yaw,min(f1,f2),max(f1,f2))*unrrottodeg);
         
-        if (0<=f1*unrrottodeg && f1*unrrottodeg<=180)
-        {
-            if (0<=f2*unrrottodeg && f2*unrrottodeg<=180)
-            {
-                //`log("r="@r.Yaw*unrrottodeg@"f1="@f1*unrrottodeg@"f2="@f2*unrrottodeg@"res="@fclamp(r.Yaw,min(f1,f2),max(f1,f2))*unrrottodeg);
-                //`log("case 1");
-                if (0<r.Yaw && r.Yaw<=f1)
-                {
-                    r.Yaw=f1;     
-                }
-                    
-                if (f2<=r.Yaw && r.Yaw<180*degtounrrot)
-                {
-                    r.Yaw=f2;    
-                }  
-               
-                if (-180*degtounrrot<=r.Yaw && r.Yaw<=0)
-                {
-                    if ((-r.Yaw)+f1 <= (r.Yaw-(-180)*degtounrrot)+(180*degtounrrot-f2))    
-                        r.Yaw=f1; 
-                    else 
-                        r.Yaw=f2;    
-                }
-            }
-            else
-            {
-                //`log("case 2");
-                if (f2<=r.Yaw && r.Yaw<0)
-                {
-                    if ((-r.Yaw)+f1 <= r.Yaw-f2)    
-                        r.Yaw=f1; 
-                    else 
-                        r.Yaw=f2;       
-                }
-                    
-                if (0<=r.Yaw && r.Yaw<=f1)
-                {
-                    if (f1-r.Yaw < r.Yaw+(-f2))    
-                        r.Yaw=f1; 
-                    else 
-                        r.Yaw=f2;    
-                }  
-            }
-        }
-        else
-        {
-            if (0<=f2*unrrottodeg && f2*unrrottodeg<=180) 
-            {
-                //`log("case 3");
-                //`log("r="@r.Yaw*unrrottodeg@"f1="@f1*unrrottodeg@"f2="@f2*unrrottodeg);
-                if (f2<=r.Yaw && r.Yaw<=180*degtounrrot)
-                {
-                    if ((180*degtounrrot-r.Yaw)+(f1-(-180)*degtounrrot) < r.Yaw-f2)    
-                        r.Yaw=f1; 
-                    else 
-                        r.Yaw=f2;       
-                }
-                    
-                if (-180*degtounrrot<r.Yaw && r.Yaw<=f1)
-                {
-                    if (r.Yaw-f1 < (r.Yaw-(-180)*degtounrrot)+(180*degtounrrot-f2))    
-                        r.Yaw=f1; 
-                    else 
-                        r.Yaw=f2;    
-                }
-                    //`log("res="@r.Yaw*unrrottodeg);
-            }
-            else
-            {
-                //`log("case 4");
-                //`log("r="@r.Yaw*unrrottodeg@"f1="@f1*unrrottodeg@"f2="@f2*unrrottodeg@"res="@fclamp(r.Yaw,min(f1,f2),max(f1,f2))*unrrottodeg);
-                if (f2<r.Yaw && r.Yaw<=0)
-                {
-                    r.Yaw=f2;     
-                }
-                    
-                if ((-180)*degtounrrot<=r.Yaw && r.Yaw<f1) 
-                {
-                    r.Yaw=f1;    
-                }  
-               
-                if (0<r.Yaw && r.Yaw<=180*degtounrrot)
-                {
-                    if ((f1-(-180)*degtounrrot)+(180*degtounrrot-r.Yaw) < r.Yaw+(-f2))    
-                        r.Yaw=f1; 
-                    else 
-                        r.Yaw=f2;    
-                }
-                //`log("res="@r.Yaw*unrrottodeg);
-            }   
-        }
+        rp.Yaw=ClampRotatorAxis(NormalizeRotAxis(r.Yaw),NormalizeRotAxis(parent.rotation.Yaw-75*degtounrrot),NormalizeRotAxis(parent.rotation.Yaw+75*degtounrrot))-parent.Rotation.Yaw;
+        rp.Pitch=ClampRotatorAxis(-NormalizeRotAxis(r.Pitch),NormalizeRotAxis(parent.rotation.Pitch-75*degtounrrot),NormalizeRotAxis(parent.rotation.Pitch+75*degtounrrot))-parent.Rotation.Pitch;
+       
+        //r.Pitch=pitch-parent.Rotation.Yaw; r.Roll=roll-parent.Rotation.Pitch; r.Yaw=0;
         
-        //r.Yaw=fclamp(r.Yaw,min(f1,f2),max(f1,f2));
-        //r.Yaw=ClampRotAxisFromRange(NormalizeRotAxis(r.Yaw),int(f1),int(f2));
-        rd=rot(0,0,0); rd.Yaw=f1;
-        parent.DrawDebugLine(parent.Location+vect(0,0,96),parent.Location+vect(0,0,96)+vector(rd)*64,128,128,128);
-        rd=rot(0,0,0); rd.Yaw=f2;
-
-        //parent.DrawDebugLine(parent.Location+vect(0,0,96),parent.Location+vect(0,0,96)+vector(parent.Rotation-rot(0,45,0)*degtounrrot)*64,128,128,128);
-        //r.Yaw=fclamp(r.Yaw,parent.Rotation.Yaw-45*degtounrrot,parent.Rotation.Yaw+45*degtounrrot);
-        ////r=ResolveRotator(currot,RotatorResolver(RotationAxes_Pitch,RotationAxes_Roll,RotationAxes_Yaw,,,true))+parent.Rotation-rotator(v);
-        //
-        //r=ResolveRotator(currot,RotatorResolver(RotationAxes_Pitch,RotationAxes_Roll,RotationAxes_Yaw,,,true));
-        //
-        //GetAxes(r+parent.Rotation,X,Y,Z);
-        //parent.drawDebugLine(parent.Location+vect(0,0,128),parent.Location+vect(0,0,128)+X*64,128,0,0);
-        //parent.drawDebugLine(parent.Location+vect(0,0,128),parent.Location+vect(0,0,128)+Y*64,0,128,0);
-        //parent.drawDebugLine(parent.Location+vect(0,0,128),parent.Location+vect(0,0,128)+Z*64,0,0,128);
-        //
-        /////parent.drawDebugLine(parent.Location+vect(0,0,128),parent.Location+vect(0,0,128)+vector(parent.Rotation+(parent.Rotation-rotator(v)))*64,255,255,255);
-        //r=rotator(v);
+        res.Pitch=ResolveRotatorAxis(rp,RotatorAxis_Yaw);
+        res.Roll=ResolveRotatorAxis(rp,RotatorAxis_Pitch);
         
-        //v=LookAtActor.Location-parent.Location;
-        //r=parent.rotation-rotator(v);
-        //r=rotator(v)-parent.Rotation;
-        //r=ResolveRotator(r,RotatorResolver(RotationAxes_Pitch,RotationAxes_Roll,RotationAxes_Yaw,,,true));
-        //TargetRotation=r;  
-        
-    //if (bTranslateFromDegToUnrrot)
-    //    TargetRotation=TargetRotation*UnrRotToDeg; 
-        
-        //`log("r.Yaw"@r.Yaw*unrrottodeg@"r.Pitch"@r.Pitch*unrrottodeg@"r.Roll"@r.Roll*unrrottodeg);
-        //`log("bonerotation"@bonecontroller.BoneRotation);
-        
-        //`log(r*unrrottodeg);
-
-        //return ClampRotator(r*unrrottodeg);
-        //r=ResolveRotator(r,RotatorResolver(RotationAxes_Roll,RotationAxes_Yaw,RotationAxes_Pitch,,,true));
-        // r.Pitch=r.Yaw; r.Roll=0; r.Yaw=0;
-        
-        //r=NormalizeDegRot(r*unrrottodeg);
-        //r.Yaw=r.Yaw % 360;
-        //r.Pitch=r.Pitch % 360;
-        //r.Roll=r.Roll % 360;
-        //r.Pitch=NormalizeDegAngle(r.Yaw-(parent.Rotation*unrrottodeg).Yaw) -- РАБОТАЕТ
-        
-        r.Pitch=r.Yaw-parent.Rotation.Yaw; r.Roll=0; r.Yaw=0;
-        //`log(r.Pitch*unrrottodeg@"Min:"@((NormalizeRotAxis(parent.Rotation.Yaw)-NormalizeRotAxis(rot(0,45,0)*degtounrrot).Yaw))*unrrottodeg@"Max:"@((NormalizeRotAxis(parent.Rotation.Yaw)+NormalizeRotAxis(rot(0,45,0)*degtounrrot).Yaw))*unrrottodeg);
-        //`log(NormalizeRotAxis(r.Pitch)*unrrottodeg@"|"@NormalizeRotAxis(parent.Rotation.Yaw)*unrrottodeg);
-        //r.Pitch=fclamp(r.Pitch,parent.Rotation.Pitch-45*degtounrrot,parent.Rotation.Pitch+45*degtounrrot);
-        //parent.DrawDebugLine(parent.Location+vect(0,0,96),parent.Location+vect(0,0,96)+vector(parent.Rotation-rot(0,45,0)*degtounrrot)*64,128,128,128);
-        //parent.DrawDebugLine(parent.Location+vect(0,0,96),parent.Location+vect(0,0,96)+vector(parent.Rotation+rot(0,45,0)*degtounrrot)*64,128,128,128);
-        //parent.DrawDebugLine(parent.Location+vect(0,0,96),parent.Location+vect(0,0,96)+vector(r+parent.Rotation)*64,255,0,0);
-        //`log(r@" | "@parent.Rotation*unrrottodeg);
-        return r;  
+        return res;  
     }
     else
     {
