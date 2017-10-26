@@ -36,41 +36,51 @@ function ChangeBehaviorMode(int newmode)
 function Rotator GetTargetRotation()
 {
     local vector v, X,Y,Z;
-    local rotator r,rp,res;
+    local rotator r,res;
     local float f1,f2;
-    
-    //local int yaw, pitch, roll;
-    
-    //GetAxes(ResolveRotator(currot,RotatorResolver(RotationAxes_Pitch,RotationAxes_Roll,RotationAxes_Yaw,,,true))+parent.Rotation,X,Y,Z);
-    //    parent.drawDebugLine(parent.Location+vect(0,0,128),parent.Location+vect(0,0,128)+X*64,255,0,0);
-    //    parent.drawDebugLine(parent.Location+vect(0,0,128),parent.Location+vect(0,0,128)+Y*64,0,255,0);
-    //    parent.drawDebugLine(parent.Location+vect(0,0,128),parent.Location+vect(0,0,128)+Z*64,0,0,255);
-    //    v=LookAtActor.Location.X*X+LookAtActor.Location.Y*Y+LookAtActor.Location.Z*Z;
-    //    parent.DrawDebugSphere(v,8,8,0,128,128);
     
     if (BehaviorMode==BoneBehaviorModes_LookAtPoint)
     {
-        //v=parent.Location-LookAtPoint;
-        //r=rotator(v)-parent.Rotation;
-        ////`log("r.Yaw"@r.Yaw*unrrottodeg@"r.Pitch"@r.Pitch*unrrottodeg@"r.Roll"@r.Roll*unrrottodeg);
-        ////TargetRotation=r+currot;  
-        //TargetRotation.Pitch=r.Yaw;       
-        //        //`log("currot="@currot*UnrRotToDeg);
-        // 
+        v=LookAtPoint-parent.location;
+        r=rotator(v);
+        
+        if (YawRestraint.bUseRestraint)
+            res.Yaw=ClampRotatorAxis(r.Yaw,NormalizeRotAxis(parent.rotation.Yaw+YawRestraint.MinValueDeg*degtounrrot),NormalizeRotAxis(parent.rotation.Yaw+YawRestraint.MaxValueDeg*degtounrrot))-parent.Rotation.Yaw;
+        else
+            res.Yaw=super.GetTargetRotation().Yaw;
+            
+        if (PitchRestraint.bUseRestraint)
+            res.Pitch=ClampRotatorAxis(r.Pitch,NormalizeRotAxis(parent.rotation.Pitch+PitchRestraint.MinValueDeg*degtounrrot),NormalizeRotAxis(parent.rotation.Pitch+PitchRestraint.MaxValueDeg*degtounrrot))-parent.Rotation.Pitch;
+        else
+            res.Pitch=super.GetTargetRotation().Pitch;
+        
+        if (RollRestraint.bUseRestraint)
+            res.Roll=ClampRotatorAxis(r.Roll,NormalizeRotAxis(parent.rotation.Roll+RollRestraint.MinValueDeg*degtounrrot),NormalizeRotAxis(parent.rotation.Roll+RollRestraint.MaxValueDeg*degtounrrot))-parent.Rotation.Roll;
+        else
+            res.Roll=super.GetTargetRotation().Roll;            
+            
+        return res;     
     }    
     else if (BehaviorMode==BoneBehaviorModes_LookAtActor)
     {
         v=LookAtActor.Location-parent.location;
         r=rotator(v);
-        
-        rp.Yaw=ClampRotatorAxis(NormalizeRotAxis(r.Yaw),NormalizeRotAxis(parent.rotation.Yaw-75*degtounrrot),NormalizeRotAxis(parent.rotation.Yaw+75*degtounrrot))-parent.Rotation.Yaw;
-        rp.Pitch=ClampRotatorAxis(-NormalizeRotAxis(r.Pitch),NormalizeRotAxis(parent.rotation.Pitch-75*degtounrrot),NormalizeRotAxis(parent.rotation.Pitch+75*degtounrrot))-parent.Rotation.Pitch;
        
-        //r.Pitch=pitch-parent.Rotation.Yaw; r.Roll=roll-parent.Rotation.Pitch; r.Yaw=0;
+        if (YawRestraint.bUseRestraint)
+            res.Yaw=ClampRotatorAxis(r.Yaw,NormalizeRotAxis(parent.rotation.Yaw+YawRestraint.MinValueDeg*degtounrrot),NormalizeRotAxis(parent.rotation.Yaw+YawRestraint.MaxValueDeg*degtounrrot))-parent.Rotation.Yaw;
+        else
+            res.Yaw=super.GetTargetRotation().Yaw;
+            
+        if (PitchRestraint.bUseRestraint)
+            res.Pitch=ClampRotatorAxis(r.Pitch,NormalizeRotAxis(parent.rotation.Pitch+PitchRestraint.MinValueDeg*degtounrrot),NormalizeRotAxis(parent.rotation.Pitch+PitchRestraint.MaxValueDeg*degtounrrot))-parent.Rotation.Pitch;
+        else
+            res.Pitch=super.GetTargetRotation().Pitch;
         
-        res.Pitch=ResolveRotatorAxis(rp,RotatorAxis_Yaw);
-        res.Roll=ResolveRotatorAxis(rp,RotatorAxis_Pitch);
-        
+        if (RollRestraint.bUseRestraint)
+            res.Roll=ClampRotatorAxis(r.Roll,NormalizeRotAxis(parent.rotation.Roll+RollRestraint.MinValueDeg*degtounrrot),NormalizeRotAxis(parent.rotation.Roll+RollRestraint.MaxValueDeg*degtounrrot))-parent.Rotation.Roll;
+        else
+            res.Roll=super.GetTargetRotation().Roll;            
+            
         return res;  
     }
     else

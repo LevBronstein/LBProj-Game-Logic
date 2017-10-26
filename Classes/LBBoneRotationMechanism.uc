@@ -17,21 +17,23 @@ var(BoneRotation) bool bApplyYaw;
 var(BoneRotation) bool bApplyPitch;
 var(BoneRotation) bool bApplyRoll;
 
-var(BoneRotationCoords) RotatorResolver BoneRotationResolver;
+var(BoneRotationCoords) bool bResolveFromWorldSpace;
+//All rotations are made in world space and the translated to local (bone, socket, etc) space
+var(BoneRotationCoords) RotatorResolver BoneRotationResolver <editcondition=bResolveFromWorldSpace>; 
 
 var(BoneRotationRestraint) RotationRestraint YawRestraint; 
 var(BoneRotationRestraint) RotationRestraint PitchRestraint; 
 var(BoneRotationRestraint) RotationRestraint RollRestraint; 
 
-var(BoneRotationMechanismSystem) Name BoneRotationController; //Which controller to use for the rotation
-var(BoneRotationMechanismSystem) bool bTranslateFromDegToUnrrot; //Set to true when all input data is given in degrees
+var(BoneRotationSpeed) bool bSmoothRotation;
+var(BoneRotationSpeed) float AngularSpeed;
 
 var(MovementSynchronization) bool bTickIndependent;
 var(MovementSynchronization) float MovementTimeScale; //A value, x, which affects 1/x (unit / second) ratio
 var(MovementSynchronization) float RotationTimeScale;
 
-var(BoneRotationSpeed) bool bSmoothRotation;
-var(BoneRotationSpeed) float AngularSpeed;
+var(BoneRotationMechanismSystem) Name BoneRotationController; //Which controller to use for the rotation
+var(BoneRotationMechanismSystem) bool bTranslateFromDegToUnrrot; //Set to true when all input data is given in degrees
 
 var(BoneRotation) rotator TargetRotation;
 
@@ -63,8 +65,24 @@ function PerfromTick(float dt)
 
 function rotator GetTargetRotation()
 {
-    //`log(TargetRotation*unrrottodeg);
-    return TargetRotation;
+    local rotator res;
+    
+    if (YawRestraint.bUseRestraint)
+        res.Yaw=ClampRotatorAxis(TargetRotation.Yaw,YawRestraint.MinValueDeg*degtounrrot,YawRestraint.MaxValueDeg*degtounrrot);
+    else
+        res.Yaw=TargetRotation.Yaw;
+        
+    if (PitchRestraint.bUseRestraint)
+        res.Pitch=ClampRotatorAxis(TargetRotation.Pitch,PitchRestraint.MinValueDeg*degtounrrot,PitchRestraint.MaxValueDeg*degtounrrot);
+    else
+        res.Pitch=TargetRotation.Pitch;
+
+    if (RollRestraint.bUseRestraint)
+        res.Roll=ClampRotatorAxis(TargetRotation.Roll,RollRestraint.MinValueDeg*degtounrrot,RollRestraint.MaxValueDeg*degtounrrot);
+    else
+        res.Roll=TargetRotation.Roll;
+
+    return res;
 }
 
 function float RotateYaw(float dt)
@@ -76,7 +94,7 @@ function float RotateYaw(float dt)
     crot=currot.Yaw;    
 
     if (bSmoothRotation)
-        rrot=LinearInterpAngle(crot,trot,TickIndependentFloat(AngularSpeed,dt,RotationTimeScale),dt);
+        rrot=LinearInterpAngle(crot*unrrottodeg,trot*unrrottodeg,TickIndependentFloat(AngularSpeed,dt,RotationTimeScale),dt)*degtounrrot;
     else
         rrot=trot;
         
@@ -92,7 +110,7 @@ function float RotatePitch(float dt)
     crot=currot.Pitch;    
 
     if (bSmoothRotation)
-        rrot=LinearInterpAngle(crot,trot,TickIndependentFloat(AngularSpeed,dt,RotationTimeScale),dt);
+        rrot=LinearInterpAngle(crot*unrrottodeg,trot*unrrottodeg,TickIndependentFloat(AngularSpeed,dt,RotationTimeScale),dt)*degtounrrot;
     else
         rrot=trot;
     
@@ -108,7 +126,7 @@ function float RotateRoll(float dt)
     crot=currot.Roll;    
 
     if (bSmoothRotation)
-        rrot=LinearInterpAngle(crot,trot,TickIndependentFloat(AngularSpeed,dt,RotationTimeScale),dt);
+        rrot=LinearInterpAngle(crot*unrrottodeg,trot*unrrottodeg,TickIndependentFloat(AngularSpeed,dt,RotationTimeScale),dt)*degtounrrot;
     else 
         rrot=trot;
     
@@ -130,9 +148,12 @@ function PerformRotation(float dt)
         if (bApplyRoll)
         {
             currot.Roll=RotateRoll(dt);
-        }   
-         
-        bonecontroller.BoneRotation=currot;    
+        } 
+        
+        if (bResolveFromWorldSpace)
+            bonecontroller.BoneRotation=ResolveRotator(currot,BoneRotationResolver);
+        else
+            bonecontroller.BoneRotation=currot;
     }
 }
 
@@ -199,15 +220,7 @@ function float NormalizeDegAngleByValue(int degangle, int value)
     return ((degangle * unrrottodeg) % value + value)*degtounrrot;
 }
 
-function float UnfoldDegAngle(float ang)
-{
-    local float a;
-
-    a=ang;
-    
-    //if (a<-180)
-    //a=NormalizeRotAxis(ang)*unrrottodeg; //[-180,180]    
-}
+function
 
 function float LinearInterpAngle(float current, float target, float step, float dt)
 {
@@ -381,6 +394,8 @@ defaultproperties
  
     MovementTimeScale=0.01
     RotationTimeScale=0.01
+    
+    BoneRotationResolver=(GetYawFrom=RotatorAxis_Yaw,GetPitchFrom=RotatorAxis_Pitch,GetRollFrom=RotatorAxis_Roll)
     
     bApplyYaw=true
     bApplyPitch=true
