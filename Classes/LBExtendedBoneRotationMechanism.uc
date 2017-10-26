@@ -16,6 +16,10 @@ enum BoneBehaviorModes
 var(ExtendedBoneRotationMechanism) BoneBehaviorModes BehaviorMode;
 var(ExtendedBoneRotationMechanism) vector LookAtPoint;
 var(ExtendedBoneRotationMechanism) actor LookAtActor;
+//Set to TRUE when BoneBehaviorModes_Free should be used when @TargetRotation is out of restraints bounds
+var(BoneRotationRestraint) bool bDefaultTRWhenOutOfRestraints;
+//An offset (aproximate) of the target bone
+var(BoneRotationCoords) vector BaseOffset;
 
 function ChangeBehaviorMode(int newmode)
 {
@@ -38,48 +42,109 @@ function Rotator GetTargetRotation()
     local vector v, X,Y,Z;
     local rotator r,res;
     local float f1,f2;
+    local bool bOutOfBounds;
     
     if (BehaviorMode==BoneBehaviorModes_LookAtPoint)
     {
-        v=LookAtPoint-parent.location;
+        v=LookAtPoint-(parent.location+BaseOffset);
         r=rotator(v);
         
         if (YawRestraint.bUseRestraint)
-            res.Yaw=ClampRotatorAxis(r.Yaw,NormalizeRotAxis(parent.rotation.Yaw+YawRestraint.MinValueDeg*degtounrrot),NormalizeRotAxis(parent.rotation.Yaw+YawRestraint.MaxValueDeg*degtounrrot))-parent.Rotation.Yaw;
+        {
+            res.Yaw=ClampRotatorAxis(r.Yaw,NormalizeRotAxis(parent.rotation.Yaw+YawRestraint.MinValueDeg*degtounrrot),NormalizeRotAxis(parent.rotation.Yaw+YawRestraint.MaxValueDeg*degtounrrot));
+            
+            if (bDefaultTRWhenOutOfRestraints && NormalizeRotAxis(res.Yaw)!=NormalizeRotAxis(r.Yaw) || bOutOfBounds)
+            {
+                res.Yaw=super.GetTargetRotation().Yaw;
+                bOutOfBounds=true;
+            }
+            else
+                res.Yaw=res.Yaw-parent.Rotation.Yaw;
+        }
         else
-            res.Yaw=super.GetTargetRotation().Yaw;
+            res.Yaw=r.Yaw-parent.Rotation.Yaw;
             
         if (PitchRestraint.bUseRestraint)
-            res.Pitch=ClampRotatorAxis(r.Pitch,NormalizeRotAxis(parent.rotation.Pitch+PitchRestraint.MinValueDeg*degtounrrot),NormalizeRotAxis(parent.rotation.Pitch+PitchRestraint.MaxValueDeg*degtounrrot))-parent.Rotation.Pitch;
+        {
+            res.Pitch=ClampRotatorAxis(r.Pitch,NormalizeRotAxis(parent.rotation.Pitch+PitchRestraint.MinValueDeg*degtounrrot),NormalizeRotAxis(parent.rotation.Pitch+PitchRestraint.MaxValueDeg*degtounrrot));
+            
+            if (bDefaultTRWhenOutOfRestraints && NormalizeRotAxis(res.Pitch)!=NormalizeRotAxis(r.Pitch) || bOutOfBounds)
+            {
+                res.Pitch=super.GetTargetRotation().Pitch;
+                bOutOfBounds=true;
+            }
+            else
+                res.Pitch=res.Pitch-parent.Rotation.Pitch;
+        }
         else
-            res.Pitch=super.GetTargetRotation().Pitch;
+            res.Pitch=r.Pitch-parent.Rotation.Pitch;
         
         if (RollRestraint.bUseRestraint)
+        {
             res.Roll=ClampRotatorAxis(r.Roll,NormalizeRotAxis(parent.rotation.Roll+RollRestraint.MinValueDeg*degtounrrot),NormalizeRotAxis(parent.rotation.Roll+RollRestraint.MaxValueDeg*degtounrrot))-parent.Rotation.Roll;
+            
+            if (bDefaultTRWhenOutOfRestraints && NormalizeRotAxis(res.Roll)!=NormalizeRotAxis(r.Roll) || bOutOfBounds)
+            {
+                res.Roll=super.GetTargetRotation().Roll;
+                bOutOfBounds=true;
+            }
+            else
+                res.Roll=res.Roll-parent.Rotation.Roll;
+        }
         else
-            res.Roll=super.GetTargetRotation().Roll;            
+            res.Roll=r.Roll-parent.Rotation.Roll;            
             
         return res;     
     }    
     else if (BehaviorMode==BoneBehaviorModes_LookAtActor)
     {
-        v=LookAtActor.Location-parent.location;
+        v=LookAtActor.Location-(parent.location+BaseOffset);
         r=rotator(v);
        
         if (YawRestraint.bUseRestraint)
-            res.Yaw=ClampRotatorAxis(r.Yaw,NormalizeRotAxis(parent.rotation.Yaw+YawRestraint.MinValueDeg*degtounrrot),NormalizeRotAxis(parent.rotation.Yaw+YawRestraint.MaxValueDeg*degtounrrot))-parent.Rotation.Yaw;
+        {
+            res.Yaw=ClampRotatorAxis(r.Yaw,NormalizeRotAxis(parent.rotation.Yaw+YawRestraint.MinValueDeg*degtounrrot),NormalizeRotAxis(parent.rotation.Yaw+YawRestraint.MaxValueDeg*degtounrrot));
+            
+            if (bDefaultTRWhenOutOfRestraints && NormalizeRotAxis(res.Yaw)!=NormalizeRotAxis(r.Yaw) || bOutOfBounds)
+            {
+                res.Yaw=super.GetTargetRotation().Yaw;
+                bOutOfBounds=true;
+            }
+            else
+                res.Yaw=res.Yaw-parent.Rotation.Yaw;
+        }
         else
-            res.Yaw=super.GetTargetRotation().Yaw;
+            res.Yaw=r.Yaw-parent.Rotation.Yaw;
             
         if (PitchRestraint.bUseRestraint)
-            res.Pitch=ClampRotatorAxis(r.Pitch,NormalizeRotAxis(parent.rotation.Pitch+PitchRestraint.MinValueDeg*degtounrrot),NormalizeRotAxis(parent.rotation.Pitch+PitchRestraint.MaxValueDeg*degtounrrot))-parent.Rotation.Pitch;
+        {
+            res.Pitch=ClampRotatorAxis(r.Pitch,NormalizeRotAxis(parent.rotation.Pitch+PitchRestraint.MinValueDeg*degtounrrot),NormalizeRotAxis(parent.rotation.Pitch+PitchRestraint.MaxValueDeg*degtounrrot));
+            
+            if (bDefaultTRWhenOutOfRestraints && NormalizeRotAxis(res.Pitch)!=NormalizeRotAxis(r.Pitch) || bOutOfBounds)
+            {
+                res.Pitch=super.GetTargetRotation().Pitch;
+                bOutOfBounds=true;
+            }
+            else
+                res.Pitch=res.Pitch-parent.Rotation.Pitch;
+        }
         else
-            res.Pitch=super.GetTargetRotation().Pitch;
+            res.Pitch=r.Pitch-parent.Rotation.Pitch;
         
         if (RollRestraint.bUseRestraint)
+        {
             res.Roll=ClampRotatorAxis(r.Roll,NormalizeRotAxis(parent.rotation.Roll+RollRestraint.MinValueDeg*degtounrrot),NormalizeRotAxis(parent.rotation.Roll+RollRestraint.MaxValueDeg*degtounrrot))-parent.Rotation.Roll;
+            
+            if (bDefaultTRWhenOutOfRestraints && NormalizeRotAxis(res.Roll)!=NormalizeRotAxis(r.Roll) || bOutOfBounds)
+            {
+                res.Roll=super.GetTargetRotation().Roll;
+                bOutOfBounds=true;
+            }
+            else
+                res.Roll=res.Roll-parent.Rotation.Roll;
+        }
         else
-            res.Roll=super.GetTargetRotation().Roll;            
+            res.Roll=r.Roll-parent.Rotation.Roll;            
             
         return res;  
     }

@@ -89,12 +89,12 @@ function float RotateYaw(float dt)
 {
     local float crot,trot,rrot;
     
-    trot=GetTargetRotation().Yaw;
+    trot=NormalizeRotAxis(GetTargetRotation().Yaw);
 
-    crot=currot.Yaw;    
-
+    crot=NormalizeRotAxis(currot.Yaw);   
+    
     if (bSmoothRotation)
-        rrot=LinearInterpAngle(crot*unrrottodeg,trot*unrrottodeg,TickIndependentFloat(AngularSpeed,dt,RotationTimeScale),dt)*degtounrrot;
+        rrot=LinearInerpFloatValue(crot*unrrottodeg,trot*unrrottodeg,TickIndependentFloat(AngularSpeed,dt,RotationTimeScale),dt)*degtounrrot;
     else
         rrot=trot;
         
@@ -105,12 +105,12 @@ function float RotatePitch(float dt)
 {
     local float crot,trot,rrot;
     
-    trot=GetTargetRotation().Pitch;
+    trot=NormalizeRotAxis(GetTargetRotation().Pitch);
 
-    crot=currot.Pitch;    
+    crot=NormalizeRotAxis(currot.Pitch);    
 
     if (bSmoothRotation)
-        rrot=LinearInterpAngle(crot*unrrottodeg,trot*unrrottodeg,TickIndependentFloat(AngularSpeed,dt,RotationTimeScale),dt)*degtounrrot;
+        rrot=LinearInerpFloatValue(crot*unrrottodeg,trot*unrrottodeg,TickIndependentFloat(AngularSpeed,dt,RotationTimeScale),dt)*degtounrrot;
     else
         rrot=trot;
     
@@ -121,18 +121,19 @@ function float RotateRoll(float dt)
 {
     local float crot,trot,rrot;
                         
-    trot=GetTargetRotation().Roll;
+    trot=NormalizeRotAxis(GetTargetRotation().Roll);
 
-    crot=currot.Roll;    
+    crot=NormalizeRotAxis(currot.Roll);    
 
     if (bSmoothRotation)
-        rrot=LinearInterpAngle(crot*unrrottodeg,trot*unrrottodeg,TickIndependentFloat(AngularSpeed,dt,RotationTimeScale),dt)*degtounrrot;
+        rrot=LinearInerpFloatValue(crot*unrrottodeg,trot*unrrottodeg,TickIndependentFloat(AngularSpeed,dt,RotationTimeScale),dt)*degtounrrot;
     else 
         rrot=trot;
     
     return rrot;   
 }
 
+//FIX the interpolation, please!!!
 function PerformRotation(float dt)
 {
     if (bonecontroller!=None)
@@ -220,7 +221,27 @@ function float NormalizeDegAngleByValue(int degangle, int value)
     return ((degangle * unrrottodeg) % value + value)*degtounrrot;
 }
 
-function
+function float LinearInerpFloatValue(float current, float target, float step, float dt)
+{
+    local float value;
+    
+    if (abs(current - target) > abs(step))
+    {
+        if (current < target)
+            value=current+abs(step); 
+        else
+            value=current-abs(step);   
+    }
+    else
+    {
+        if (current < target)
+            value=current+abs(current - target); 
+        else
+            value=current-abs(current - target);      
+    }
+        
+     return value;
+}
 
 function float LinearInterpAngle(float current, float target, float step, float dt)
 {

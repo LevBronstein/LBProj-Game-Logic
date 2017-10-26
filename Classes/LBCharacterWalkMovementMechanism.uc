@@ -283,7 +283,7 @@ function PerformRotation(float dt)
                 cyaw=cyaw+360;
             
             yaw=LinearInterpAngle(cyaw,tyaw,TickIndependentFloat(AngularSpeed*kAngularSpeed,dt,RotationTimeScale),dt);
-            
+
             curangspeed=cyaw-yaw;
             
             currot=yaw;
@@ -299,7 +299,7 @@ function PerformRotation(float dt)
             if (bShowDebugGraphics)
                 DGDisplayOrientation(MoveDirection);
             
-            parent.SetRotation(dr);    
+            parent.SetRotation(dr);   
         }
         else
         {
