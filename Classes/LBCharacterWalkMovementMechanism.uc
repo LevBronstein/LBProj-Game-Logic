@@ -150,6 +150,8 @@ function vector PerformPawnWalk(float dt)
     {
         curfwdspeed=LinearInerpFloatValue(curfwdspeed,ForwardSpeed*kForwardSpeed,TickIndependentFloat(horAccelRate, dt, MovementTimeScale),dt);
         curstrspeed=LinearInerpFloatValue(curstrspeed,StrafeSpeed*kStrafeSpeed,TickIndependentFloat(horAccelRate, dt, MovementTimeScale),dt); 
+        //curfwdspeed=LinearInerpFloatValue(curfwdspeed,TickIndependentFloat(ForwardSpeed*kForwardSpeed, dt, MovementTimeScale),TickIndependentFloat(horAccelRate, dt, MovementTimeScale),dt);
+        //curstrspeed=LinearInerpFloatValue(curstrspeed,TickIndependentFloat(StrafeSpeed*kStrafeSpeed, dt, MovementTimeScale),TickIndependentFloat(horAccelRate, dt, MovementTimeScale),dt); 
     }
     else
     {

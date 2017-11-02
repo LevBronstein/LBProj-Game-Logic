@@ -12,7 +12,7 @@ var(FloatingMovement) float MaxSpeedZ;
 function PerformMovement(float dt) 
 {
     local vector v;
-    `log(AttitudeZ);
+
     if (LBSMPhysicsActor(parent)!=none || LBSKMPhysicsActor(parent)!=none)
     {
         v=ForwardSpeed*kForwardSpeed*Vector(MoveDirection);
@@ -21,7 +21,7 @@ function PerformMovement(float dt)
         {
             v.z=Fclamp(AttitudeZ-parent.Location.z,-MaxSpeedZ,MaxSpeedZ);
         }
-        `log(v);    
+ 
         parent.CollisionComponent.SetRBLinearVelocity(v); 
     }
     else
