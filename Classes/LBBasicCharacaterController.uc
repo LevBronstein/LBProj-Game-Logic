@@ -90,18 +90,46 @@ function InitAnimation()
 
     i=0;
     
-    foreach LBPawn(parent).Mesh.AllAnimNodes(class'LBBlendByAction', blendbyaction)
+    if (LBPawn(parent)!=none)
     {
-        if (blendbyaction!=none)
+        foreach LBPawn(parent).Mesh.AllAnimNodes(class'LBBlendByAction', blendbyaction)
         {
-            i++;
-            blendbyaction.SetActiveChild(0, 0.5); //сброс на исходное состояние
-            LogInfo(i@":"@blendbyaction);
-            blendbyactionnodes.AddItem(blendbyaction);
-        }
-               
+            if (blendbyaction!=none)
+            {
+                i++;
+                blendbyaction.SetActiveChild(0, 0.5); //сброс на исходное состояние
+                LogInfo(i@":"@blendbyaction);
+                blendbyactionnodes.AddItem(blendbyaction);
+            }     
+        }    
     }
-    
+    else if (LBSkeletalMeshActor(parent)!=none)
+    {
+        foreach LBSkeletalMeshActor(parent).SkeletalMeshComponent.AllAnimNodes(class'LBBlendByAction', blendbyaction)
+        {
+            if (blendbyaction!=none)
+            {
+                i++;
+                blendbyaction.SetActiveChild(0, 0.5); //сброс на исходное состояние
+                LogInfo(i@":"@blendbyaction);
+                blendbyactionnodes.AddItem(blendbyaction);
+            }     
+        }        
+    }
+    else if (LBSKMPhysicsActor(parent)!=none)
+    {
+        foreach LBSKMPhysicsActor(parent).SkeletalMeshComponent.AllAnimNodes(class'LBBlendByAction', blendbyaction)
+        {
+            if (blendbyaction!=none)
+            {
+                i++;
+                blendbyaction.SetActiveChild(0, 0.5); //сброс на исходное состояние
+                LogInfo(i@":"@blendbyaction);
+                blendbyactionnodes.AddItem(blendbyaction);
+            }     
+        }        
+    }
+
     if (i==0)
         LogInfo("None found...");
 }
