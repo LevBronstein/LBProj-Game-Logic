@@ -239,12 +239,15 @@ function UpdateAnimationNodes(LBCharActionInfo actioninfo)
 {
     local int i,j;
     local AnimNode anim;
+    local bool bfoundanynode;
      
     //if (actioninfo.ActionType==ActionTypes_ContiniousOrNoAnim)
     //    return;
     
     for (i=0;i<blendbyactionnodes.Length;i++)
     {
+        bfoundanynode=false; //если не найдём никакой анимации -- можем испльзовать ReservNode
+        
         for (j=0;j<blendbyactionnodes[i].Children.Length;j++)
         {
             if (blendbyactionnodes[i].Children[j].Name == actioninfo.ActionName)
@@ -254,6 +257,7 @@ function UpdateAnimationNodes(LBCharActionInfo actioninfo)
                 //AnimNodeSequence(anim).SetPosition(0.0f,false);
                 //AnimNodeSequence(anim).PlayAnim(actioninfo.bLoopActionAnim,actioninfo.ActionAnimPlayRate,actioninfo.ActionAnimPlayPos); 
                 curanim=anim;
+                bfoundanynode=true;
                 //по умолчанию не трогаем -- там всё само регулируеются   
                 //if (actioninfo.ActionName != 'Default')
                 //{
@@ -263,6 +267,23 @@ function UpdateAnimationNodes(LBCharActionInfo actioninfo)
                 //anim.PlayAnim();
             }
         }  
+        
+        //Если не нашли ни одного выхода, соотвествтующего действию -- можем просто передать на запасной выхода @ReserveNode
+        if (!bfoundanynode && blendbyactionnodes[i].bRUseReserveNode)
+        {
+            for (j=0;j<blendbyactionnodes[i].Children.Length;j++)
+            {
+                if (blendbyactionnodes[i].Children[j].Name == blendbyactionnodes[i].ReserveNode)
+                {
+                    blendbyactionnodes[i].SetActiveChild(j,actioninfo.ActionAnimBlendTime);
+                    //anim=blendbyactionnodes[i].Children[j].Anim;
+                    //curanim=anim;
+                    //bfoundanynode=true;
+                    //if (actioninfo.ActionType!=ActionTypes_ContiniousOrNoAnim)
+                    //    anim.PlayAnim(actioninfo.bLoopActionAnim,actioninfo.ActionAnimPlayRate,actioninfo.ActionAnimPlayPos); //не нужно сразу проигрывать! просто перемотать время на 0.0, установить скорость а может и нет  
+                }
+            } 
+        }
     }    
 }
 
@@ -458,7 +479,11 @@ function int GetParamInt(name param)
     if (param == 'CurrentAction' || param == 'CurAction')
     {
         return curaction;
-    }  
+    }
+    else if (param == 'CurentActonCode' || param == 'CurActionCode')
+    {
+        return CharActionInfoByIndex(curaction).ActionCode;    
+    }
     else
         return super.GetParamInt(param);  
 }
@@ -479,7 +504,8 @@ defaultproperties
     
     defaultaction=(ActionCode=-1, ActionName="Default", ActionType=ActionTypes_ContiniousOrNoAnim, bAllowMovement=TRUE)
     
-    MechanismParams.Add((ParamName="CurAction", ParamType=ParamType_Integer, ParamInfo="Integer. Read. Gets currently performed action."))
+    MechanismParams.Add((ParamName="CurAction", ParamType=ParamType_Integer, ParamInfo="Integer. Read. Gets currently performed action @curaction."))
+    MechanismParams.Add((ParamName="CurentActonCode", ParamType=ParamType_Integer, ParamInfo="Integer. Read. Gets currently performed action's code @ActionCode."))
     MechanismParams.Add((ParamName="BeginAction", ParamType=ParamType_Integer, ParamInfo="Integer. Write. Sets the number of an action from action list, wich should be executed.")) 
     MechanismParams.Add((ParamName="bAllowMovement", ParamType=ParamType_Boolean, ParamInfo="Boolean. Read. Returns TRUE if current action allows movement, otherwise -- FALSE."))
     //Добавить что-то вроде GetNotifyStats, который будет true только когда приходит соответствующий нотифай 

@@ -43,8 +43,13 @@ var rotator currot;
 
 function InitMechanism()
 {
-    bonecontroller=SkelControlSingleBone(LBPawn(parent).Mesh.FindSkelControl(BoneRotationController));
-    
+    if (LBPawn(parent)!=none)
+        bonecontroller=SkelControlSingleBone(LBPawn(parent).Mesh.FindSkelControl(BoneRotationController));
+    else if (LBSkeletalMeshActor(parent)!=none)
+        bonecontroller=SkelControlSingleBone(LBSkeletalMeshActor(parent).SkeletalMeshComponent.FindSkelControl(BoneRotationController));
+    else if (LBSKMPhysicsActor(parent)!=none)
+        bonecontroller=SkelControlSingleBone(LBSKMPhysicsActor(parent).SkeletalMeshComponent.FindSkelControl(BoneRotationController));
+        
     if (bonecontroller==none)
     {
         LogError("bonecontroller <"@BoneRotationController@"> not found!");    

@@ -4,7 +4,7 @@
  *  Creation date: 01.02.2017 01:16
  *  Copyright 2017, Windows7
  */
-class LBTransposeMechanism extends LBInteractableMechanism;
+class LBTransposeMechanism extends LBUnCoreHandleMechanism;
 
 enum CoordinateTypes
 {
@@ -87,16 +87,6 @@ function PreserveRotation(float dt)
 
 function PerformPhysics(float dt)
 {
-}
-
-function SetParentLocation(vector v)
-{
-    parent.SetLocation(v);
-}
-
-function SetParentRotation(rotator r)
-{
-    parent.SetRotation(r);
 }
 
 function AddParentLocation(vector v, optional bool bTickIndependent=TRUE, optional float deltatime=1, optional float seconds=1)

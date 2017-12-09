@@ -25,7 +25,7 @@ var(BoxArea) vector CheckingBoxExtent;
     
 function bool CheckSphereArea(actor a)
 {
-    if (a!=none && VSize(a.Location-TransformCoords(CheckingAreaCenter,CheckingAreaCoords)) <= CheckingSphereRadius)
+    if (a!=none && VSize(GetActorLocation(a)-TransformCoords(CheckingAreaCenter,CheckingAreaCoords)) <= CheckingSphereRadius)
         return true;
     else
         return false;    
@@ -34,9 +34,9 @@ function bool CheckSphereArea(actor a)
 function bool CheckBoxArea(actor a)
 {
     if (a!=none && 
-        a.Location.X >= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).X-CheckingBoxExtent.X && a.Location.X <= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).X+CheckingBoxExtent.X && 
-        a.Location.Y >= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).Y-CheckingBoxExtent.Y && a.Location.Y <= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).Y+CheckingBoxExtent.Y && 
-        a.Location.Z >= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).Z-CheckingBoxExtent.Z && a.Location.Z <= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).Z+CheckingBoxExtent.Z)
+        GetActorLocation(a).X >= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).X-CheckingBoxExtent.X && GetActorLocation(a).X <= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).X+CheckingBoxExtent.X && 
+        GetActorLocation(a).Y >= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).Y-CheckingBoxExtent.Y && GetActorLocation(a).Y <= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).Y+CheckingBoxExtent.Y && 
+        GetActorLocation(a).Z >= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).Z-CheckingBoxExtent.Z && GetActorLocation(a).Z <= TransformCoords(CheckingAreaCenter,CheckingAreaCoords).Z+CheckingBoxExtent.Z)
     {
         return true;
     }
@@ -61,7 +61,7 @@ function vector GetObjectOffset(actor a)
     local vector v;
 
     v=TransformCoords(CheckingAreaCenter,CheckingAreaCoords);
-    v=v-a.Location;
+    v=v-GetActorLocation(a);
     v.X=v.X/(CheckingBoxExtent.X);
     v.Y=v.Y/(CheckingBoxExtent.Y);
     v.Z=v.Z/(CheckingBoxExtent.Z);

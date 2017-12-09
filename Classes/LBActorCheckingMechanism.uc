@@ -4,7 +4,7 @@
  *  Creation date: 10.02.2017 19:51
  *  Copyright 2017, Windows7
  */
-class LBActorCheckingMechanism extends LBInteractableMechanism;
+class LBActorCheckingMechanism extends LBUnCoreHandleMechanism;
 
 struct ParamValue
 {

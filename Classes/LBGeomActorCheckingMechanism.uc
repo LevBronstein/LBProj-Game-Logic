@@ -39,12 +39,12 @@ function vector TransformCoords(vector p, CoordinateTypes coords)
     }   
     else if (coords==CoordinateType_Local)
     {
-        return p+parent.Location;
+        return p+GetParentLocation();
     }
     else if (coords==CoordinateType_LocalOriented)
     {
-        GetAxes(parent.Rotation,X,Y,Z);
-        v=parent.Location+X*p.X+Y*p.Y+Z*p.Z;
+        GetAxes(GetParentRotation(),X,Y,Z);
+        v=GetParentLocation()+X*p.X+Y*p.Y+Z*p.Z;
         return v;        
     }
 }

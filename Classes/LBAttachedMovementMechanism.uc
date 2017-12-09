@@ -9,10 +9,11 @@ class LBAttachedMovementMechanism extends LBTransposeMechanism;
 var(AttachTarget) actor AttachActor;
 var(AttachTarget) name AttachSocket;
 
-var(AttachOffset) vector LocOffset;
-var(AttachOffset) rotator OrbitOffset;
-var(AttachOffset) rotator RotOffset;
-var(AttachOffset) CoordinateTypes CoordSystem;
+var(AttachOffset) bool bUseOnlySocketData;
+var(AttachOffset) vector LocOffset <editcondition=!bUseOnlySocketData>;
+var(AttachOffset) rotator OrbitOffset <editcondition=!bUseOnlySocketData>;
+var(AttachOffset) rotator RotOffset <editcondition=!bUseOnlySocketData>;
+var(AttachOffset) CoordinateTypes CoordSystem <editcondition=!bUseOnlySocketData>;
 
 var(DefaultParams) EPhysics phys; 
 var(DefaultParams) bool bColActors, bBlockActors, bIgnoreEncroachers;
@@ -44,23 +45,30 @@ function PerformMovement(float dt)
         //If pawn has certain socket - attach to it, otherwise - to the root location
         if (pawn(AttachActor).Mesh.GetSocketByName(AttachSocket)!=none && pawn(AttachActor).Mesh.GetSocketWorldLocationAndRotation(AttachSocket, l, r, 0)==true)
         {
-            if (CoordSystem==CoordinateType_World)
-                parent.SetLocation(LocOffset);    
-            else if (CoordSystem==CoordinateType_Local)
-                parent.SetLocation(GetLocalLocation(LocOffset, l));
-            else if (CoordSystem==CoordinateType_LocalOriented)
-                parent.SetLocation(GetOrientedLocation(LocOffset, r+OrbitOffset, l)); 
-               
-             return;        
+            if (bUseOnlySocketData)
+            {
+                SetParentLocation(l);
+            }
+            else
+            {
+                if (CoordSystem==CoordinateType_World)
+                    SetParentLocation(LocOffset);    
+                else if (CoordSystem==CoordinateType_Local)
+                    SetParentLocation(GetLocalLocation(LocOffset, l));
+                else if (CoordSystem==CoordinateType_LocalOriented)
+                    SetParentLocation(GetOrientedLocation(LocOffset, r+OrbitOffset, l)); 
+            }   
+            
+            return;      
         }
     }
     
     if (CoordSystem==CoordinateType_World)
-        parent.SetLocation(LocOffset);    
+        SetParentLocation(LocOffset);    
     else if (CoordSystem==CoordinateType_Local)
-        parent.SetLocation(GetLocalLocation(LocOffset, AttachActor.Location));
+        SetParentLocation(GetLocalLocation(LocOffset, AttachActor.Location));
     else if (CoordSystem==CoordinateType_LocalOriented)
-        parent.SetLocation(GetOrientedLocation(LocOffset, AttachActor.Rotation+OrbitOffset, AttachActor.Location));          
+        SetParentLocation(GetOrientedLocation(LocOffset, AttachActor.Rotation+OrbitOffset, AttachActor.Location));          
   
 }
 
@@ -77,15 +85,22 @@ function PerformRotation(float dt)
     {
         if (pawn(AttachActor).Mesh.GetSocketByName(AttachSocket)!=none && pawn(AttachActor).Mesh.GetSocketWorldLocationAndRotation(AttachSocket, l, r, 0)==true)
         {
-            if (CoordSystem==CoordinateType_LocalOriented)
-                parent.SetRotation(r+RotOffset);  
+            if (bUseOnlySocketData)
+            {
+                SetParentRotation(r);
+            }
+            else
+            {
+                if (CoordSystem==CoordinateType_LocalOriented)
+                    SetParentRotation(r+RotOffset);  
+            }
                 
             return;
         }
     }
         
     if (CoordSystem==CoordinateType_LocalOriented)
-        parent.SetRotation(AttachActor.Rotation+RotOffset);
+        SetParentRotation(AttachActor.Rotation+RotOffset);
 }
 
 function SaveCollisionParams()

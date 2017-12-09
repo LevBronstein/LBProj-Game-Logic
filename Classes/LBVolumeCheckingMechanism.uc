@@ -46,7 +46,7 @@ function GetCheckingActors()
    
 function bool CustomActorCheck(actor a)
 {
-    if (a!=none && VSize(a.Location-TransformCoords(CheckingAreaCenter,CheckingAreaCoords)) <= dError)
+    if (a!=none && VSize(GetActorLocation(a)-TransformCoords(CheckingAreaCenter,CheckingAreaCoords)) <= dError)
         return true;
     else
         return false;
@@ -123,7 +123,7 @@ function float GetObjectDistance(actor a)
 
     v=TransformCoords(CheckingAreaCenter,CheckingAreaCoords);
     
-    l=VSize(a.Location-v);
+    l=VSize(GetActorLocation(a)-v);
 
     return l;    
 }
