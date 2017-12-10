@@ -40,7 +40,7 @@ function PerformMovement(float dt)
         return;
    
     //If parent is attached to a pawn, we can use sockets
-    if (pawn(AttachActor)!=none)
+    if (pawn(AttachActor)!=none || LBSKMPhysicsActor(AttachActor)!=none)
     {
         //If pawn has certain socket - attach to it, otherwise - to the root location
         if (pawn(AttachActor).Mesh.GetSocketByName(AttachSocket)!=none && pawn(AttachActor).Mesh.GetSocketWorldLocationAndRotation(AttachSocket, l, r, 0)==true)

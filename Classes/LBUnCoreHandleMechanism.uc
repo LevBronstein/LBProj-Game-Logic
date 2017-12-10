@@ -56,6 +56,11 @@ function SetParentRotation(rotator r)
     else if (LBSMPhysicsActor(parent)!=none || LBSKMPhysicsActor(parent)!=none)
         parent.CollisionComponent.SetRBRotation(r); 
 }
+    
+function bool GetSocket(actor a, name socketname, vector location, vector rotation)
+{
+    
+}
 
 defaultproperties
 {

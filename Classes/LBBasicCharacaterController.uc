@@ -65,6 +65,13 @@ var(ActionList) array<LBCharActionInfo> CharacterActionList;
 */
 var(ActionList) LBCharActionInfo DefaultAction;
 
+/* Tells which blend nodes (LBBlendByAction) does this mechanism control --
+ * updates only nodes, which have certain @GroupTag (GroupTag==ActionGroup)
+ * if left blank (ActionGroup==none), this  mechanism only works with blend nodes with @GroupTag==none
+ * for example -- characters facial animations can be updated independently of its walk animations
+ */
+var(ActionGroup) name ActionGroup;
+
 var array<LBBlendByAction> blendbyactionnodes; 
 var array<AnimNodeSequence> actionseqs;
 
@@ -248,42 +255,46 @@ function UpdateAnimationNodes(LBCharActionInfo actioninfo)
     {
         bfoundanynode=false; //если не найдём никакой анимации -- можем испльзовать ReservNode
         
-        for (j=0;j<blendbyactionnodes[i].Children.Length;j++)
-        {
-            if (blendbyactionnodes[i].Children[j].Name == actioninfo.ActionName)
-            {
-                blendbyactionnodes[i].SetActiveChild(j,actioninfo.ActionAnimBlendTime);
-                anim=blendbyactionnodes[i].Children[j].Anim;
-                //AnimNodeSequence(anim).SetPosition(0.0f,false);
-                //AnimNodeSequence(anim).PlayAnim(actioninfo.bLoopActionAnim,actioninfo.ActionAnimPlayRate,actioninfo.ActionAnimPlayPos); 
-                curanim=anim;
-                bfoundanynode=true;
-                //по умолчанию не трогаем -- там всё само регулируеются   
-                //if (actioninfo.ActionName != 'Default')
-                //{
-                if (actioninfo.ActionType!=ActionTypes_ContiniousOrNoAnim)
-                    anim.PlayAnim(actioninfo.bLoopActionAnim,actioninfo.ActionAnimPlayRate,actioninfo.ActionAnimPlayPos); //не нужно сразу проигрывать! просто перемотать время на 0.0, установить скорость а может и нет  
-                //}
-                //anim.PlayAnim();
-            }
-        }  
-        
-        //Если не нашли ни одного выхода, соотвествтующего действию -- можем просто передать на запасной выхода @ReserveNode
-        if (!bfoundanynode && blendbyactionnodes[i].bRUseReserveNode)
+        //Если данный механизм имеет право контролировать эту группу блэнд нодов
+        if (ActionGroup==blendbyactionnodes[i].GroupTag || (ActionGroup=='' && blendbyactionnodes[i].GroupTag==''))
         {
             for (j=0;j<blendbyactionnodes[i].Children.Length;j++)
             {
-                if (blendbyactionnodes[i].Children[j].Name == blendbyactionnodes[i].ReserveNode)
+                if (blendbyactionnodes[i].Children[j].Name == actioninfo.ActionName)
                 {
                     blendbyactionnodes[i].SetActiveChild(j,actioninfo.ActionAnimBlendTime);
-                    //anim=blendbyactionnodes[i].Children[j].Anim;
-                    //curanim=anim;
-                    //bfoundanynode=true;
-                    //if (actioninfo.ActionType!=ActionTypes_ContiniousOrNoAnim)
-                    //    anim.PlayAnim(actioninfo.bLoopActionAnim,actioninfo.ActionAnimPlayRate,actioninfo.ActionAnimPlayPos); //не нужно сразу проигрывать! просто перемотать время на 0.0, установить скорость а может и нет  
+                    anim=blendbyactionnodes[i].Children[j].Anim;
+                    //AnimNodeSequence(anim).SetPosition(0.0f,false);
+                    //AnimNodeSequence(anim).PlayAnim(actioninfo.bLoopActionAnim,actioninfo.ActionAnimPlayRate,actioninfo.ActionAnimPlayPos); 
+                    curanim=anim;
+                    bfoundanynode=true;
+                    //по умолчанию не трогаем -- там всё само регулируеются   
+                    //if (actioninfo.ActionName != 'Default')
+                    //{
+                    if (actioninfo.ActionType!=ActionTypes_ContiniousOrNoAnim)
+                        anim.PlayAnim(actioninfo.bLoopActionAnim,actioninfo.ActionAnimPlayRate,actioninfo.ActionAnimPlayPos); //не нужно сразу проигрывать! просто перемотать время на 0.0, установить скорость а может и нет  
+                    //}
+                    //anim.PlayAnim();
                 }
-            } 
-        }
+            }  
+        
+            //Если не нашли ни одного выхода, соотвествтующего действию -- можем просто передать на запасной выхода @ReserveNode
+            if (!bfoundanynode && blendbyactionnodes[i].bRUseReserveNode)
+            {
+                for (j=0;j<blendbyactionnodes[i].Children.Length;j++)
+                {
+                    if (blendbyactionnodes[i].Children[j].Name == blendbyactionnodes[i].ReserveNode)
+                    {
+                        blendbyactionnodes[i].SetActiveChild(j,actioninfo.ActionAnimBlendTime);
+                        //anim=blendbyactionnodes[i].Children[j].Anim;
+                        //curanim=anim;
+                        //bfoundanynode=true;
+                        //if (actioninfo.ActionType!=ActionTypes_ContiniousOrNoAnim)
+                        //    anim.PlayAnim(actioninfo.bLoopActionAnim,actioninfo.ActionAnimPlayRate,actioninfo.ActionAnimPlayPos); //не нужно сразу проигрывать! просто перемотать время на 0.0, установить скорость а может и нет  
+                    }
+                } 
+            }    
+        }   
     }    
 }
 
