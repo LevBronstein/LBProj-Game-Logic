@@ -39,37 +39,32 @@ function PerformMovement(float dt)
     if (AttachActor == none)
         return;
    
-    //If parent is attached to a pawn, we can use sockets
-    if (pawn(AttachActor)!=none || LBSKMPhysicsActor(AttachActor)!=none)
+    //If actor has certain socket - attach to it, otherwise - to the root location
+    if (GetSocket(AttachActor,AttachSocket,l,r,0))
     {
-        //If pawn has certain socket - attach to it, otherwise - to the root location
-        if (pawn(AttachActor).Mesh.GetSocketByName(AttachSocket)!=none && pawn(AttachActor).Mesh.GetSocketWorldLocationAndRotation(AttachSocket, l, r, 0)==true)
+        if (bUseOnlySocketData)
         {
-            if (bUseOnlySocketData)
-            {
-                SetParentLocation(l);
-            }
-            else
-            {
-                if (CoordSystem==CoordinateType_World)
-                    SetParentLocation(LocOffset);    
-                else if (CoordSystem==CoordinateType_Local)
-                    SetParentLocation(GetLocalLocation(LocOffset, l));
-                else if (CoordSystem==CoordinateType_LocalOriented)
-                    SetParentLocation(GetOrientedLocation(LocOffset, r+OrbitOffset, l)); 
-            }   
-            
-            return;      
+            SetParentLocation(l);
         }
+        else
+        {
+            if (CoordSystem==CoordinateType_World)
+                SetParentLocation(LocOffset);    
+            else if (CoordSystem==CoordinateType_Local)
+                SetParentLocation(GetLocalLocation(LocOffset, l));
+            else if (CoordSystem==CoordinateType_LocalOriented)
+                SetParentLocation(GetOrientedLocation(LocOffset, r+OrbitOffset, l)); 
+        }       
     }
-    
-    if (CoordSystem==CoordinateType_World)
-        SetParentLocation(LocOffset);    
-    else if (CoordSystem==CoordinateType_Local)
-        SetParentLocation(GetLocalLocation(LocOffset, AttachActor.Location));
-    else if (CoordSystem==CoordinateType_LocalOriented)
-        SetParentLocation(GetOrientedLocation(LocOffset, AttachActor.Rotation+OrbitOffset, AttachActor.Location));          
-  
+    else
+    {
+        if (CoordSystem==CoordinateType_World)
+            SetParentLocation(LocOffset);    
+        else if (CoordSystem==CoordinateType_Local)
+            SetParentLocation(GetLocalLocation(LocOffset, AttachActor.Location));
+        else if (CoordSystem==CoordinateType_LocalOriented)
+            SetParentLocation(GetOrientedLocation(LocOffset, AttachActor.Rotation+OrbitOffset, AttachActor.Location));    
+    }
 }
 
 function PerformRotation(float dt)
@@ -79,28 +74,25 @@ function PerformRotation(float dt)
 
     if (AttachActor == none)
         return;
-    
-    //If parent is attached to a pawn, we can use sockets
-    if (pawn(AttachActor)!=none)
-    {
-        if (pawn(AttachActor).Mesh.GetSocketByName(AttachSocket)!=none && pawn(AttachActor).Mesh.GetSocketWorldLocationAndRotation(AttachSocket, l, r, 0)==true)
-        {
-            if (bUseOnlySocketData)
-            {
-                SetParentRotation(r);
-            }
-            else
-            {
-                if (CoordSystem==CoordinateType_LocalOriented)
-                    SetParentRotation(r+RotOffset);  
-            }
-                
-            return;
-        }
-    }
         
-    if (CoordSystem==CoordinateType_LocalOriented)
-        SetParentRotation(AttachActor.Rotation+RotOffset);
+    //If actor has a certain socket - use it,
+    if (GetSocket(AttachActor,AttachSocket,l,r,0))
+    {
+        if (bUseOnlySocketData)
+        {
+            SetParentRotation(r);
+        }
+        else
+        {
+            if (CoordSystem==CoordinateType_LocalOriented)
+                SetParentRotation(r+RotOffset);  
+        }    
+    }
+    else
+    {
+        if (CoordSystem==CoordinateType_LocalOriented)
+            SetParentRotation(AttachActor.Rotation+RotOffset);   
+    }    
 }
 
 function SaveCollisionParams()

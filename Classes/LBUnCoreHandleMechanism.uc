@@ -55,11 +55,18 @@ function SetParentRotation(rotator r)
         parent.SetRotation(r);
     else if (LBSMPhysicsActor(parent)!=none || LBSKMPhysicsActor(parent)!=none)
         parent.CollisionComponent.SetRBRotation(r); 
+        `log(parent@parent.CollisionComponent);
 }
     
-function bool GetSocket(actor a, name socketname, vector location, vector rotation)
+function bool GetSocket(actor a, name socketname, out vector location, out rotator rotation, optional int space=0)
 {
-    
+    if (pawn(a)!=none && socketname!='' && pawn(a).Mesh.GetSocketByName(socketname)!=none)
+        return pawn(a).Mesh.GetSocketWorldLocationAndRotation(socketname, location, rotation, space);
+     
+    if (kasset(a)!=none && socketname!='' && kasset(a).SkeletalMeshComponent.GetSocketByName(socketname)!=none)
+        return kasset(a).SkeletalMeshComponent.GetSocketWorldLocationAndRotation(socketname, location, rotation, space);   
+       
+    return false; 
 }
 
 defaultproperties

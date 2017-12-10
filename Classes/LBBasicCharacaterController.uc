@@ -262,7 +262,8 @@ function UpdateAnimationNodes(LBCharActionInfo actioninfo)
             {
                 if (blendbyactionnodes[i].Children[j].Name == actioninfo.ActionName)
                 {
-                    blendbyactionnodes[i].SetActiveChild(j,actioninfo.ActionAnimBlendTime);
+                    //blendbyactionnodes[i].SetActiveChild(j,actioninfo.ActionAnimBlendTime); -> GetBlendTimeForOutput
+                    blendbyactionnodes[i].SetActiveChild(j,blendbyactionnodes[i].GetBlendTimeForOutput(j));  
                     anim=blendbyactionnodes[i].Children[j].Anim;
                     //AnimNodeSequence(anim).SetPosition(0.0f,false);
                     //AnimNodeSequence(anim).PlayAnim(actioninfo.bLoopActionAnim,actioninfo.ActionAnimPlayRate,actioninfo.ActionAnimPlayPos); 
@@ -279,7 +280,7 @@ function UpdateAnimationNodes(LBCharActionInfo actioninfo)
             }  
         
             //Если не нашли ни одного выхода, соотвествтующего действию -- можем просто передать на запасной выхода @ReserveNode
-            if (!bfoundanynode && blendbyactionnodes[i].bRUseReserveNode)
+            if (!bfoundanynode && blendbyactionnodes[i].bUseReserveNode)
             {
                 for (j=0;j<blendbyactionnodes[i].Children.Length;j++)
                 {
