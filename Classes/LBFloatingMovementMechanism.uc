@@ -17,9 +17,9 @@ function PerformMovement(float dt)
     {
         v=ForwardSpeed*kForwardSpeed*Vector(MoveDirection);
         
-        if (parent.Location.z < AttitudeZ || parent.Location.z > AttitudeZ)
+        if (GetParentLocation().z < AttitudeZ || GetParentLocation().z > AttitudeZ)
         {
-            v.z=Fclamp(AttitudeZ-parent.Location.z,-MaxSpeedZ,MaxSpeedZ);
+            v.z=Fclamp(AttitudeZ-GetParentLocation().z,-MaxSpeedZ,MaxSpeedZ);
         }
  
         parent.CollisionComponent.SetRBLinearVelocity(v); 
@@ -28,6 +28,15 @@ function PerformMovement(float dt)
     {
         super.PerformMovement(dt);
     }
+}
+
+function PerformRotation(float dt)
+{
+    if (LBSMPhysicsActor(parent)!=none || LBSKMPhysicsActor(parent)!=none)
+    {
+    }
+    else
+        parent.SetRotation(MoveDirection);
 }
 
 function SetParamFloat(name param, float value, optional int priority=0)

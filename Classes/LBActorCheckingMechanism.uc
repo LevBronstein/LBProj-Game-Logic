@@ -21,7 +21,10 @@ of the given array of actors @CheckingActors. Default is TRUE.
 WARNING: may be extremely slow!!!*/
 var(CheckingActors) bool bCheckAllActors; 
 
-var(CheckingActors) bool bCheckOnlyLBActors; 
+/*Set true to check only classes from @CheckingClasses or false to ignore all classes from @CheckingClasses*/
+var(CheckingActorsFilter) bool swApproveOrIgnoreCheckingClasses;
+/*Set classes of @CheckingActors, which are checked or ignored, or just leave empty*/
+var(CheckingActorsFilter) array<class> CheckingClasses;
 
 var(MechanismTick) bool bCheckEveryTick;
 
@@ -70,13 +73,37 @@ function PerfromTick(float dt)
 
 function bool CheckActorValidity(actor a)
 {
-    if (bCheckOnlyLBActors && !TargetIsLBObject(a))
+    local int i;
+    
+    if (CheckingClasses.Length>0)
     {
-        LogError("proc: CheckActorValidity(), actor"@a@"is not valid LB-Object");
-        return false;
+        if (swApproveOrIgnoreCheckingClasses)
+        {
+            //approve mode -- valid if is in list
+            for (i=0;i<CheckingClasses.Length;i++)    
+            {
+                if (a.class==CheckingClasses[i])
+                    return true;
+            }
+                
+            return false;
+        }
+        else
+        {
+            //ignore mode -- invalid if is in list
+            for (i=0;i<CheckingClasses.Length;i++)    
+            {
+                if (a.class==CheckingClasses[i])
+                {
+                    LogError("proc: CheckActorValidity(), actor"@a@"is not valid LB-Object");
+                    return false; 
+                }
+            } 
+            return true;
+        }   
     }
-
-    return true;    
+    else 
+        return true;    
 }
 
 /*Use this function to implement any custom code in derived class*/

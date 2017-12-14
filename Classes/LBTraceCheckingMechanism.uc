@@ -23,7 +23,7 @@ struct TraceInfo
 enum TraceOriginModes
 {
     TraceOriginModes_Default,
-    TraceOriginModes_PawnSocket,
+    TraceOriginModes_MeshSocket,
     TraceOriginModes_LocationRotation,
     TraceOriginModes_PredefinedOrigin, //Use @PredefLoc and @PredefRot
 };
@@ -55,7 +55,7 @@ function TraceInfo TraceRay(vector origin, vector target)
     
     mindist=MaxTraceLength;
     hit.hitloc=target;
-    
+
     foreach parent.TraceActors(class'Actor',a,hitloc,hitnormal,target,origin)
     {
         dist=hitloc-origin;
@@ -79,6 +79,8 @@ function TraceInfo TraceRay(vector origin, vector target)
     
     if (bShowDebugGraphics)
     {
+        parent.DrawDebugSphere(origin,1,8,128,0,0);
+        
         if (TargetIsLBObject(hit.hitactor))
             parent.DrawDebugLine(origin, hit.hitloc, 255, 0, 0);
         else if (hit.hitactor!=none || a!=none)
@@ -122,28 +124,29 @@ function TraceOrigin GetTraceOrigin(TraceOriginModes originmode, optional vector
     local vector l, d; 
     local rotator r;
     
-    p=LBPawn(parent);
+    //p=LBPawn(parent);
     
-    if (p!=none && originmode==TraceOriginModes_PawnSocket)
+    if (originmode==TraceOriginModes_MeshSocket)
     {
-        if (p.Mesh.GetSocketWorldLocationAndRotation(RayTraceOriginSocket, l, r, 0)!=false)
+        if (GetParentSocket(RayTraceOriginSocket, l, r, 0)!=false)
         {
             //origin.origdir=vect(0,0,1)>>r;
             origin.origloc=l;
-            origin.origdir=Vector(r);
+            origin.origdir=vector(r);
             //d=Normal(d);    
         }    
     }
     else if (originmode==TraceOriginModes_PredefinedOrigin)
     {
         origin.origloc=TransformCoords(pLoc,pCoord);
-        origin.origdir=Vector(parent.rotation+pRot);
+        origin.origdir=vector(GetParentRotation()+pRot);
         //d=Normal(d);     
     }
     else
     {
-        origin.origloc=parent.Location;
-        origin.origdir=vector(parent.Rotation);   
+        origin.origloc=GetParentLocation();
+        origin.origdir=vector(GetParentRotation());   
+        // `log(parent@GetParentLocation()@GetParentRotation()*unrrottodeg);
     }
     
     return origin;
@@ -185,7 +188,7 @@ function array<actor> GetActorsMatchingTrue()
     //}
 
     origin=GetTraceOrigin(TraceOriginMode,PredefLoc,PredefRot,PredefLocCoords);
-
+    
     hit=TraceRay(origin.origloc+origin.origdir*TraceStartOffset, origin.origloc+origin.origdir*MaxTraceLength);
     
     if (hit.hitactor!=none)

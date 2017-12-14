@@ -40,7 +40,7 @@ function PerformMovement(float dt)
         return;
    
     //If actor has certain socket - attach to it, otherwise - to the root location
-    if (GetSocket(AttachActor,AttachSocket,l,r,0))
+    if (GetActorSocket(AttachActor,AttachSocket,l,r,0))
     {
         if (bUseOnlySocketData)
         {
@@ -76,7 +76,7 @@ function PerformRotation(float dt)
         return;
         
     //If actor has a certain socket - use it,
-    if (GetSocket(AttachActor,AttachSocket,l,r,0))
+    if (GetActorSocket(AttachActor,AttachSocket,l,r,0))
     {
         if (bUseOnlySocketData)
         {
@@ -163,7 +163,7 @@ function SetParamRotator(name param, rotator value, optional int priority=0)
     if (param=='RotOffset' || param=='RotationOffset') 
     {
         RotOffset=value;
-        `log(">>>>>>>>>>>>>>>>>"@value);  
+        //`log(">>>>>>>>>>>>>>>>>"@value);  
     }    
 }
   
