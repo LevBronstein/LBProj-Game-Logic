@@ -141,6 +141,10 @@ function float RotateRoll(float dt)
 //FIX the interpolation, please!!!
 function PerformRotation(float dt)
 {
+    local vector X,Y,Z;
+    local rotator r;
+    local int boneid;
+    
     if (bonecontroller!=None)
     {
         if (bApplyYaw)
@@ -156,8 +160,16 @@ function PerformRotation(float dt)
             currot.Roll=RotateRoll(dt);
         } 
         
+        //if (bonecontroller.RotationSpaceBoneName!='')
+        //{
+        //    LogError("Bone with name"@bonecontroller.RotationSpaceBoneName@"was not found, cannot rotate child bone!");
+        //}
+        
+        //r=GetParentBoneRotation(bonecontroller.RotationSpaceBoneName);
+        //GetAxes(r,X,Y,Z);
+      
         if (bResolveFromWorldSpace)
-            bonecontroller.BoneRotation=ResolveRotator(currot,BoneRotationResolver);
+            bonecontroller.BoneRotation=ResolveRotator(currot,BoneRotationResolver); 
         else
             bonecontroller.BoneRotation=currot;
     }

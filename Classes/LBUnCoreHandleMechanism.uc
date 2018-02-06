@@ -45,7 +45,22 @@ function name FindRootBone(actor a)
     
     return '';
 }
+
+function array<name> GetActorBoneNames(actor a)
+{
+    local array<name> names;
     
+    if (LBPawn(a)!=none)
+    { 
+        LBPawn(a).Mesh.GetBoneNames(names);
+    }
+    else if (LBSKMPhysicsActor(a)!=none)
+    {
+        LBSKMPhysicsActor(a).SkeletalMeshComponent.GetBoneNames(names); 
+    }
+    return names;
+}
+   
 function rotator GetActorRotation(actor a)
 {
     if (LBActor(a)!=none || LBPawn(a)!=none)
@@ -66,6 +81,60 @@ function vector GetParentLocation()
         return parent.CollisionComponent.GetPosition();     
 }
     
+function vector GetActorBoneLocation(actor a, name bonename, optional int space)
+{
+    local vector v;
+    
+    if (LBSKMPhysicsActor(a)!=none)
+    {
+        v=LBSKMPhysicsActor(a).SkeletalMeshComponent.GetBoneLocation(bonename,space);
+        
+        return v;     
+    }  
+    else if (LBPawn(a)!=none)
+    {
+        v=LBPawn(a).Mesh.GetBoneLocation(bonename,space);
+        
+        return v;       
+    }
+    else
+        return vect(0,0,0);
+}
+    
+function vector GetParentBoneLocation(name bonename, optional int space)
+{
+    return GetActorBoneLocation(parent, bonename, space);   
+}
+    
+function rotator GetActorBoneRotation(actor a, name bonename)
+{
+    local vector X,Y,Z;  
+  
+    if (LBSKMPhysicsActor(a)!=none)
+    {
+        X=LBSKMPhysicsActor(a).SkeletalMeshComponent.GetBoneAxis(bonename,Axis_X);
+        Y=LBSKMPhysicsActor(a).SkeletalMeshComponent.GetBoneAxis(bonename,Axis_Y);
+        Z=LBSKMPhysicsActor(a).SkeletalMeshComponent.GetBoneAxis(bonename,Axis_Z);
+        
+        return OrthoRotation(X,Y,Z);     
+    }  
+    else if (LBPawn(a)!=none)
+    {
+        X=LBPawn(a).Mesh.GetBoneAxis(bonename,Axis_X);
+        Y=LBPawn(a).Mesh.GetBoneAxis(bonename,Axis_Y);
+        Z=LBPawn(a).Mesh.GetBoneAxis(bonename,Axis_Z);
+        
+        return OrthoRotation(X,Y,Z);       
+    }
+    else
+        return OrthoRotation(vect(1,0,0),vect(0,1,0),vect(0,0,1));
+}
+
+function rotator GetParentBoneRotation(name bonename)
+{
+    return GetActorBoneRotation(parent, bonename);   
+}
+
 function rotator GetParentRotation()
 {
     local rotator r;
@@ -73,19 +142,25 @@ function rotator GetParentRotation()
     
     if (LBActor(parent)!=none || LBPawn(parent)!=none)
         return parent.Rotation;
-    else if (LBSMPhysicsActor(parent)!=none || LBSKMPhysicsActor(parent)!=none)
+    else if (LBSKMPhysicsActor(parent)!=none)
     {
         //`log(LBSKMPhysicsActor(parent).SkeletalMeshComponent.PhysicsAssetInstance.Bodies[LBSKMPhysicsActor(parent).SkeletalMeshComponent.PhysicsAssetInstance.RootBodyIndex].GetUnrealWorldTM().XPlane.X);
         //LBSKMPhysicsActor(parent).SkeletalMeshComponent.TransformFromBoneSpace(FindRootBone(parent),vect(0,0,1),rot(0,0,0),v,r);
         X=LBSKMPhysicsActor(parent).SkeletalMeshComponent.GetBoneAxis(FindRootBone(parent),Axis_X);
-        parent.DrawDebugLine(parent.Location,parent.Location+X*256,255,0,0);
+        //parent.DrawDebugLine(parent.Location,parent.Location+X*256,255,0,0);
         Y=LBSKMPhysicsActor(parent).SkeletalMeshComponent.GetBoneAxis(FindRootBone(parent),Axis_Y);
-        parent.DrawDebugLine(parent.Location,parent.Location+Y*256,0,255,0);
+        //parent.DrawDebugLine(parent.Location,parent.Location+Y*256,0,255,0);
         Z=LBSKMPhysicsActor(parent).SkeletalMeshComponent.GetBoneAxis(FindRootBone(parent),Axis_Z);
-        parent.DrawDebugLine(parent.Location,parent.Location+Z*256,0,0,255);
+        //parent.DrawDebugLine(parent.Location,parent.Location+Z*256,0,0,255);
         //`log(OrthoRotation(X,Y,Z));
         return OrthoRotation(X,Y,Z);     
     }
+    else if (LBSMPhysicsActor(parent)!=none)
+    {
+        
+    }
+    
+    //GetRotation() ??
 }    
 
 function SetParentLocation(vector v)
