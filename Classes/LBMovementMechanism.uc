@@ -42,25 +42,29 @@ function PerformMovement(float dt)
 {
     if (bTickIndependent)
     {
-        if (LBActor(parent)!=none)
-            parent.SetLocation(parent.location+TickIndependentVector(ForwardSpeed,dt,MovementTimeScale));
-        else if (LBPawn(parent)!=none)
-            parent.Velocity=TickIndependentVector(ForwardSpeed,dt,MovementTimeScale);  
-        else if (LBSMPhysicsActor(parent)!=none)
-            LBSMPhysicsActor(parent).CollisionComponent.SetRBPosition(parent.Location+TickIndependentVector(ForwardSpeed,dt,MovementTimeScale));
-        else if (LBSKMPhysicsActor(parent)!=none)
-            LBSKMPhysicsActor(parent).CollisionComponent.SetRBPosition(parent.Location+TickIndependentVector(ForwardSpeed,dt,MovementTimeScale));
+        SetParentLocation(GetParentLocation()+TickIndependentVector(ForwardSpeed,dt,MovementTimeScale));
+        
+        //if (LBActor(parent)!=none)
+        //    parent.SetLocation(parent.location+TickIndependentVector(ForwardSpeed,dt,MovementTimeScale));
+        //else if (LBPawn(parent)!=none)
+        //    parent.Velocity=TickIndependentVector(ForwardSpeed,dt,MovementTimeScale);  
+        //else if (LBSMPhysicsActor(parent)!=none)
+        //    LBSMPhysicsActor(parent).CollisionComponent.SetRBPosition(parent.Location+TickIndependentVector(ForwardSpeed,dt,MovementTimeScale));
+        //else if (LBSKMPhysicsActor(parent)!=none)
+        //    LBSKMPhysicsActor(parent).CollisionComponent.SetRBPosition(parent.Location+TickIndependentVector(ForwardSpeed,dt,MovementTimeScale));
     }
     else
     {
-        if (LBActor(parent)!=none)
-            parent.SetLocation(parent.location+ForwardSpeed);
-        else if (LBPawn(parent)!=none)
-            parent.Velocity=ForwardSpeed;  
-        else if (LBSMPhysicsActor(parent)!=none)
-            LBSMPhysicsActor(parent).CollisionComponent.SetRBPosition(parent.Location+ForwardSpeed);    
-        else if (LBSKMPhysicsActor(parent)!=none)
-            LBSKMPhysicsActor(parent).CollisionComponent.SetRBPosition(parent.Location+ForwardSpeed);
+        SetParentLocation(GetParentLocation()+ForwardSpeed);
+        
+        //if (LBActor(parent)!=none)
+        //    parent.SetLocation(parent.location+ForwardSpeed);
+        //else if (LBPawn(parent)!=none)
+        //    parent.Velocity=ForwardSpeed;  
+        //else if (LBSMPhysicsActor(parent)!=none)
+        //    LBSMPhysicsActor(parent).CollisionComponent.SetRBPosition(parent.Location+ForwardSpeed);    
+        //else if (LBSKMPhysicsActor(parent)!=none)
+        //    LBSKMPhysicsActor(parent).CollisionComponent.SetRBPosition(parent.Location+ForwardSpeed);
     }
 }
 
@@ -68,56 +72,27 @@ function PerformRotation(float dt)
 {    
     if (bTickIndependent)
     {
-        if (LBActor(parent)!=none || LBPawn(parent)!=none)
-            parent.SetRotation(parent.Rotation+TickIndependentRotator(AngularSpeed,dt,RotationTimeScale));
-        else if (LBSMPhysicsActor(parent)!=none)
-            LBSMPhysicsActor(parent).CollisionComponent.SetRBRotation(parent.Rotation+TickIndependentRotator(AngularSpeed,dt,RotationTimeScale));
-        else if (LBSKMPhysicsActor(parent)!=none)
-            LBSKMPhysicsActor(parent).CollisionComponent.SetRBRotation(parent.Rotation+TickIndependentRotator(AngularSpeed,dt,RotationTimeScale));
+        SetParentRotation(GetParentRotation()+TickIndependentRotator(AngularSpeed,dt,RotationTimeScale));
+        
+        //if (LBActor(parent)!=none || LBPawn(parent)!=none)
+        //    parent.SetRotation(parent.Rotation+TickIndependentRotator(AngularSpeed,dt,RotationTimeScale));
+        //else if (LBSMPhysicsActor(parent)!=none)
+        //    LBSMPhysicsActor(parent).CollisionComponent.SetRBRotation(parent.Rotation+TickIndependentRotator(AngularSpeed,dt,RotationTimeScale));
+        //else if (LBSKMPhysicsActor(parent)!=none)
+        //    LBSKMPhysicsActor(parent).CollisionComponent.SetRBRotation(parent.Rotation+TickIndependentRotator(AngularSpeed,dt,RotationTimeScale));
     }
     else
     {
-        if (LBActor(parent)!=none || LBPawn(parent)!=none)
-            parent.SetRotation(parent.Rotation+AngularSpeed);
-        else if (LBSMPhysicsActor(parent)!=none)
-            LBSMPhysicsActor(parent).CollisionComponent.SetRBRotation(parent.Rotation+AngularSpeed);
-        else if (LBSKMPhysicsActor(parent)!=none)
-            LBSKMPhysicsActor(parent).CollisionComponent.SetRBRotation(parent.Rotation+AngularSpeed);
+        SetParentRotation(GetParentRotation()+AngularSpeed);
+        
+        //if (LBActor(parent)!=none || LBPawn(parent)!=none)
+        //    parent.SetRotation(parent.Rotation+AngularSpeed);
+        //else if (LBSMPhysicsActor(parent)!=none)
+        //    LBSMPhysicsActor(parent).CollisionComponent.SetRBRotation(parent.Rotation+AngularSpeed);
+        //else if (LBSKMPhysicsActor(parent)!=none)
+        //    LBSKMPhysicsActor(parent).CollisionComponent.SetRBRotation(parent.Rotation+AngularSpeed);
     }
 }
-
-//function GetParameters()
-//{
-//    if (SpeedXSrc.bUseSource)
-//    {
-//        ForwardSpeed.X=GetTargetParamFloat(SpeedXSrc.SourceActor, SpeedXSrc.SourceMechanismName, SpeedXSrc.SourceParamName);
-//    }
-//    
-//    if (SpeedYSrc.bUseSource)
-//    {
-//        ForwardSpeed.Y=GetTargetParamFloat(SpeedYSrc.SourceActor, SpeedYSrc.SourceMechanismName, SpeedYSrc.SourceParamName);
-//    }
-//    
-//    if (SpeedZSrc.bUseSource)
-//    {
-//        ForwardSpeed.Z=GetTargetParamFloat(SpeedZSrc.SourceActor, SpeedZSrc.SourceMechanismName, SpeedZSrc.SourceParamName);
-//    }
-//    
-//    if (AngSpeedYawSrc.bUseSource)
-//    {
-//        AngularSpeed.Yaw=GetTargetParamFloat(AngSpeedYawSrc.SourceActor, AngSpeedYawSrc.SourceMechanismName, AngSpeedYawSrc.SourceParamName);
-//    }
-//    
-//    if (AngSpeedPitchSrc.bUseSource)
-//    {
-//        AngularSpeed.Pitch=GetTargetParamFloat(AngSpeedPitchSrc.SourceActor, AngSpeedPitchSrc.SourceMechanismName, AngSpeedPitchSrc.SourceParamName);
-//    }
-//    
-//    if (AngSpeedRollSrc.bUseSource)
-//    {
-//        AngularSpeed.Roll=GetTargetParamFloat(AngSpeedRollSrc.SourceActor, AngSpeedRollSrc.SourceMechanismName, AngSpeedRollSrc.SourceParamName);
-//    }
-//}
 
 function vector GetParamVector(name param)
 {

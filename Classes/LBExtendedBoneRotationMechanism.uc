@@ -37,6 +37,7 @@ function ChangeBehaviorMode(int newmode)
     }
 }
 
+//Здесь должен быть GetParentBoneRotation() вместо GetParentRotation()
 function Rotator GetTargetRotation()
 {
     local vector v, X,Y,Z;
@@ -152,27 +153,6 @@ function Rotator GetTargetRotation()
     {
         return super.GetTargetRotation();  
     }
-}
-
-function DGDisplayBoneRotation()
-{
-    local rotator r;
-    local vector v,X,Y,Z;
-    
-    //parent.DrawDebugLine(parent.Location+vect(0,0,96),parent.Location+LocalCoords.X*64+vect(0,0,96),128,0,0);  
-    //parent.DrawDebugLine(parent.Location+vect(0,0,96),parent.Location+LocalCoords.Y*64+vect(0,0,96),0,128,0);   
-    //parent.DrawDebugLine(parent.Location+vect(0,0,96),parent.Location+LocalCoords.Z*64+vect(0,0,96),0,0,128); 
-    
-    GetAxes(currot,X,Y,Z);
-    //`log(currot*unrrottodeg);
-    
-    //v=(LookAtActor.Location-parent.Location).X*X+(LookAtActor.Location-parent.Location).Y*Y+(LookAtActor.Location-parent.Location).Z*Z;
-    //
-    //parent.DrawDebugLine(parent.Location+vect(0,0,96),parent.Location+X*64+vect(0,0,96),128,0,0);  
-    //parent.DrawDebugLine(parent.Location+vect(0,0,96),parent.Location+Y*64+vect(0,0,96),0,128,0);   
-    //parent.DrawDebugLine(parent.Location+vect(0,0,96),parent.Location+Z*64+vect(0,0,96),0,0,128); 
-    //
-    //parent.DrawDebugLine(parent.Location+vect(0,0,96),parent.Location+v*128+vect(0,0,96),128,128,128);
 }
 
 //function rotator GetExtendedTargetRotation(float dt)

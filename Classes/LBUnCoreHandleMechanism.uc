@@ -169,7 +169,7 @@ function SetParentLocation(vector v)
         parent.SetLocation(v);
     else if (LBSMPhysicsActor(parent)!=none || LBSKMPhysicsActor(parent)!=none)
     {
-        parent.SetLocation(v);
+        //parent.SetLocation(v);
         parent.CollisionComponent.SetRBPosition(v);    
     }
 }

@@ -20,6 +20,7 @@ var(BoneRotation) bool bApplyRoll;
 var(BoneRotationCoords) bool bResolveFromWorldSpace;
 //All rotations are made in world space and the translated to local (bone, socket, etc) space
 var(BoneRotationCoords) RotatorResolver BoneRotationResolver <editcondition=bResolveFromWorldSpace>; 
+var(BoneRotationCoords) Rotator AdditionalAngle; //Set to a certain value (in degrees), when your mesh is rotated by default (rotation offset)
 
 var(BoneRotationRestraint) RotationRestraint YawRestraint; 
 var(BoneRotationRestraint) RotationRestraint PitchRestraint; 
@@ -36,6 +37,9 @@ var(BoneRotationMechanismSystem) Name BoneRotationController; //Which controller
 var(BoneRotationMechanismSystem) bool bTranslateFromDegToUnrrot; //Set to true when all input data is given in degrees
 
 var(BoneRotation) rotator TargetRotation;
+
+var(MechanismDebug) bool bShowDebugGraphics;
+var(MechanismDebug) name debugRealBone; //A real bone, which is ran bu current skel controller. ONLY FOR DEBUG!
 
 var SkelControlSingleBone bonecontroller;
 
@@ -65,7 +69,9 @@ function PerfromTick(float dt)
     super.PerfromTick(dt);
 
     PerformRotation(dt); 
-    DGDisplayBoneRotation();
+
+    if (bShowDebugGraphics)
+        DGDisplayBoneRotation();
 }
 
 function rotator GetTargetRotation()
@@ -141,7 +147,6 @@ function float RotateRoll(float dt)
 //FIX the interpolation, please!!!
 function PerformRotation(float dt)
 {
-    local vector X,Y,Z;
     local rotator r;
     local int boneid;
     
@@ -167,7 +172,13 @@ function PerformRotation(float dt)
         
         //r=GetParentBoneRotation(bonecontroller.RotationSpaceBoneName);
         //GetAxes(r,X,Y,Z);
-      
+        
+       
+        
+        //currot.Yaw=rotator(GetParentLocation()-vect(-4992,15648,200)).Yaw+90*degtounrrot-GetParentRotation().Yaw;
+        
+        currot=currot+AdditionalAngle*degtounrrot; //костыль?!
+        
         if (bResolveFromWorldSpace)
             bonecontroller.BoneRotation=ResolveRotator(currot,BoneRotationResolver); 
         else
@@ -177,11 +188,19 @@ function PerformRotation(float dt)
 
 function DGDisplayBoneRotation()
 {
+    local vector X,Y,Z;
 
+    GetAxes(GetParentRotation(),X,Y,Z);
     
-    //r=OrthoRotation(X,Y,Z);
+    parent.DrawDebugLine(GetParentLocation()+X*128,GetParentLocation()+X*256,255,0,0);
+    parent.DrawDebugLine(GetParentLocation()+Y*128,GetParentLocation()+Y*256,0,255,0);
+    parent.DrawDebugLine(GetParentLocation()+Z*128,GetParentLocation()+Z*256,0,0,255);
     
-    //parent.DrawDebugLine(parent.Location+vect(0,0,96),parent.Location+vector(r)*128+vect(0,0,96),128,128,128); 
+    GetAxes(GetParentBoneRotation(debugRealBone),X,Y,Z);
+  
+    parent.DrawDebugLine(GetParentBoneLocation(debugRealBone),GetParentLocation()+X*128,255,0,0);
+    parent.DrawDebugLine(GetParentBoneLocation(debugRealBone),GetParentLocation()+Y*128,0,255,0);
+    parent.DrawDebugLine(GetParentBoneLocation(debugRealBone),GetParentLocation()+Z*128,0,0,255);
 }
 
 function SetParamFloat(name param, float value, optional int priority=0)
